@@ -7,19 +7,17 @@ import com.github.codegenerator.common.spi.viewer.Viewer;
 import com.github.codegenerator.common.spi.viewer.ViewerInfo;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
-import org.springframework.boot.system.ApplicationHome;
-import org.springframework.util.ClassUtils;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ServiceLoader;
 
 @WebListener
 public class GeneratorInitListener implements ServletContextListener {
+
+    //web运行时调试jar环境
+    private boolean debug = false;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -44,6 +42,13 @@ public class GeneratorInitListener implements ServletContextListener {
     }
 
     private void initInnerTmpTree(){
+        if(debug){
+            String selfJarPath = FileUtils.concatPath("/Users/user/Desktop","code-generator.jar");
+            String innerPath = FileUtils.concatPath("BOOT-INF","classes","templates",ContextContainer.DEFAULT_TMP_TREE,"/");
+            FileUtils.copyDirFromJar(selfJarPath,innerPath,FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,ContextContainer.DEFAULT_TMP_TREE));
+            return;
+        }
+
         //jar运行时，jar包内部不支持采用File方式copy，只能用流
         if(ContextContainer.ENV_JAR){
             String selfJarPath = FileUtils.concatPath(ContextContainer.RUNNING_PATH,ContextContainer.RUNNING_JAR_NAME);

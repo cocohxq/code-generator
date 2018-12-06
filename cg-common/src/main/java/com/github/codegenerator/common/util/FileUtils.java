@@ -429,11 +429,11 @@ public class FileUtils {
         int index = 0;
         for(String path : paths){
             //去除每个path的首尾的路径分隔符  首path不去头/
-            if(path.startsWith(File.separator) && index != 0 && path.length() > 1){
+            if(path.startsWith(File.separator) && index != 0){
                 path = path.substring(1);
             }
             //尾path不去末尾/
-            if(path.endsWith(File.separator) && index != paths.length-1 && path.length() > 1){
+            if(path.endsWith(File.separator) && index != paths.length-1){
                 path = path.substring(0,path.length()-1);
             }
             //添加分隔符

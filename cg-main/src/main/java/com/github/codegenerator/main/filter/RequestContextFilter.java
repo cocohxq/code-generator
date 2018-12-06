@@ -25,7 +25,7 @@ public class RequestContextFilter implements Filter {
         if(req.getRequestURI().endsWith("/init")){
             context = new SessionGenerateContext();
             context.setSessionId(req.getSession().getId());
-            context.getGenerateInfo().setCodepath(FileUtils.concatPath(ContextContainer.USER_CODE_DIR,context.getSessionId()+"/"));
+            context.getGenerateInfo().setCodepath(FileUtils.concatPath(ContextContainer.USER_CODE_DIR,context.getSessionId(),"/"));
             //访问首页时，重置会话对应的上下文
             ContextContainer.getSessionContext().put(req.getSession().getId(),context);
         }else{
