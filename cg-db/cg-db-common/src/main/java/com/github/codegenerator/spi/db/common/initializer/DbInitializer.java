@@ -19,11 +19,6 @@ import java.util.List;
 
 public abstract class DbInitializer extends AbstractInitializer {
 
-    private final static String TABLE_NAME = "TABLE_NAME";
-    private final static String TABLE_COMMENT = "REMARKS";
-    private final static String COLUMN_NAME = "COLUMN_NAME";
-    private final static String COLUMN_TYPE = "TYPE_NAME";
-    private final static String COLUMN_COMMENT = "REMARKS";
 
     @Override
     public boolean before(SessionGenerateContext context) {
@@ -53,19 +48,22 @@ public abstract class DbInitializer extends AbstractInitializer {
             Database db = new Database(DbEnum.getDbByType(getDbType()).getDriver(),cfg.getUsername(),cfg.getPwd(),getJdbcUrl(cfg.getIp(),cfg.getPort(),cfg.getDbName()),cfg.getDbName());
             cn = DbUtils.getConnection(db);
 
-            DatabaseMetaData metaData = cn.getMetaData();
+            //使用JDBC此种方式 可能会出现获取的字段类型同数据库字段类型不一致的问题 eg：db-tinyint(1) 会被读取成BIT 从而转换成boolean
+            //DatabaseMetaData metaData = cn.getMetaData();
             //提取表
-            tablesSet = metaData.getTables(null,"%","%",new String[]{"TABLE"});
+            //tablesSet = metaData.getTables(null,"%","%",new String[]{"TABLE"});
+
+
+            List<Table> tables = getTables(cn,cfg.getDbName());
+
 
             List<TableMeta> tableList = new ArrayList<>();
-            while (tablesSet.next()){
-                Table table = getTable(tablesSet,db.getDbName());
+            for(Table table : tables){
                 if(null == table || null == table.getTableName() || "".equals(table.getTableName())){
                     throw new RuntimeException("can`t find tables in database "+cfg.getDbName());
                 }
                 //提取表对应的所有列
-                columnsRet =  metaData.getColumns(null,"%",table.getTableName(),"%");
-                List<Column> columns = getColumns(columnsRet);
+                List<Column> columns = getColumns(cn,cfg.getDbName(),table.getTableName());
                 if(null == columns){
                     throw new RuntimeException("table: "+table.getTableName()+"can`t find colums");
                 }
@@ -129,44 +127,12 @@ public abstract class DbInitializer extends AbstractInitializer {
 
     public abstract String getJdbcUrl(String ip,String port,String dbName);
 
-
-    /**
-     * 获取表名
-     * @return
-     */
-    public Table getTable(ResultSet curTable,String dbName){
-        try {
-            Table table = new Table();
-            table.setTableName(curTable.getString(TABLE_NAME));
-            table.setComment(curTable.getString(TABLE_COMMENT));
-            return table;
-        } catch (Exception e) {
-            LogUtils.error("initiailze db getTableName error",e,this.getClass());
-            return null;
-        }
-    }
-
     /**
      * 获取列
      * @param
      * @return
      */
-    public List<Column> getColumns(ResultSet allColums){
-        try {
-            List<Column> list = new ArrayList<>();
-            while(allColums.next()){
-                Column column = new Column();
-                column.setColumnName(allColums.getString(COLUMN_NAME));
-                column.setColumnType(allColums.getString(COLUMN_TYPE));
-                column.setComment(allColums.getString(COLUMN_COMMENT));
-                list.add(column);
-            }
-            return list;
-        } catch (Exception e) {
-            LogUtils.error("initiailze db getColumns error",e,this.getClass());
-        }
-        return null;
-    }
+    public abstract List<Column> getColumns(Connection cn,String dbName,String tableName);
 
     /**
      * 根据数据列数据类型来转换java类型
@@ -180,46 +146,5 @@ public abstract class DbInitializer extends AbstractInitializer {
         return StepEnum.STEP_DB.getType();
     }
 
-
-    /*
-
-    原始的获取元数据的方法
-
-    tabStmt = cn.createStatement();
-            tablesSet = tabStmt.executeQuery(sqlQueryTables());
-
-            List<TableMeta> tableList = new ArrayList<>();
-            while (tablesSet.next()){
-                String tableName = getTableName(tablesSet,db.getDbName());
-                if(null == tableName || "".equals(tableName)){
-                    throw new RuntimeException("can`t find tables in database "+cfg.getDbName());
-                }
-                Table table = new Table();
-                table.setTableName(tableName);
-                colStmt = cn.createStatement();
-                columnsRet =  colStmt.executeQuery(sqlQueryTableColumns(tableName));
-                List<Column> columns = getColumns(columnsRet);
-                if(null == columns){
-                    throw new RuntimeException("table: "+tableName+"can`t find colums");
-                }
-                table.setColumnList(columns);
-                //根据表信息构建表对应的对象信息
-                TableMeta tableMeta = new TableMeta();
-                tableList.add(tableMeta);
-                tableMeta.setTable(table);
-                tableMeta.setTableCamelNameMin(BuildUtils.conver2CameltName(tableName));//表名转换为驼峰命名
-                List<FieldMeta> list = new ArrayList<>(columns.size());
-                tableMeta.setFields(list);
-                columns.stream().forEach(l -> {
-                    FieldMeta fieldMeta = new FieldMeta();
-                    fieldMeta.setColumn(l);
-                    fieldMeta.setFieldName(BuildUtils.conver2CameltName(l.getColumnName()));
-                    fieldMeta.setFieldType(convertType(l.getColumnType()));
-                    list.add(fieldMeta);
-                });
-            }
-            db.setTableList(tableList);
-            context.setDatabase(db);
-
-     */
+    public abstract List<Table> getTables(Connection cn,String dbName);
 }

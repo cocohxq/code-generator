@@ -11,7 +11,7 @@
     </resultMap>
 
     <sql id="selectColumnList">
-        select
+        select id id,
     <#list tableMeta.fields as field>
         <#if field_index == 0>${field.column.columnName}<#else>,${field.column.columnName}</#if>
     </#list>
@@ -21,20 +21,20 @@
         where 1=1
     <#list tableMeta.fields as field>
         <if test="${field.fieldName} != null">
-            and ${field.column.columnName}=${r'#'}{field.fieldName}
+            and ${field.column.columnName}=${r'#'}{${field.fieldName}}
         </if>
     </#list>
     </sql>
 
 
-    <insert id="insert" parameterType="${tableCamelName}DO">
+    <insert id="insert" parameterType="${commonValueStack.getValue(tableCamelName + "DO.classPath")!""}">
         insert into(
 		<#list tableMeta.fields as field>
             <#if field_index == 0>${field.column.columnName}<#else>,${field.column.columnName}</#if>
         </#list>
         ) value(
 		<#list tableMeta.fields as field>
-            <#if field_index == 0>${r'#'}{field.fieldName}<#else >,${r'#'}{field.fieldName}</#if>
+            <#if field_index == 0>${r'#'}{${field.fieldName}}<#else >,${r'#'}{${field.fieldName}}</#if>
         </#list>
         )
         <selectKey keyProperty="id" resultType="long" order="AFTER">
@@ -62,7 +62,7 @@
     </select>
 
 
-    <select id="query" resultMap="${tableCamelName}Result" parameterType="${tableCamelName}Query">
+    <select id="query" resultMap="${tableCamelName}Result" parameterType="${commonValueStack.getValue(tableCamelName + "Query.classPath")!""}">
         select
         <include refid="selectColumnList" />
         from ${tableMeta.table.tableName}
@@ -71,7 +71,7 @@
     </select>
 
 
-    <select id="count" resultType="int" parameterType="${tableCamelName}Query">
+    <select id="count" resultType="int" parameterType="${commonValueStack.getValue(tableCamelName + "Query.classPath")!""}">
         select
         count(id)
         from ${tableMeta.table.tableName}
@@ -79,12 +79,12 @@
     </select>
 
 
-    <update id="updateById" parameterType="${tableCamelName}DO">
+    <update id="updateById" parameterType="${commonValueStack.getValue(tableCamelName + "DO.classPath")!""}">
         update ${tableMeta.table.tableName}
         set
 		<#list tableMeta.fields as field>
         <if test="${field.fieldName} != null">
-            <#if field_index &gt; 0>,</#if>${field.column.columnName}=${r'#'}{field.fieldName}
+            <#if field_index &gt; 0>,</#if>${field.column.columnName}=${r'#'}{${field.fieldName}}
         </if>
         </#list>
         where id = ${r'#'}{id}

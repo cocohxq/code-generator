@@ -372,7 +372,7 @@ function step0Callback(data){
         $("#tables").focus();
         return true;
     }else{
-        $.messager.alert('error','数据库连接失败，请检查配置');
+        $.messager.alert('error','数据库表数据初始化失败，请检查配置');
         return false;
     }
 
