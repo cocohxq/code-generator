@@ -1,0 +1,2 @@
+com.github.codegenerator.main.spi.initializer.TmpInitializer
+com.github.codegenerator.main.spi.initializer.PreviewInitializer

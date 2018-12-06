@@ -1,0 +1,2 @@
+com.github.codegenerator.spi.db.mysql.initializer.MysqlInitializer
+com.github.codegenerator.spi.db.mysql.initializer.MysqlTableInitializer
