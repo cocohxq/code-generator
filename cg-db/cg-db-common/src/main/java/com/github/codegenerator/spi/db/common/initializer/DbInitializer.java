@@ -75,7 +75,7 @@ public abstract class DbInitializer extends AbstractInitializer {
                 List<FieldMeta> list = new ArrayList<>(columns.size());
                 tableMeta.setFields(list);
                 //这里不把id放入field数组
-                columns.stream().filter(l -> !l.getColumnName().equalsIgnoreCase("id")).forEach(l -> {
+                columns.stream().forEach(l -> {
                     FieldMeta fieldMeta = new FieldMeta();
                     fieldMeta.setColumn(l);
                     fieldMeta.setFieldName(BuildUtils.conver2CameltName(l.getColumnName()));

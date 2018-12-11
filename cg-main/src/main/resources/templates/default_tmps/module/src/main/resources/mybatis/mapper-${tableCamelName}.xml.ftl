@@ -84,9 +84,10 @@
         set
 		<#list tableMeta.fields as field>
         <if test="${field.fieldName} != null">
-            <#if field_index &gt; 0>,</#if>${field.column.columnName}=${r'#'}{${field.fieldName}}
+            ${field.column.columnName}=${r'#'}{${field.fieldName}},
         </if>
         </#list>
+        id=id
         where id = ${r'#'}{id}
     </update>
 
@@ -97,10 +98,11 @@
             set
             <#list tableMeta.fields as field>
             <if test="item.${field.fieldName} != null">
-                <#if field_index &gt; 0>,</#if>${field.column.columnName}=${r'#'}{item.${field.fieldName}}
+                ${field.column.columnName}=${r'#'}{item.${field.fieldName}},
             </if>
             </#list>
-                where id = ${r'#'}{item.id};
+            id=id
+            where id = ${r'#'}{item.id};
         </foreach>
     </update>
 
