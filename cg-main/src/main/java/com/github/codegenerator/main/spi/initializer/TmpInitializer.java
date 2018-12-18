@@ -55,10 +55,21 @@ public class TmpInitializer extends AbstractInitializer {
                         targetFileName = FileUtils.concatPath(targetFileName.substring(0, 1).toUpperCase()+targetFileName.substring(1));
                         tableRelatedMap.put("javaClassName", targetFileName.replace(".java",""));//eg: CarEntity
                         //java文件，则放置一些import
-                        boolean hasDate = k.getFields().stream().filter(m -> m.getFieldType().indexOf("Date") > -1).count() > 0 ? true : false;
-                        if (hasDate) {
-                            tableRelatedMap.put("javaImports", Arrays.asList("java.util.Date"));
-                        }
+                        k.getFields().stream().forEach(t -> {
+                            List<String> importList = (List<String>)tableRelatedMap.get("javaImports");
+                            if(null == importList){
+                                importList = new ArrayList<>();
+                                tableRelatedMap.put("javaImports",importList);
+                            }
+
+                            if(t.getFieldType().indexOf("Date") > -1){
+                                importList.add("java.util.Date");
+                            }
+                            if(t.getFieldType().indexOf("BigDecimal") > -1){
+                                importList.add("java.math.BigDecimal");
+                            }
+                        });
+
                         //生成模板对应的package路径 a.b.c,java模板package用
                         String javaPackage = ((String)tableRelatedMap.get("targetFileDir")).replace(generateInfo.getCodepath(), "").replace("module/src/main/java/","").replace("/",".");
                         if(!javaPackage.trim().equals("")) {

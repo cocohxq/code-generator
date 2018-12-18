@@ -9,7 +9,7 @@ import ${commonValueStack.getValue("BaseDO.classPath")!""};
  * ${tableMeta.table.comment!''}
  *
  */
-public class ${javaClassName} extend BaseDO{
+public class ${javaClassName} extends BaseDO{
 
 <#list tableMeta.fields as field>
 	// ${field.column.comment!''}
