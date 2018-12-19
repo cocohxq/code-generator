@@ -29,11 +29,11 @@
 
     <insert id="insert" parameterType="${commonValueStack.getValue(tableCamelName + "DO.classPath")!""}">
         insert into(
-		<#list tableMeta.fields as field>
+		<#list tableMeta.noIdFields as field>
             <#if field_index == 0>${field.column.columnName}<#else>,${field.column.columnName}</#if>
         </#list>
         ) value(
-		<#list tableMeta.fields as field>
+		<#list tableMeta.noIdFields as field>
             <#if field_index == 0>${r'#'}{${field.fieldName}}<#else >,${r'#'}{${field.fieldName}}</#if>
         </#list>
         )
@@ -75,19 +75,18 @@
         select
         count(id)
         from ${tableMeta.table.tableName}
-        <include refid="queryWhereSql"
+        <include refid="queryWhereSql" />
     </select>
 
 
     <update id="updateById" parameterType="${commonValueStack.getValue(tableCamelName + "DO.classPath")!""}">
         update ${tableMeta.table.tableName}
         set
-		<#list tableMeta.fields as field>
+		<#list tableMeta.noIdFields as field>
         <if test="${field.fieldName} != null">
             ${field.column.columnName}=${r'#'}{${field.fieldName}},
         </if>
         </#list>
-        id=id
         where id = ${r'#'}{id}
     </update>
 
@@ -96,12 +95,11 @@
         <foreach collection="list" item="item" open=" " separator=" " close="">
             update ${tableMeta.table.tableName}
             set
-            <#list tableMeta.fields as field>
+            <#list tableMeta.noIdFields as field>
             <if test="item.${field.fieldName} != null">
                 ${field.column.columnName}=${r'#'}{item.${field.fieldName}},
             </if>
             </#list>
-            id=id
             where id = ${r'#'}{item.id};
         </foreach>
     </update>
