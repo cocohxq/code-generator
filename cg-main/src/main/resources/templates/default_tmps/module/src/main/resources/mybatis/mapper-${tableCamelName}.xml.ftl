@@ -28,7 +28,7 @@
 
 
     <insert id="insert" parameterType="${commonValueStack.getValue(tableCamelName + "DO.classPath")!""}">
-        insert into(
+        insert into ${tableMeta.table.tableName}(
 		<#list tableMeta.noIdFields as field>
             <#if field_index == 0>${field.column.columnName}<#else>,${field.column.columnName}</#if>
         </#list>
