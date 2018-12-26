@@ -8,6 +8,9 @@ public class FieldMeta {
 
     private Column column;
 
+    //orm框架中对应的常量值  比如时间now(),deleted的1
+    private String ormConstantValue;
+
     public String getFieldName() {
         return fieldName;
     }

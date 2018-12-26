@@ -5,7 +5,7 @@ import java.util.List;
 public class Config {
 
     //当前提交step
-    private Integer stepType;
+    private transient Integer stepType;
 
     //step0
     private String ip;
@@ -15,12 +15,18 @@ public class Config {
     private String dbName;
     private String groupId;
     private Integer dbType;
+    private String outBusiPack;
+    private String inBusiPack;
+    private Integer codeLocationType;
+    private String createTimeStr;
+    private String updateTimeStr;
+    private String deleteStr;
 
     //step1
-    private List<String> tableNames;
+    private transient List<String> tableNames;
 
     //step2
-    private List<String> tmps;
+    private transient List<String> tmps;
 
 
     public String getUsername() {
@@ -103,4 +109,51 @@ public class Config {
         this.groupId = groupId;
     }
 
+    public String getOutBusiPack() {
+        return outBusiPack;
+    }
+
+    public void setOutBusiPack(String outBusiPack) {
+        this.outBusiPack = outBusiPack;
+    }
+
+    public String getInBusiPack() {
+        return inBusiPack;
+    }
+
+    public void setInBusiPack(String inBusiPack) {
+        this.inBusiPack = inBusiPack;
+    }
+
+    public Integer getCodeLocationType() {
+        return codeLocationType;
+    }
+
+    public void setCodeLocationType(Integer codeLocationType) {
+        this.codeLocationType = codeLocationType;
+    }
+
+    public String getCreateTimeStr() {
+        return createTimeStr;
+    }
+
+    public void setCreateTimeStr(String createTimeStr) {
+        this.createTimeStr = createTimeStr;
+    }
+
+    public String getUpdateTimeStr() {
+        return updateTimeStr;
+    }
+
+    public void setUpdateTimeStr(String updateTimeStr) {
+        this.updateTimeStr = updateTimeStr;
+    }
+
+    public String getDeleteStr() {
+        return deleteStr;
+    }
+
+    public void setDeleteStr(String deleteStr) {
+        this.deleteStr = deleteStr;
+    }
 }

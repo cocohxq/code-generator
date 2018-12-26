@@ -7,6 +7,10 @@ import com.github.codegenerator.common.spi.initializer.Initializer;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
 import com.github.codegenerator.common.util.TreeUtils;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 配置入口
@@ -31,8 +32,9 @@ public class ConfigController {
 
     //step1 进入选择页
     @GetMapping("/init")
-    public String init(Model model) {
+    public String init(Model model, HttpServletRequest request) {
         model.addAttribute("view", ContextContainer.getViewerInfo());
+        model.addAttribute("config",request.getAttribute("configInfo"));
         return "config";
     }
 
@@ -40,11 +42,12 @@ public class ConfigController {
     @PostMapping("/initData")
     @ResponseBody
     public Map<String, Object> initData(@RequestBody Config config) {
-        ContextContainer.getContext().setConfig(config);
+        BeanUtils.copyProperties(config,ContextContainer.getContext().getConfig(),getNullPropertyNames(config));
         for (Initializer initializer : ContextContainer.getStepInitializer(config.getStepType())) {
             initializer.initialize(ContextContainer.getContext());
         }
         Map<String, Object> result = new HashMap<>();
+        result.put("error",ContextContainer.getContext().getErrorMsgs());
         result.put("stepResult", ContextContainer.getContext().getStepInitResult());
         return result;
     }
@@ -206,5 +209,18 @@ public class ConfigController {
         FileUtils.deleteFile(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,modulePath));
         jsonObject.put("msg","删除成功");
         return jsonObject;
+    }
+
+    private String[] getNullPropertyNames (Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<String>();
+        for(java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 }

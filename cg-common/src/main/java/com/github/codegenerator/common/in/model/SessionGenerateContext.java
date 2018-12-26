@@ -1,5 +1,8 @@
 package com.github.codegenerator.common.in.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SessionGenerateContext {
 
     //step配置
@@ -11,6 +14,8 @@ public class SessionGenerateContext {
     private Object stepInitResult;
 
     private String sessionId;
+
+    private List<String> errorMsgs = new ArrayList<>();
 
     public Config getConfig() {
         return config;
@@ -43,4 +48,22 @@ public class SessionGenerateContext {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
+
+    public List<String> getErrorMsgs() {
+        return errorMsgs;
+    }
+
+    public void error(String... err){
+        StringBuffer sb = new StringBuffer();
+        for(String s : err){
+            sb.append(s);
+        }
+        sb.append(";");
+        errorMsgs.add(sb.toString());
+    }
+
+    public void resetErrorMsgs(){
+        errorMsgs.clear();
+    }
+
 }

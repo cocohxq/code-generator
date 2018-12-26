@@ -6,12 +6,10 @@ import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.db.*;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
-import com.github.codegenerator.common.util.LogUtils;
 import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -27,26 +25,26 @@ public abstract class DbInitializer extends AbstractInitializer {
             return false;
         }
         if(null == config.getIp() || null == config.getPort() || null == config.getDbName()){
-            throw new RuntimeException("ip、port、dbName名称存在空值");
+            context.error("ip、port、dbName名称存在空值");
+            return false;
         }
         //构建信息重建
-        context.getGenerateInfo().setGroupId(null);
-        context.getGenerateInfo().setSelectDbType(null);
         context.getGenerateInfo().setDatabase(null);
         return true;
     }
 
     @Override
     public void doInitialize(SessionGenerateContext context) {
-        ResultSet tablesSet = null;
         Connection cn = null;
-        Statement tabStmt = null;
-        Statement colStmt = null;
-        ResultSet columnsRet = null;
         try {
             Config cfg = context.getConfig();
             Database db = new Database(DbEnum.getDbByType(getDbType()).getDriver(),cfg.getUsername(),cfg.getPwd(),getJdbcUrl(cfg.getIp(),cfg.getPort(),cfg.getDbName()),cfg.getDbName());
-            cn = DbUtils.getConnection(db);
+            try {
+                cn = DbUtils.getConnection(db);
+            } catch (Exception e) {
+                context.error("根据数据源配置获取数据库连接有误,请检查配置,错误信息：",e.toString());
+                return;
+            }
 
             //使用JDBC此种方式 可能会出现获取的字段类型同数据库字段类型不一致的问题 eg：db-tinyint(1) 会被读取成BIT 从而转换成boolean
             //DatabaseMetaData metaData = cn.getMetaData();
@@ -54,18 +52,29 @@ public abstract class DbInitializer extends AbstractInitializer {
             //tablesSet = metaData.getTables(null,"%","%",new String[]{"TABLE"});
 
 
-            List<Table> tables = getTables(cn,cfg.getDbName());
-
-
+            List<Table> tables = null;
+            try {
+                tables = getTables(cn,cfg.getDbName());
+            } catch (Exception e) {
+                context.error(String.format("根据数据库%s加载表数据失败",cfg.getDbName()));
+                return;
+            }
             List<TableMeta> tableList = new ArrayList<>();
             for(Table table : tables){
                 if(null == table || null == table.getTableName() || "".equals(table.getTableName())){
-                    throw new RuntimeException("can`t find tables in database "+cfg.getDbName());
+                    return;
                 }
                 //提取表对应的所有列
-                List<Column> columns = getColumns(cn,cfg.getDbName(),table.getTableName());
+                List<Column> columns = null;
+                try {
+                    columns = getColumns(cn,cfg.getDbName(),table.getTableName());
+                } catch (Exception e) {
+                    context.error(String.format("根据数据库%s表%s加载列数据失败",cfg.getDbName(),table.getTableName()));
+                    return;
+                }
+                //过滤没有字段的空表
                 if(null == columns){
-                    throw new RuntimeException("table: "+table.getTableName()+"can`t find colums");
+                    continue;
                 }
                 //根据表信息构建表对应的对象信息
                 TableMeta tableMeta = new TableMeta();
@@ -73,43 +82,38 @@ public abstract class DbInitializer extends AbstractInitializer {
                 tableMeta.setTable(table);
                 tableMeta.setTableCamelNameMin(BuildUtils.conver2CameltName(table.getTableName()));//表名转换为驼峰命名
                 List<FieldMeta> list = new ArrayList<>(columns.size());
-                tableMeta.setFields(list);
+
+                try {
                 //这里不把id放入field数组
                 columns.stream().forEach(l -> {
                     FieldMeta fieldMeta = new FieldMeta();
                     fieldMeta.setColumn(l);
                     fieldMeta.setFieldName(BuildUtils.conver2CameltName(l.getColumnName()));
-                    fieldMeta.setFieldType(convertType(l.getColumnType()));
+                    try {
+                        fieldMeta.setFieldType(convertType(l.getColumnType()));
+                    } catch (Exception e) {
+                        throw new RuntimeException(String.format("表%s中字段%s转换类型出错",table.getTableName(),l.getColumnName()),e);
+                    }
                     list.add(fieldMeta);
                 });
+                } catch (Exception e) {
+                    context.error(e.toString());
+                    return;
+                }
+                tableMeta.setFields(list);
             }
             db.setTableList(tableList);
 
-            context.getGenerateInfo().setGroupId(context.getConfig().getGroupId());
-            context.getGenerateInfo().setSelectDbType(context.getConfig().getDbType());
             context.getGenerateInfo().setDatabase(db);
             context.setStepInitResult(db);
         } catch (Exception e) {
-            LogUtils.error("initiailze db error",e,this.getClass());
+            context.error("数据库初始化异常：",e.toString());
         }finally {
             try {
-                if(null != tablesSet){
-                    tablesSet.close();
-                }
-                if(null != columnsRet){
-                    columnsRet.close();
-                }
-                if(null != tabStmt){
-                    tabStmt.close();
-                }
-                if(null != colStmt){
-                    colStmt.close();
-                }
                 if(null != cn){
                     cn.close();
                 }
             }catch (Exception e1){
-                LogUtils.error("close db error",e1,this.getClass());
             }
         }
     }
@@ -132,19 +136,19 @@ public abstract class DbInitializer extends AbstractInitializer {
      * @param
      * @return
      */
-    public abstract List<Column> getColumns(Connection cn,String dbName,String tableName);
+    public abstract List<Column> getColumns(Connection cn,String dbName,String tableName) throws Exception;
 
     /**
      * 根据数据列数据类型来转换java类型
      * @param columnType
      * @return
      */
-    public abstract String convertType(String columnType);
+    public abstract String convertType(String columnType) throws Exception;
 
     @Override
     public Integer getStepType() {
         return StepEnum.STEP_DB.getType();
     }
 
-    public abstract List<Table> getTables(Connection cn,String dbName);
+    public abstract List<Table> getTables(Connection cn,String dbName) throws Exception;
 }

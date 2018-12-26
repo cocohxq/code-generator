@@ -13,13 +13,9 @@ public interface Dao<D extends BaseDO,Q extends BaseQuery> {
 
     List<D> query(Q q);
 
-    List<D> queryForTask(Q q);
-
     Integer count(Q q);
 
     D queryById(Long id);
-
-    D queryById(Long id, List<String> fields);
 
     List<D> queryByIds(List<Long> ids);
 

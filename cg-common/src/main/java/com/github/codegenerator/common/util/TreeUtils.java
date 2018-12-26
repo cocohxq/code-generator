@@ -4,6 +4,7 @@ import com.github.codegenerator.common.in.model.TreeNode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,10 @@ public class TreeUtils {
                 curNode.getChildren().add(childNode);
             }
         }
+        Collections.sort(curNode.getChildren(),(b,f)-> SortUtils.sort(b.getText(),f.getText(),SortUtils.SORT_ASC));//按名称从小到大排序
     }
+
+
+
 
 }

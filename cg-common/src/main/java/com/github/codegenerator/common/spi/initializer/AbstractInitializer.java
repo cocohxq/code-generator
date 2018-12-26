@@ -7,12 +7,16 @@ public abstract class AbstractInitializer implements Initializer {
 
     @Override
     public void initialize(SessionGenerateContext context) {
-        if (!before(context)) {
-            return;
+        try {
+            if (!before(context)) {
+                return;
+            }
+            //下一步
+            doInitialize(context);
+            after(context);
+        } catch (Exception e) {
+            context.error("处理失败，异常：",e.toString());
         }
-        //下一步
-        doInitialize(context);
-        after(context);
     }
 
     public abstract boolean before(SessionGenerateContext context);

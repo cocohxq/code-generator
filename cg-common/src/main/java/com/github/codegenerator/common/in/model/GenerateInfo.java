@@ -9,8 +9,6 @@ import java.util.Map;
 
 public class GenerateInfo {
 
-    //基础包名
-    private String groupId;
     //代码最终存放路径
     private String codepath;
 
@@ -18,8 +16,6 @@ public class GenerateInfo {
      * 表映射成的java对象信息
      */
     private Database database;
-
-    private Integer selectDbType;
 
     /**
      * 选中的表
@@ -57,31 +53,6 @@ public class GenerateInfo {
 
     public void setSelectedTables(List<TableMeta> selectedTables) {
         this.selectedTables = selectedTables;
-    }
-
-
-    public Integer getSelectDbType() {
-        return selectDbType;
-    }
-
-    public void setSelectDbType(Integer selectDbType) {
-        this.selectDbType = selectDbType;
-    }
-
-//    public Map<String, TemplateInfo> getAllTmps() {
-//        return allTmps;
-//    }
-//
-//    public void setAllTmps(Map<String, TemplateInfo> allTmps) {
-//        this.allTmps = allTmps;
-//    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public String getCodepath() {

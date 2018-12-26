@@ -4,7 +4,6 @@ $(document).ready(function(){
     editor = null;
     fileEditor = null;
     refreshuserTmpTreeList();
-    loadTmpTree()
     initCodeArea();//模板编辑区域
 
     //选择数据源-下一步
@@ -12,19 +11,37 @@ $(document).ready(function(){
         let next = true;
         let param ={};
         $("#step0 input").each(function (item) {
-            if(!$(this).val()){
+            if(!$(this).val() && $(this).attr("notNull")){
                 $("#step0 .errMsg").text("必填项不能为空");
                 next=false;
                 return;
             }
             let id=$(this).attr("id");
-            let value=$(this).val();
-            param[id]=value;
+            if(id){
+                let value=$(this).val();
+                param[id]=value;
+            }
         })
         if(!next){
             return;
         }
         param.dbType=$("#dbType").val();
+
+        //代码位置
+        param.codeLocationType = $("input[name='codeLocationType'][type=radio]:checked").val();
+
+        //包名的位置
+        let businessPackage = $("input[name='businessPackage']").val();
+        let businessLocationType = $("input[name='businessLocationType'][type=radio]:checked").val();
+        if(businessPackage){
+            if(businessLocationType == 1){
+                param.outBusiPack = businessPackage;
+            }else{
+                param.inBusiPack = businessPackage;
+            }
+        }
+
+
         //初始化库表信息
         initData(0,true,param,step0Callback);
     });
@@ -44,6 +61,7 @@ $(document).ready(function(){
 
         param.tableNames = tableNames;
         initData(1,true,param,function(data){return true;});
+        loadTmpTree();
     });
 
     $("#step1 .pre").click(function(){
@@ -400,6 +418,11 @@ function initData(curStep,next,param,succ_callback) {
         async:false,
         dataType: "json",
         success: function (data) {
+            if(data.error && data.error.length > 0){
+                let err = data.error.join("<br>");
+                $.messager.alert('error',err);
+                return;
+            }
             result = succ_callback(data);
             if(result){
                 chooseBar(curStep,next);
@@ -560,6 +583,10 @@ function del() {
  * 提交代码
  */
 function commitCode() {
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能修改代码,请提交到副本编辑");
+        return;
+    }
     let node = $('#tmps').tree('getSelected');
     let templateContent = editor.getValue();
     if(node && node.attributes.type == "file" && templateContent){

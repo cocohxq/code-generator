@@ -3,7 +3,7 @@ package ${javaPackage};
 <#list javaImports as ipt>
 import ${ipt};
 </#list>
-import ${commonValueStack.getValue(tableCamelName + "BaseQuery.classPath")!""};
+import ${commonValueStack.getValue("BaseQuery.classPath")!""};
 
 
 /**

@@ -43,7 +43,11 @@ public abstract class BaseDao<D extends BaseDO, Q extends BaseQuery> extends Sql
         if (null == id || 0L >= id) {
             return 0;
         }
-        return getSqlSession().update(getNamespace() + "deleteById", id);
+        <#if deleteStr??>
+            return getSqlSession().update(getNamespace() + "deleteById", id);
+        <#else>
+            return getSqlSession().delete(getNamespace() + "deleteById", id);
+        </#if>
     }
 
     public List<D> query(Q q) {
@@ -72,6 +76,14 @@ public abstract class BaseDao<D extends BaseDO, Q extends BaseQuery> extends Sql
             return Collections.emptyList();
         }
         return getSqlSession().selectList(getNamespace() + "queryByIds", ids);
+    }
+
+    @Override
+    public void batchInsert(List<D> items) {
+        if (CollectionUtils.isEmpty(items)) {
+            return;
+        }
+        getSqlSession().insert(namespace + "batchInsert", items);
     }
 
     public Integer batchUpdateById(List<D> list) {

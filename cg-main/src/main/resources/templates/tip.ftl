@@ -164,6 +164,7 @@
 {
   "targetFilePath": "/Users/user/6B2E8BD3DE746842C8EE323A7C66BBD4/module/src/main/java/com/hxq/dto/UserInfoDTO.java",
   "javaImports": ["java.util.Date"],
+  "dbName":"demo",
   "javaPackage": "com.hxq.dto",
   "javaClassName": "UserInfoDTO",
   "tableMeta": {
@@ -200,49 +201,10 @@
   },
   "groupId": "com.hxq",
   "tableCamelNameMin": "userInfo",
-  "targetFileDir": "/Users/user/6B2E8BD3DE746842C8EE323A7C66BBD4/module/src/main/java/com/hxq/dto/",
-  "tableCamelName": "UserInfo"
-}
-
-
-{
-  "targetFilePath": "/Users/user/6B2E8BD3DE746842C8EE323A7C66BBD4/module/src/main/resources/mybatis/mapper-userInfo.xml",
-  "tableMeta": {
-    "fields": [{
-      "column": {
-        "columnName": "id",
-        "columnType": "BIGINT",
-        "comment": ""
-      },
-      "fieldName": "id",
-      "fieldType": "Long"
-    }, {
-      "column": {
-        "columnName": "user_name",
-        "columnType": "VARCHAR",
-        "comment": "姓名"
-      },
-      "fieldName": "userName",
-      "fieldType": "String"
-    }, {
-      "column": {
-        "columnName": "birthday",
-        "columnType": "DATETIME",
-        "comment": "生日"
-      },
-      "fieldName": "birthday",
-      "fieldType": "Date"
-    }],
-    "table": {
-      "comment": "",
-      "tableName": "user_info"
-    },
-    "tableCamelNameMin": "userInfo"
-  },
-  "groupId": "com.hxq",
-  "tableCamelNameMin": "userInfo",
-  "targetFileDir": "/Users/user/6B2E8BD3DE746842C8EE323A7C66BBD4/module/src/main/resources/mybatis/",
-  "tableCamelName": "UserInfo"
+  "tableCamelName": "UserInfo",
+  "createTimeStr":"created_time",
+  "updateTimeStr":"update_time",
+  "deleteStr":"deleted"
 }
 </textarea>
 

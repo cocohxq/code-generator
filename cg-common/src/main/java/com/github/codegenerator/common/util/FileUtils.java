@@ -2,8 +2,10 @@ package com.github.codegenerator.common.util;
 
 import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.StringTemplateLoader;
+import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
 import java.io.*;
@@ -25,7 +27,9 @@ public class FileUtils {
     public static void generateFile(GenerateInfo info) {
         Configuration configration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         configration.setDefaultEncoding("UTF-8");
-        configration.setTemplateExceptionHandler(TemplateExceptionHandler.IGNORE_HANDLER);
+        configration.setTemplateExceptionHandler((TemplateException te, Environment env, Writer out) -> {
+            ContextContainer.getContext().error(env.getConfiguration().getSharedVariable("templateFileName").toString(),"中${",te.getBlamedExpressionString(),"}无法识别");
+        });
         File codeDir = new File(info.getCodepath());
         if(codeDir.exists()){
             deleteDir(info.getCodepath(),true);
@@ -35,16 +39,18 @@ public class FileUtils {
             try {
                 StringTemplateLoader loader = new StringTemplateLoader(template.getTemplateContent());
                 configration.setTemplateLoader(loader);
+                configration.setSharedVariable("templateFileName",template.getTemplateFileName());
                 Template tmp = configration.getTemplate("");
                 //遍历选中的表
                 for(Map<String,Object> tableContentMap : template.getTableContentList()){
                     tableContentMap.put("commonValueStack",info.getCommonValueStack());
-                    String targetFileDir = (String)tableContentMap.get("targetFileDir");
+                    String targetFilePath = (String)tableContentMap.get("targetFilePath");
+                    String targetFileDir = targetFilePath.substring(0,targetFilePath.lastIndexOf(File.separator));
                     File dir = new File(targetFileDir);
                     dir.mkdirs();
                     Writer writer = null;
                     try {
-                        File targetFile = new File((String)tableContentMap.get("targetFilePath"));
+                        File targetFile = new File(targetFilePath);
                         if(targetFile.exists()){
                             FileUtils.deleteFile(targetFile.getPath());
                         }
@@ -63,7 +69,7 @@ public class FileUtils {
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

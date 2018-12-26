@@ -18,7 +18,7 @@ public abstract class TableInitializer extends AbstractInitializer {
     public boolean before(SessionGenerateContext context) {
         Config config = context.getConfig();
         if (null == config.getTableNames()) {
-            throw new RuntimeException("请选择需要的表或model类");
+            context.error("请选择需要生成代码的表");
         }
         context.getGenerateInfo().setSelectedTables(null);
         return true;
