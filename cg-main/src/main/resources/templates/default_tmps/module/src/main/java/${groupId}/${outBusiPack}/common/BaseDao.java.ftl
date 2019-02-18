@@ -43,10 +43,10 @@ public abstract class BaseDao<D extends BaseDO, Q extends BaseQuery> extends Sql
         if (null == id || 0L >= id) {
             return 0;
         }
-        <#if deleteStr??>
-            return getSqlSession().update(getNamespace() + "deleteById", id);
+        <#if deleteStr?exists>
+        return getSqlSession().update(getNamespace() + "deleteById", id);
         <#else>
-            return getSqlSession().delete(getNamespace() + "deleteById", id);
+        return getSqlSession().delete(getNamespace() + "deleteById", id);
         </#if>
     }
 

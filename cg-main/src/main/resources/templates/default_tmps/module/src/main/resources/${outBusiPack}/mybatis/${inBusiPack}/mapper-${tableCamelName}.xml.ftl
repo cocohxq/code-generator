@@ -146,7 +146,7 @@
         </foreach>
     </update>
 
-    <#if deleteStr??>
+    <#if deleteStr?exists>
     <update id="deleteById" parameterType="java.lang.Long">
         update ${dbName}.${tableMeta.table.tableName}
         set <#list commonValueStack.getSpecifiedFields(tableMeta.fields,deleteStr) as field>${field.column.columnName}=1</#list>

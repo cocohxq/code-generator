@@ -18,8 +18,10 @@ $(document).ready(function(){
             }
             let id=$(this).attr("id");
             if(id){
-                let value=$(this).val();
-                param[id]=value;
+                let value=$.trim($(this).val());
+                if(value != ""){
+                    param[id]=value;
+                }
             }
         })
         if(!next){
@@ -249,7 +251,7 @@ function initCodeArea(){
         extraKeys: {"Ctrl-Space": function(cm) {CodeMirror.simpleHint(cm, CodeMirror.javascriptHint);}}
     });
 
-    editor.setSize('800px', '950px');
+    editor.setSize('1000px', '950px');
 
     fileEditor = CodeMirror.fromTextArea(document.getElementById("fileContent"), {
         mode: "application/x-ejs",

@@ -3,7 +3,8 @@ package ${javaPackage};
 import org.springframework.stereotype.Repository;
 import ${commonValueStack.getValue(tableCamelName + "DO.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Query.classPath")!""};
-import ${commonValueStack.getValue(tableCamelName + "BaseDao.classPath")!""};
+import ${commonValueStack.getValue(tableCamelName + "Dao.classPath")!""};
+import ${commonValueStack.getValue("BaseDao.classPath")!""};
 /**
  *  基础Dao
  */

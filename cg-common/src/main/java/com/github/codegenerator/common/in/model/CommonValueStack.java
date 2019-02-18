@@ -1,6 +1,7 @@
 package com.github.codegenerator.common.in.model;
 
 import com.github.codegenerator.common.in.model.db.FieldMeta;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +36,9 @@ public class CommonValueStack {
 
         Set<String> excludeSet = new HashSet<>();
         for(String str : excludeStrs){
+            if(null == str){
+                continue;
+            }
             String[] arr = str.split(",");
             for(String item : arr){
                 excludeSet.add(item);
@@ -57,6 +61,9 @@ public class CommonValueStack {
 
         Set<String> specifiedSet = new HashSet<>();
         for(String str : specifiedStrs){
+            if(StringUtils.isEmpty(str)){
+                continue;
+            }
             String[] arr = str.split(",");
             for(String item : arr){
                 specifiedSet.add(item);
