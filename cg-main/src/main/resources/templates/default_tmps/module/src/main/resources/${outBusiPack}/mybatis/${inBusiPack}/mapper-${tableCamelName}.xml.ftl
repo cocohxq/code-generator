@@ -119,7 +119,9 @@
         update ${dbName}.${tableMeta.table.tableName}
         <trim prefix="set" suffixOverrides=",">
         <#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,"id",createTimeStr,updateTimeStr,deleteStr) as field>
-            ${field.column.columnName}=${r'#'}{${field.fieldName}},
+            <if test="${field.fieldName} != null">
+                ${field.column.columnName}=${r'#'}{${field.fieldName}},
+            </if>
         </#list>
         <#list commonValueStack.getSpecifiedFields(tableMeta.fields,updateTimeStr) as field>
             ${field.column.columnName}=now(),
