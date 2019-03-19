@@ -1,11 +1,13 @@
 package com.github.codegenerator.spi.db.common.initializer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.DbEnum;
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.db.*;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
+import com.github.codegenerator.common.util.DataUtil;
 import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
 
@@ -21,6 +23,15 @@ public abstract class DbInitializer extends AbstractInitializer {
     @Override
     public boolean before(SessionGenerateContext context) {
         Config config = context.getConfig();
+        //保存配置
+        if(config.isAdd()){
+            DataUtil.updateData("cb",config.getConfigName(), JSONObject.toJSONString(config),true);
+            return false;
+        }else{
+            //加载class
+            config = DataUtil.getData("cb",config.getConfigName(),Config.class);
+            context.setConfig(config);
+        }
         if(null == config.getDbType() || !config.getDbType().equals(getDbType())){
             return false;
         }

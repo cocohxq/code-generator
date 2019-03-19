@@ -35,7 +35,7 @@ public class MysqlInitializer extends DbInitializer {
         columnType = columnType.toUpperCase();
         if (columnType.startsWith("VARCHAR") || columnType.startsWith("CHAR") || columnType.contains("TEXT") || columnType.startsWith("VAR")) {
             return "String";
-        } else if (columnType.startsWith("INT") || columnType.startsWith("TINYINT")) {
+        } else if (columnType.startsWith("INT") || columnType.startsWith("TINYINT") || columnType.startsWith("MEDIUMINT") || columnType.startsWith("SMALLINT")) {
             return "Integer";
         } else if (columnType.startsWith("BIGINT")) {
             return "Long";

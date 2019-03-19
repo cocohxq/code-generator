@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.DbEnum;
 import com.github.codegenerator.common.in.model.TreeNode;
 import com.github.codegenerator.common.in.model.Tuple;
+import com.github.codegenerator.common.util.DataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,11 @@ public class ViewerInfo {
      * 已经被支持的db类型
      */
     private List<Tuple> effectiveDbs = new ArrayList<>();
+
+    /**
+     * 已保存的配置
+     */
+    private List<String> configs = new ArrayList<>();
 
     /**
      * 内置模板树

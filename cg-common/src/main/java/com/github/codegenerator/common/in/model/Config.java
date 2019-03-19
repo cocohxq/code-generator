@@ -1,5 +1,6 @@
 package com.github.codegenerator.common.in.model;
 
+import java.beans.Transient;
 import java.util.List;
 
 public class Config {
@@ -8,6 +9,7 @@ public class Config {
     private transient Integer stepType;
 
     //step0
+    private String configName;
     private String ip;
     private String port;
     private String username;
@@ -21,6 +23,7 @@ public class Config {
     private String createTimeStr;
     private String updateTimeStr;
     private String deleteStr;
+    private transient boolean add;
 
     //step1
     private transient List<String> tableNames;
@@ -155,5 +158,21 @@ public class Config {
 
     public void setDeleteStr(String deleteStr) {
         this.deleteStr = deleteStr;
+    }
+
+    public String getConfigName() {
+        return configName;
+    }
+
+    public void setConfigName(String configName) {
+        this.configName = configName;
+    }
+
+    public boolean isAdd() {
+        return add;
+    }
+
+    public void setAdd(boolean add) {
+        this.add = add;
     }
 }

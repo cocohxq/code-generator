@@ -6,8 +6,31 @@ $(document).ready(function(){
     refreshuserTmpTreeList();
     initCodeArea();//模板编辑区域
 
-    //选择数据源-下一步
-    $("#step0 .next").click(function(){
+    //更换配置重新加载
+    $("#step0 #addConfig").click(function () {
+        let href = location.href;
+        if(href.indexOf("?") != -1){
+            href = href.substring(0,href.indexOf("?"))
+        }
+        location.href = href+ "?op=e&sc=";
+    });
+
+    //更换配置重新加载
+    $("#step0 #editConfig").click(function () {
+        let href = location.href;
+        if(href.indexOf("?") != -1){
+            href = href.substring(0,href.indexOf("?"))
+        }
+        let selectedConfig = $("#selectedConfig").val();
+        if(selectedConfig == "请选择"){
+            $.messager.alert('error','请选择配置');
+            return;
+        }
+        location.href = href+ "?op=e&sc="+selectedConfig;
+    });
+
+    //更换配置重新加载
+    $("#step0 #saveConfig").click(function () {
         let next = true;
         let param ={};
         $("#step0 input").each(function (item) {
@@ -42,9 +65,29 @@ $(document).ready(function(){
                 param.inBusiPack = businessPackage;
             }
         }
-
+        param.add=true;
 
         //初始化库表信息
+        initData(0,true,param,function(){
+            //重新加载页面
+            let href = location.href;
+            if(href.indexOf("?") != -1){
+                href = href.substring(0,href.indexOf("?"))
+            }
+            location.href = href;
+        });
+    });
+
+    //选择数据源-下一步
+    $("#step0 .next").click(function(){
+        let param ={};
+        param.add=false;
+        let selectedConfig = $("#selectedConfig").val();
+        if(selectedConfig == "请选择"){
+            $.messager.alert('error','请选择配置');
+            return;
+        }
+        param.configName = selectedConfig;
         initData(0,true,param,step0Callback);
     });
 

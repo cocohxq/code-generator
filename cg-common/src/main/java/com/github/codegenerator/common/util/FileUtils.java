@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 public class FileUtils {
 
 
+
     /**
      * 生成类文件
      *
@@ -518,6 +519,62 @@ public class FileUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    /**
+     * 读文件
+     * @param filePath
+     * @return
+     * @throws Exception
+     */
+    public static String read(String filePath) throws Exception{
+        File file = new File(filePath);
+        if(!file.exists()){
+            return null;
+        }
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        return br.lines().collect(Collectors.joining());
+    }
+
+    /**
+     * 写文件
+     * @param filePath
+     * @param info
+     * @throws Exception
+     */
+    public static void write(String filePath,String info) throws Exception{
+        File file = new File(filePath);
+        if(file.exists()){
+            throw new RuntimeException("该配置已存在，不能重复保存");
+        }
+        file.createNewFile();
+        FileWriter fw = new FileWriter(filePath);
+        fw.write(info);
+        fw.flush();
+    }
+
+    /**
+     * 更新文件
+     * @param filePath
+     * @param info
+     * @throws Exception
+     */
+    public static void update(String filePath,String info,boolean insertIfAbsent) throws Exception{
+        File file = new File(filePath);
+        if(file.exists()){
+            file.delete();
+        }else{
+            //没有也可以更新
+            if(insertIfAbsent){
+                file.createNewFile();
+            }else{
+                throw new FileNotFoundException("找不到配置");
+            }
+        }
+        FileWriter fw = new FileWriter(filePath);
+        fw.write(info);
+        fw.flush();
     }
 
 }

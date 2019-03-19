@@ -51,6 +51,11 @@ public class ContextContainer {
      */
     public static String MODULE_PATH_ROOT = "module";
 
+    /**
+     * 配置路径
+     */
+    public static String CONFIG_PATH = "";
+
 
 
     public static void registryInitializer(Initializer initializer){
@@ -105,8 +110,14 @@ public class ContextContainer {
             RUNNING_JAR_NAME = RUNNING_PATH.substring(index+1);
             RUNNING_PATH = RUNNING_PATH.substring(0,index);
         }
+        RUNNING_PATH = FileUtils.concatPath(RUNNING_PATH,"code-generator");
 
+        CONFIG_PATH = FileUtils.concatPath(RUNNING_PATH,"config/");
         USER_TMPTREE_DIR = FileUtils.concatPath(RUNNING_PATH,"userTmps/");
         USER_CODE_DIR = FileUtils.concatPath(RUNNING_PATH,"userCode/");
+
+        new File(CONFIG_PATH).mkdirs();
+        new File(USER_TMPTREE_DIR).mkdirs();
+        new File(USER_CODE_DIR).mkdirs();
     }
 }

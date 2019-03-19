@@ -138,126 +138,157 @@
         </div>
         <!--选择数据源-->
         <div id="step0" type="${view.steps[0].type}" class="step">
-            <div class="control-group">
-                <label class="control-label"><span class="highlight">*</span>数据库类型</label>
-                <div class="controls">
-                    <select class="input-large" id="dbType">
-                        <#list view.effectiveDbs as dbType>
-                            <option class="input-large" value="${dbType.type}" <#if config.dbType?? && config.dbType == dbType.type>selected</#if>>${dbType.name}</option>
-                        </#list>
-                    </select>
+
+                <#if !op??>
+                    <div class="control-group" style="height: 350px">
+                        <label class="control-label"><span class="highlight">*</span>数据库配置</label>
+                        <div class="controls">
+                            <select class="input-large" id="selectedConfig" >
+                                <#list configList as config>
+                                    <option class="input-large" value="${config}" <#if selectedConfig?? && selectedConfig == config>selected</#if>>${config}</option>
+                                </#list>
+                            </select>
+                            <button class="btn add" id="addConfig">新增</button>
+                            <button class="btn edit" id="editConfig">编辑</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn btn-success input-large next">下一步</button>
+                            <span class="errMsg" style="color: red"></span>
+                        </div>
+                    </div>
+                </#if>
+            <#if op?? && op=="e">
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>配置名称</label>
+                    <div class="controls">
+                        <input id="configName" type="text" placeholder="配置名称" class="input-large" value="${config.configName!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>ip</label>
-                <div class="controls">
-                    <input id="ip" type="text" placeholder="数据库ip" class="input-large" value="${config.ip!""}" notNull="true">
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label"><span class="highlight">*</span>数据库类型</label>
+                    <div class="controls">
+                        <select class="input-large" id="dbType">
+                            <#list view.effectiveDbs as dbType>
+                                <option class="input-large" value="${dbType.type}" <#if config.dbType?? && config.dbType == dbType.type>selected</#if>>${dbType.name}</option>
+                            </#list>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>port</label>
-                <div class="controls">
-                    <input id="port" type="text" placeholder="端口" class="input-large" value="${config.port!""}" notNull="true">
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>ip</label>
+                    <div class="controls">
+                        <input id="ip" type="text" placeholder="数据库ip" class="input-large" value="${config.ip!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>数据库名</label>
-                <div class="controls">
-                    <input id="dbName" type="text" placeholder="需连接的数据库" class="input-large" value="${config.dbName!""}" notNull="true">
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>port</label>
+                    <div class="controls">
+                        <input id="port" type="text" placeholder="端口" class="input-large" value="${config.port!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>用户名</label>
-                <div class="controls">
-                    <input id="username" type="text" placeholder="数据库用户名" class="input-large" value="${config.username!""}" notNull="true">
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>数据库名</label>
+                    <div class="controls">
+                        <input id="dbName" type="text" placeholder="需连接的数据库" class="input-large" value="${config.dbName!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>密码</label>
-                <div class="controls">
-                    <input id="pwd" type="text" placeholder="数据库密码" class="input-large" value="${config.pwd!""}" notNull="true">
-                    <p class="help-block"></p>
+
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>用户名</label>
+                    <div class="controls">
+                        <input id="username" type="text" placeholder="数据库用户名" class="input-large" value="${config.username!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="control-group">
-                <label class="control-label" for="input01"><span class="highlight">*</span>groupId</label>
-                <div class="controls">
-                    <input id="groupId" type="text" placeholder="com.xxx.xxx" class="input-large" value="${config.groupId!""}" notNull="true">
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>密码</label>
+                    <div class="controls">
+                        <input id="pwd" type="text" placeholder="数据库密码" class="input-large" value="${config.pwd!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label"><span class="highlight">*</span>代码输出方式</label>
-                <div class="controls">
-                    <label class="radio inline">
-                        <input name="codeLocationType" type="radio" value="1" <#if config.codeLocationType?? && config.codeLocationType == 1>checked</#if> > 树形目录输出
-                    </label>
-                    <label class="radio inline">
-                        <input name="codeLocationType" type="radio" value="2" <#if config.codeLocationType?? && config.codeLocationType == 1><#else>checked</#if>> 同一目录输出
-                        &nbsp;&nbsp;&nbsp;&nbsp;(全量创建代码工程建议树形，增量创建代码建议同一目录输出)
-                    </label>
+
+                <div class="control-group">
+                    <label class="control-label" for="input01"><span class="highlight">*</span>groupId</label>
+                    <div class="controls">
+                        <input id="groupId" type="text" placeholder="com.xxx.xxx" class="input-large" value="${config.groupId!""}" notNull="true">
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01">businessPackage</label>
-                <div class="controls">
-                    <input name="businessPackage" type="text" placeholder="业务包名" class="input-large" value="${config.outBusiPack!""}${config.inBusiPack!""}">
-                    <p class="help-block"></p>
-                    <label class="radio inline">
-                        <input name="businessLocationType" type="radio" value="1" <#if config.outBusiPack??>checked</#if>> 相对外置
-                    </label>
-                    <label class="radio inline">
-                        <input name="businessLocationType" type="radio" value="2" <#if config.outBusiPack??><#else>checked</#if>> 相对内置
-                        &nbsp;&nbsp;&nbsp;&nbsp;(包名相对dao、service包的放置位置)
-                    </label>
+                <div class="control-group">
+                    <label class="control-label"><span class="highlight">*</span>代码输出方式</label>
+                    <div class="controls">
+                        <label class="radio inline">
+                            <input name="codeLocationType" type="radio" value="1" <#if config.codeLocationType?? && config.codeLocationType == 1>checked</#if> > 树形目录输出
+                        </label>
+                        <label class="radio inline">
+                            <input name="codeLocationType" type="radio" value="2" <#if config.codeLocationType?? && config.codeLocationType == 1><#else>checked</#if>> 同一目录输出
+                            &nbsp;&nbsp;&nbsp;&nbsp;(全量创建代码工程建议树形，增量创建代码建议同一目录输出)
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01">时间戳-新增</label>
-                <div class="controls">
-                    <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large" value="${config.createTimeStr!""}">(用于创建sql生成识别，表字段不同用","分隔)
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01">businessPackage</label>
+                    <div class="controls">
+                        <input name="businessPackage" type="text" placeholder="业务包名" class="input-large" value="${config.outBusiPack!""}${config.inBusiPack!""}">
+                        <p class="help-block"></p>
+                        <label class="radio inline">
+                            <input name="businessLocationType" type="radio" value="1" <#if config.outBusiPack??>checked</#if>> 相对外置
+                        </label>
+                        <label class="radio inline">
+                            <input name="businessLocationType" type="radio" value="2" <#if config.outBusiPack??><#else>checked</#if>> 相对内置
+                            &nbsp;&nbsp;&nbsp;&nbsp;(包名相对dao、service包的放置位置)
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01">时间戳-更新</label>
-                <div class="controls">
-                    <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time" class="input-large" value="${config.updateTimeStr!""}">(用于更新sql生成识别,表字段不同用","分隔)
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01">时间戳-新增</label>
+                    <div class="controls">
+                        <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large" value="${config.createTimeStr!""}">(用于创建sql生成识别，表字段不同用","分隔)
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="input01">逻辑删除标记</label>
-                <div class="controls">
-                    <input id="deleteStr" type="text" placeholder="deleted,is_deleted" class="input-large" value="${config.deleteStr!""}">(用于删除sql生成识别,不配置默认物理删除，表字段不同用","分隔)
-                    <p class="help-block"></p>
+                <div class="control-group">
+                    <label class="control-label" for="input01">时间戳-更新</label>
+                    <div class="controls">
+                        <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time" class="input-large" value="${config.updateTimeStr!""}">(用于更新sql生成识别,表字段不同用","分隔)
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
 
-
-            <div class="control-group">
-                <div class="controls">
-                    <button class="btn btn-success input-large next">下一步</button>
-                    <span class="errMsg" style="color: red"></span>
+                <div class="control-group">
+                    <label class="control-label" for="input01">逻辑删除标记</label>
+                    <div class="controls">
+                        <input id="deleteStr" type="text" placeholder="deleted,is_deleted" class="input-large" value="${config.deleteStr!""}">(用于删除sql生成识别,不配置默认物理删除，表字段不同用","分隔)
+                        <p class="help-block"></p>
+                    </div>
                 </div>
-            </div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-success" id="saveConfig">保存</button>
+                        <span class="errMsg" style="color: red"></span>
+                    </div>
+                </div>
+            </#if>
+
 
         </div>
 
