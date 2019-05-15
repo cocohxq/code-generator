@@ -8,7 +8,7 @@ import ${commonValueStack.getValue("BaseDao.classPath")!""};
 /**
  *  基础Dao
  */
-@Repository
+@Repository("${tableCamelNameMin}Dao")
 public class ${javaClassName} extends BaseDao<${tableCamelName}DO, ${tableCamelName}Query> implements ${tableCamelName}Dao{
 
     private static final String NAMESPACE = "${tableCamelName}.";

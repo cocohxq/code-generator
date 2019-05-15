@@ -4,6 +4,7 @@ import ${commonValueStack.getValue(tableCamelName + "Manager.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "DO.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Query.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Service.classPath")!""};
+import ${commonValueStack.getValue("PageResult.classPath")!""};
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public abstract class ${javaClassName} implements ${tableCamelName}Service {
         return ${tableCamelNameMin}Manager.deleteById(id);
     }
 
-    public List<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
+    public PageResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         return ${tableCamelNameMin}Manager.query(${tableCamelNameMin}Query);
     }
 
