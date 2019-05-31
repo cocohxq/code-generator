@@ -23,7 +23,7 @@ public class Config {
     private String createTimeStr;
     private String updateTimeStr;
     private String deleteStr;
-    private transient boolean add;
+    private transient String operation;
 
     //step1
     private transient List<String> tableNames;
@@ -168,11 +168,11 @@ public class Config {
         this.configName = configName;
     }
 
-    public boolean isAdd() {
-        return add;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setAdd(boolean add) {
-        this.add = add;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }

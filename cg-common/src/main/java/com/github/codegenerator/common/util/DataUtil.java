@@ -16,7 +16,7 @@ public class DataUtil {
             FileUtils.update(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key),data,insertIfAbsent);
             return true;
         } catch (Exception e) {
-            ContextContainer.getContext().error("保存config数据异常");
+            ContextContainer.getContext().error("保存config数据异常:"+e.getMessage());
             return false;
         }
     }
@@ -26,7 +26,17 @@ public class DataUtil {
             FileUtils.write(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key),data);
             return true;
         } catch (Exception e) {
-            ContextContainer.getContext().error("保存config数据异常");
+            ContextContainer.getContext().error("保存config数据异常："+e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean deleteData(String group,String key) {
+        try {
+            FileUtils.delete(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key));
+            return true;
+        } catch (Exception e) {
+            ContextContainer.getContext().error("删除config数据异常："+e.getMessage());
             return false;
         }
     }
@@ -40,7 +50,7 @@ public class DataUtil {
             }
             return JSONObject.parseObject(info,clazz);
         } catch (Exception e) {
-            ContextContainer.getContext().error("获取config数据异常");
+            ContextContainer.getContext().error("获取config数据异常:"+e.getMessage());
             return null;
         }
     }
@@ -53,7 +63,7 @@ public class DataUtil {
             }
             return Arrays.asList(configDir.listFiles()).stream().filter(f -> !f.isHidden() && f.isFile()).map(f ->f.getName().substring(f.getName().indexOf("_")+1)).collect(Collectors.toList());
         } catch (Exception e) {
-            ContextContainer.getContext().error("获取config数据列表异常");
+            ContextContainer.getContext().error("获取config数据列表异常:"+e.getMessage());
             return null;
         }
     }

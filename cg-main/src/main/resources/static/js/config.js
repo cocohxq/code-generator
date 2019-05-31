@@ -1,3 +1,4 @@
+let copyNode,cutNode = null;
 $(document).ready(function(){
 
     originEditNode = null;
@@ -12,7 +13,21 @@ $(document).ready(function(){
         if(href.indexOf("?") != -1){
             href = href.substring(0,href.indexOf("?"))
         }
-        location.href = href+ "?op=e&sc=";
+        location.href = href+ "?op=e";
+    });
+
+    //更换配置重新加载
+    $("#step0 #copyAddConfig").click(function () {
+        let href = location.href;
+        if(href.indexOf("?") != -1){
+            href = href.substring(0,href.indexOf("?"))
+        }
+        let selectedConfig = $("#selectedConfig").val();
+        if(selectedConfig == "请选择"){
+            $.messager.alert('error','请选择配置');
+            return;
+        }
+        location.href = href+ "?op=e&cp=1&sc="+selectedConfig;
     });
 
     //更换配置重新加载
@@ -27,6 +42,28 @@ $(document).ready(function(){
             return;
         }
         location.href = href+ "?op=e&sc="+selectedConfig;
+    });
+
+    //更换配置重新加载
+    $("#step0 #delConfig").click(function () {
+        let selectedConfig = $("#selectedConfig").val();
+        if(selectedConfig == "请选择"){
+            $.messager.alert('error','请选择配置');
+            return;
+        }
+        let param={};
+        param.configName = selectedConfig;
+        param.operation="delete";
+
+        //删除配置
+        initData(0,true,param,function(){
+            //重新加载页面
+            let href = location.href;
+            if(href.indexOf("?") != -1){
+                href = href.substring(0,href.indexOf("?"))
+            }
+            location.href = href;
+        });
     });
 
     //更换配置重新加载
@@ -65,7 +102,15 @@ $(document).ready(function(){
                 param.inBusiPack = businessPackage;
             }
         }
-        param.add=true;
+        //判断操作
+        let href = location.href;
+        if(href.indexOf("cp=1")){
+            param.operation="copy";
+        }else if(href.indexOf("sc=")){
+            param.operation="edit";
+        }else{
+            param.operation="add";
+        }
 
         //初始化库表信息
         initData(0,true,param,function(){
@@ -184,6 +229,7 @@ function initTmps(treeNode){
         checkbox:true,
         lines:true,
         dnd:true,
+        disableDnd:true,
         onBeforeEdit:function(node){
             originEditNode = JSON.parse(JSON.stringify(node));//这里需要采用深度克隆，保证能记录原始的数据
         },
@@ -247,7 +293,7 @@ function initTmps(treeNode){
             }else{
                 editor.setValue("");
             }
-        },
+        }
     });
 }
 
@@ -260,6 +306,7 @@ function initFileTree(treeNode){
         data: treeNode,
         lines:true,
         dnd:true,
+        disableDnd:true,
         onSelect:function(node){
             if(node.attributes.type == "file"){
                 let node = $('#file_tree').tree('getSelected');
@@ -341,9 +388,9 @@ function append(type){
         param.tmpModulePath = node.attributes.modulePath+"/new_dir";
     }else{
         if(node.attributes.modulePath.indexOf("${groupId}") == -1){
-            param.tmpModulePath = node.attributes.modulePath + "/new_Xmltemplate.xml.ftl";
+            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelName}_NEW.xml.ftl";
         }else{
-            param.tmpModulePath = node.attributes.modulePath + "/New_Javatemplate.java.ftl";
+            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelName}_NEW.java.ftl";
         }
     }
     param.fileType = type;
@@ -607,13 +654,15 @@ function saveUserTmpTree() {
     });
 }
 
-function del() {
+function del(node) {
     if(isDefaultTree()){
         $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
         return;
     }
-    let node = $('#tmps').tree('getSelected');
-    param = {};
+    if(!node){
+        node = $('#tmps').tree('getSelected');
+    }
+    let param = {};
     param.modulePath = node.attributes.modulePath;
     ajaxLoad("/config/deleteTmp",param,function(data){
         if(data.msg == "删除成功"){
@@ -622,6 +671,101 @@ function del() {
             $.messager.alert('info',data.msg);
         }
     });
+}
+
+
+function copy() {
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
+        return;
+    }
+    cutNode=null;
+    copyNode = $('#tmps').tree('getSelected');//获取复制的节点
+}
+
+function cut() {
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
+        return;
+    }
+    copyNode=null;
+    cutNode = $('#tmps').tree('getSelected');//获取剪切的节点
+}
+
+function paste() {
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
+        return;
+    }
+    if(!cutNode && !copyNode){
+        $.messager.alert('error',"请先选择复制或剪切的节点");
+        return;
+    }
+    if(cutNode){
+        doMove(cutNode);
+        cutNode=null;
+    }else{
+        doCopy(copyNode);
+    }
+}
+
+function doCopy(node){
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
+        return;
+    }
+    let targetNode = $('#tmps').tree('getSelected');
+    let tmpTreeName = $("#userTmpTreeList option:selected").val();
+    let param = {};
+    param.tmpTreeName = tmpTreeName;
+    param.sourceTmpModulePath = node.attributes.modulePath;
+    param.targetTmpModulePath = targetNode.attributes.modulePath;
+    ajaxLoad("/config/copyPath",param,function(data){
+        if(data == 1){
+            loadTmpTree();
+            let nodes = $("#tmps").tree("getChildren",node.target);
+            for(let i=0;i<nodes.length;i++){
+                if(nodes[i].attributes.modulePath == param.tmpModulePath){
+                    $("#tmps").tree("select",nodes[i].target);//选中刚新增的项
+                    break;
+                }
+            }
+        }else{
+            $.messager.alert('error','同名文件已存在');
+            return;
+        }
+    });
+}
+
+function doMove(node){
+    if(isDefaultTree()){
+        $.messager.alert('error',"默认分支不能编辑，请提交到副本编辑");
+        return;
+    }
+    let targetNode = $('#tmps').tree('getSelected');
+    let tmpTreeName = $("#userTmpTreeList option:selected").val();
+    let param = {};
+    param.tmpTreeName = tmpTreeName;
+    param.sourceTmpModulePath = node.attributes.modulePath;
+    param.targetTmpModulePath = targetNode.attributes.modulePath;
+    ajaxLoad("/config/movePath",param,function(data){
+        if(data == 1){
+            loadTmpTree();
+            let nodes = $("#tmps").tree("getChildren",node.target);
+            for(let i=0;i<nodes.length;i++){
+                if(nodes[i].attributes.modulePath == param.tmpModulePath){
+                    $("#tmps").tree("select",nodes[i].target);//选中刚新增的项
+                    break;
+                }
+            }
+        }else{
+            $.messager.alert('error','同名文件已存在');
+            return;
+        }
+    });
+
+
+
 }
 
 /**

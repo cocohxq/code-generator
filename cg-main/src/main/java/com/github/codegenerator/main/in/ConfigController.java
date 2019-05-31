@@ -1,7 +1,6 @@
 package com.github.codegenerator.main.in;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.TreeNode;
 import com.github.codegenerator.common.spi.initializer.Initializer;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -35,8 +35,32 @@ public class ConfigController {
     //step1 进入选择页
     @GetMapping("/init")
     public String init(Model model, HttpServletRequest request) {
+        //存在操作
+        String operation = request.getParameter("op");
+        if(!StringUtils.isEmpty(operation)){
+            model.addAttribute("op",operation);
+            //加载相应数据
+            String selectedConfig = request.getParameter("sc");
+            if(!StringUtils.isEmpty(selectedConfig)){
+                request.setAttribute("selectedConfig",selectedConfig);
+                Config config = DataUtil.getData("cb", selectedConfig, Config.class);
+                //如果是复制新增，这里把config名称剔除,让页面重新输入
+                if(!StringUtils.isEmpty(request.getParameter("cp"))){
+                    config.setConfigName("");
+                }
+                model.addAttribute("config",config);
+            }else{
+                model.addAttribute("config",new Config());
+            }
+        }else{
+            List<String> configList = DataUtil.getDataNameList();
+            configList.add(0,"请选择");
+            if(null != configList){
+                model.addAttribute("configList", configList);
+            }
+        }
+
         model.addAttribute("view", ContextContainer.getViewerInfo());
-        model.addAttribute("config",request.getAttribute("configInfo"));
         return "config";
     }
 
@@ -85,10 +109,57 @@ public class ConfigController {
     @PostMapping("/addPath")
     @ResponseBody
     public Integer addPath(@RequestBody Map<String, String> param) {
-        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
-        String tmpModulePath = param.get("tmpModulePath");
-        Integer fileType = Integer.parseInt(param.get("fileType"));
-        return FileUtils.addFile(tmpTreeName, tmpModulePath,fileType);
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String tmpModulePath = param.get("tmpModulePath");
+            Integer fileType = Integer.parseInt(param.get("fileType"));
+            FileUtils.addFile(tmpTreeName, tmpModulePath,fileType);
+            return 1;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 增加模板
+     *
+     * @param param
+     * @return
+     */
+    @PostMapping("/movePath")
+    @ResponseBody
+    public Integer movePath(@RequestBody Map<String, String> param) {
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String sourceTmpModulePath = param.get("sourceTmpModulePath");
+            String targetTmpModulePath = param.get("targetTmpModulePath");
+            FileUtils.move(getActualPath(tmpTreeName,sourceTmpModulePath), getActualPath(tmpTreeName,targetTmpModulePath));
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 增加模板
+     *
+     * @param param
+     * @return
+     */
+    @PostMapping("/copyPath")
+    @ResponseBody
+    public Integer copyPath(@RequestBody Map<String, String> param) {
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String sourceTmpModulePath = param.get("sourceTmpModulePath");
+            String targetTmpModulePath = param.get("targetTmpModulePath");
+            FileUtils.copy(getActualPath(tmpTreeName,sourceTmpModulePath), getActualPath(tmpTreeName,targetTmpModulePath));
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 
@@ -108,7 +179,7 @@ public class ConfigController {
         if (null == tmpModulePath || null == tmpTreeName || null == newTmpModulePath) {
             return 0;
         }
-        FileUtils.modifyFileName(tmpTreeName, tmpModulePath, newTmpModulePath);
+        FileUtils.modifyFileName(getActualPath(tmpTreeName, tmpModulePath), getActualPath(tmpTreeName,newTmpModulePath));
         return 1;
     }
 
@@ -128,7 +199,7 @@ public class ConfigController {
         String filePath = FileUtils.concatPath(ContextContainer.getContext().getGenerateInfo().getCodepath(),fileName);
         ResponseEntity entity = new ResponseEntity<byte[]>(FileUtils.readFile2ByteArray(filePath),
                 headers, HttpStatus.CREATED);
-        FileUtils.deleteFile(filePath);//清除zip文件
+        FileUtils.delete(filePath);//清除zip文件
         return entity;
     }
 
@@ -208,7 +279,7 @@ public class ConfigController {
         String modulePath = (String) param.get("modulePath");
         String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
         JSONObject jsonObject = new JSONObject();
-        FileUtils.deleteFile(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,modulePath));
+        FileUtils.delete(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,modulePath));
         jsonObject.put("msg","删除成功");
         return jsonObject;
     }
@@ -224,5 +295,14 @@ public class ConfigController {
         }
         String[] result = new String[emptyNames.size()];
         return emptyNames.toArray(result);
+    }
+
+
+    private String getActualPath(String tmpTreeName,String modulePath){
+        return FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,modulePath);
+    }
+
+    private String getModulePath(String tmpTreeName,String actualPath){
+        return actualPath.replace("",FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName));
     }
 }

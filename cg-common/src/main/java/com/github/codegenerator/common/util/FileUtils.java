@@ -2,12 +2,13 @@ package com.github.codegenerator.common.util;
 
 import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.StringTemplateLoader;
+import com.sun.org.apache.bcel.internal.classfile.SourceFile;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 
+import javax.xml.transform.Source;
 import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
@@ -53,7 +54,7 @@ public class FileUtils {
                     try {
                         File targetFile = new File(targetFilePath);
                         if(targetFile.exists()){
-                            FileUtils.deleteFile(targetFile.getPath());
+                            FileUtils.delete(targetFile.getPath());
                         }
                         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile), "UTF-8"));
                         tmp.process(tableContentMap, writer);
@@ -136,7 +137,7 @@ public class FileUtils {
         if(!file.exists()){
             throw new RuntimeException("需更新的文件不存在");
         }
-        deleteFile(file.getPath());
+        delete(file.getPath());
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file);
@@ -158,19 +159,18 @@ public class FileUtils {
 
     /**
      * 重命名文件
-     * @param tmpTreeName
      * @param
      * @param
      * @return
      */
-    public static Integer modifyFileName(String tmpTreeName,String oldFileModulePath,String newFileModulePath){
+    public static Integer modifyFileName(String oldFileModulePath,String newFileModulePath){
         try {
-            File file = new File(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,oldFileModulePath));
+            File file = new File(oldFileModulePath);
             if(!file.exists()){
                 throw new RuntimeException("需更新的文件不存在");
             }
 
-            file.renameTo(new File(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, tmpTreeName, newFileModulePath)));
+            file.renameTo(new File(newFileModulePath));
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,7 +185,7 @@ public class FileUtils {
     public static void generateZip(List<String> sourcePathList, String targetPath, String zipName){
         File targetFile = new File(FileUtils.concatPath(targetPath,zipName));
         if(targetFile.exists()){
-            deleteFile(targetFile.getPath());
+            delete(targetFile.getPath());
         }
         ZipOutputStream zos = null;
         try {
@@ -228,7 +228,6 @@ public class FileUtils {
             while(offset < arr.length && (count = bis.read(arr,offset,arr.length-offset)) != -1){
                 offset+=count;
             }
-
 
             if(arr.length != offset){
                 throw new IOException("文件转成字节异常");
@@ -353,27 +352,26 @@ public class FileUtils {
     }
 
     /**
-     * 新增模板文件
+     * 新增文件
      * @param tmpTreeName
      * @param fileModulePath
      * @return
      */
-    public static Integer addFile(String tmpTreeName,String fileModulePath,Integer fileType){
-        try {
-            File file = new File(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,fileModulePath));
-            if(file.exists()){
-                return 0;
-            }
-            if(fileType == 0) {
-                file.createNewFile();
-            }else{
-                file.mkdir();
-            }
-            return 1;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
+    public static void addFile(String tmpTreeName,String fileModulePath,Integer fileType) throws Exception{
+        File file = new File(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR,tmpTreeName,fileModulePath));
+        if(file.exists()){
+            throw new RuntimeException("文件已存在");
         }
+        if(fileType == 0) {
+            file.createNewFile();
+        }else{
+            file.mkdir();
+        }
+    }
+
+    public static void move(String sourcePath,String targetPath){
+        copy(sourcePath,targetPath);
+        delete(sourcePath);
     }
 
     /**
@@ -393,9 +391,6 @@ public class FileUtils {
      */
     public static void deleteDir(String path,boolean includeSelf){
         File file = new File(path);
-        if(!file.exists() && !file.isDirectory()){
-            return;
-        }
 
         for(File childFile : file.listFiles()){
             if(childFile.isDirectory()){
@@ -414,11 +409,8 @@ public class FileUtils {
      * 删除文件
      * @param path
      */
-    public static void deleteFile(String path){
+    public static void delete(String path){
         File file = new File(path);
-        if(!file.exists()){
-            return;
-        }
         if(file.isDirectory()){
             deleteDir(path,true);
         }else{
@@ -463,7 +455,7 @@ public class FileUtils {
         try {
             File targetDir = new File(targetDirPath);
             if(targetDir.exists()){
-                FileUtils.deleteFile(targetDirPath);
+                FileUtils.delete(targetDirPath);
             }
             targetDir.mkdirs();
 
@@ -492,6 +484,78 @@ public class FileUtils {
         }
     }
 
+    public static void copyDir(String sourcePath,String targetPath,boolean includeSelf){
+        File sourceDir = new File(sourcePath);
+        //如果包含移动的源目标文件夹，需要把源目录带过去
+        if(includeSelf){
+            targetPath = concatPath(targetPath,sourcePath.substring(sourcePath.lastIndexOf(File.separator)));
+        }
+        File targetDir = new File(targetPath);
+        if(!targetDir.exists()){
+            targetDir.mkdirs();
+        }
+
+        for(File childFile : sourceDir.listFiles()){
+            if(childFile.isDirectory()){
+                copyDir(childFile.getPath(),targetPath,true);
+            }else{
+                copyFile(childFile.getPath(),concatPath(targetPath,childFile.getName()));
+            }
+        }
+    }
+
+    public static void copy(String sourcePath,String targetPath){
+        if(new File(concatPath(targetPath,sourcePath.substring(sourcePath.lastIndexOf(File.separator)))).exists()){
+            throw new RuntimeException("目标文件已存在");
+        }
+        //目录往自己内部copy的时候需要用临时目录来存档,再rename,避免遍历死循环
+        String actualTargetPath = null;
+        if(sourcePath.equals(targetPath)){
+            actualTargetPath = targetPath;
+            targetPath = targetPath+"_tmp";
+            //先copy源文件目录下所有子文件，保证xxx和xxx_tmp一模一样,下面再去把源文件夹往目标文件夹copy一次
+            copyDir(sourcePath,targetPath,false);
+        }
+        File sourceFile = new File(sourcePath);
+        if(sourceFile.isDirectory()){
+            copyDir(sourcePath,targetPath,true);
+        }else{
+            copyFile(sourcePath,targetPath);
+        }
+        //重命名临时文件夹成目标文件夹
+        if(actualTargetPath != null){
+            delete(actualTargetPath);
+            modifyFileName(targetPath,actualTargetPath);
+        }
+    }
+
+    public static void copyFile(String sourcePath,String targetPath){
+        InputStreamReader isr = null;
+        OutputStreamWriter osw = null;
+        try {
+            isr = new InputStreamReader(new FileInputStream(sourcePath));
+            osw = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(new File(targetPath))));
+            char[] buffer = new char[1024];
+            int count = 0;
+            while((count = isr.read(buffer,0,buffer.length))>0){
+                osw.write(buffer,0,count);
+            }
+            osw.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(null != osw){
+                    osw.close();
+                }
+                if(null != isr){
+                    isr.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static void copyFileFromInputStream(InputStream is,String targetPath){
         InputStreamReader isr = null;
@@ -529,10 +593,6 @@ public class FileUtils {
      * @throws Exception
      */
     public static String read(String filePath) throws Exception{
-        File file = new File(filePath);
-        if(!file.exists()){
-            return null;
-        }
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         return br.lines().collect(Collectors.joining());
     }

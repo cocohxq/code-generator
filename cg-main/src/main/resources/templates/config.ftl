@@ -149,7 +149,9 @@
                                 </#list>
                             </select>
                             <button class="btn add" id="addConfig">新增</button>
+                            <button class="btn add" id="copyAddConfig">复制新增</button>
                             <button class="btn edit" id="editConfig">编辑</button>
+                            <button class="btn edit" id="delConfig">删除</button>
                         </div>
                     </div>
                     <div class="control-group">
@@ -350,6 +352,7 @@
                 <div id="menuLevel_0" class="easyui-menu" style="width:120px;">
                     <div onclick="append(0)" data-options="iconCls:'icon-add'">添加模板</div>
                     <div onclick="append(1)" data-options="iconCls:'icon-add'">添加目录</div>
+                    <div onclick="paste()" data-options="iconCls:'icon-add'">粘贴</div>
                 </div>
 
                 <div id="menuLevel_1" class="easyui-menu" style="width:120px;">
@@ -357,11 +360,16 @@
                     <div onclick="append(1)" data-options="iconCls:'icon-add'">添加目录</div>
                     <div onclick="edit()" data-options="iconCls:'icon-add'">重命名</div>
                     <div onclick="del()" data-options="iconCls:'icon-add'">删除</div>
+                    <div onclick="copy()" data-options="iconCls:'icon-add'">复制</div>
+                    <div onclick="cut()" data-options="iconCls:'icon-add'">剪切</div>
+                    <div onclick="paste()" data-options="iconCls:'icon-add'">粘贴</div>
                 </div>
 
                 <div id="menuLevel_2" class="easyui-menu" style="width:120px;">
                     <div onclick="edit()" data-options="iconCls:'icon-add'">重命名</div>
                     <div onclick="del()" data-options="iconCls:'icon-add'">删除</div>
+                    <div onclick="copy()" data-options="iconCls:'icon-add'">复制</div>
+                    <div onclick="cut()" data-options="iconCls:'icon-add'">剪切</div>
                 </div>
 
 

@@ -20,12 +20,22 @@ import java.util.List;
 public abstract class DbInitializer extends AbstractInitializer {
 
 
+    private static final String OPERATION_COPY = "copy";
+    private static final String OPERATION_EDIT = "edit";
+    private static final String OPERATION_ADD = "add";
+
     @Override
     public boolean before(SessionGenerateContext context) {
         Config config = context.getConfig();
-        //保存配置
-        if(config.isAdd()){
-            DataUtil.updateData("cb",config.getConfigName(), JSONObject.toJSONString(config),true);
+        //保存配置或更新
+        if(null != config.getOperation()){
+            if(OPERATION_COPY.equals(config.getOperation()) || OPERATION_ADD.equals(config.getOperation())){
+                DataUtil.saveData("cb",config.getConfigName(), JSONObject.toJSONString(config));
+            }else if(OPERATION_EDIT.equals(config.getOperation())){
+                DataUtil.updateData("cb",config.getConfigName(), JSONObject.toJSONString(config),true);
+            }else{
+                DataUtil.deleteData("cb",config.getConfigName());
+            }
             return false;
         }else{
             //加载class

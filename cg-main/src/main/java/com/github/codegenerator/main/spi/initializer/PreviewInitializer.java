@@ -6,15 +6,12 @@ import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
 
-import java.io.File;
-import java.util.*;
-
 public class PreviewInitializer extends AbstractInitializer {
 
     @Override
     public boolean before(SessionGenerateContext context) {
         //清除zip
-        FileUtils.deleteFile(FileUtils.concatPath(context.getGenerateInfo().getCodepath(),"code.zip"));
+        FileUtils.delete(FileUtils.concatPath(context.getGenerateInfo().getCodepath(),"code.zip"));
         return true;
     }
 
