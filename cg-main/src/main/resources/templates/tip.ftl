@@ -146,7 +146,7 @@
   "UserInfoDao.classPath": "com.hxq.dao.UserInfoDao",
   "UserInfoQuery.classPath": "com.hxq.query.UserInfoQuery",
   "UserInfoDaoImpl.classPath": "com.hxq.dao.impl.UserInfoDaoImpl",
-  "PageResult.classPath": "com.hxq.common.PageResult",
+  "PagedResult.classPath": "com.hxq.common.PagedResult",
   "UserInfo.classPath": "com.hxq.model.UserInfo",
   "UserInfoDTO.classPath": "com.hxq.dto.UserInfoDTO",
   "UserInfoEntity.classPath": "com.hxq.entity.UserInfoEntity",

@@ -104,9 +104,9 @@ $(document).ready(function(){
         }
         //判断操作
         let href = location.href;
-        if(href.indexOf("cp=1")){
+        if(href.indexOf("cp=1") != -1){
             param.operation="copy";
-        }else if(href.indexOf("sc=")){
+        }else if(href.indexOf("sc=") != -1){
             param.operation="edit";
         }else{
             param.operation="add";

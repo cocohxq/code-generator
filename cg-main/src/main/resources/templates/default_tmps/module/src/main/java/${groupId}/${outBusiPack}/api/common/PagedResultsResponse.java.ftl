@@ -1,6 +1,6 @@
 package ${javaPackage};
 
-import ${commonValueStack.getValue("PageResult.classPath")!""};
+import ${commonValueStack.getValue("PagedResult.classPath")!""};
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 

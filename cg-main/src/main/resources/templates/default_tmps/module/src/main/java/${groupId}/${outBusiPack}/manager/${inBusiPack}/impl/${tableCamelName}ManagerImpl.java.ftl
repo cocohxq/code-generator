@@ -4,7 +4,7 @@ import ${commonValueStack.getValue(tableCamelName + "Manager.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Dao.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "DO.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Query.classPath")!""};
-import ${commonValueStack.getValue("PageResult.classPath")!""};
+import ${commonValueStack.getValue("PagedResult.classPath")!""};
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class ${javaClassName} implements ${tableCamelName}Manager {
         return ${tableCamelNameMin}Dao.deleteById(id);
     }
 
-    public PageResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
+    public PagedResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         Integer totalNum = ${tableCamelNameMin}Dao.count(${tableCamelNameMin}Query);
         List<${tableCamelName}DO> list = Collections.EMPTY_LIST;
         if (null != totalNum || 0 < totalNum) {

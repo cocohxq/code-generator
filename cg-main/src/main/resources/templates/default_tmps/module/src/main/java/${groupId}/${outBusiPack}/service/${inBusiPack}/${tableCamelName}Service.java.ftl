@@ -3,7 +3,7 @@ package ${javaPackage};
 import java.util.List;
 import ${commonValueStack.getValue(tableCamelName + "DO.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Query.classPath")!""};
-import ${commonValueStack.getValue("PageResult.classPath")!""};
+import ${commonValueStack.getValue("PagedResult.classPath")!""};
 public interface ${javaClassName} {
 
 
@@ -13,7 +13,7 @@ public interface ${javaClassName} {
 
     Integer deleteById(Long id);
 
-    PageResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query);
+    PagedResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query);
 
     ${tableCamelName}DO queryById(Long id);
 

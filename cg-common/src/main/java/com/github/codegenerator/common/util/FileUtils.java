@@ -391,7 +391,9 @@ public class FileUtils {
      */
     public static void deleteDir(String path,boolean includeSelf){
         File file = new File(path);
-
+        if(!file.exists()){
+            return;
+        }
         for(File childFile : file.listFiles()){
             if(childFile.isDirectory()){
                 deleteDir(childFile.getPath(),true);

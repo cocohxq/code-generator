@@ -1,5 +1,6 @@
 package ${javaPackage};
 
+import ${commonValueStack.getValue("BaseQuery.classPath")!""};
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,12 +79,11 @@ public abstract class BaseDao<D extends BaseDO, Q extends BaseQuery> extends Sql
         return getSqlSession().selectList(getNamespace() + "queryByIds", ids);
     }
 
-    @Override
     public void batchInsert(List<D> items) {
         if (CollectionUtils.isEmpty(items)) {
             return;
         }
-        getSqlSession().insert(namespace + "batchInsert", items);
+        getSqlSession().insert(getNamespace() + "batchInsert", items);
     }
 
     public Integer batchUpdateById(List<D> list) {

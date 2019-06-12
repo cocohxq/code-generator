@@ -1,7 +1,7 @@
 package ${javaPackage};
 
 import java.util.List;
-import ${commonValueStack.getValue("PageResultsResponse.classPath")!""};
+import ${commonValueStack.getValue("PagedResultsResponse.classPath")!""};
 import ${commonValueStack.getValue("Response.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "DTO.classPath")!""};
 import ${commonValueStack.getValue(tableCamelName + "Query.classPath")!""};
