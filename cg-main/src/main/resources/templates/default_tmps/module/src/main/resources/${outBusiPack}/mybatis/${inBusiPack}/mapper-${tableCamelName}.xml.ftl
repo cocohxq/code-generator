@@ -103,6 +103,7 @@
         <include refid="selectColumnList" />
         from ${dbName}.${tableMeta.table.tableName}
         <include refid="queryWhereSql" />
+        order by id desc
         limit  ${r'#'}{startIndex},${r'#'}{pageSize}
     </select>
 

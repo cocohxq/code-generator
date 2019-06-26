@@ -29,4 +29,9 @@ public class Page implements Serializable {
         this.pageSize = pageSize;
     }
 
+    public int getStartIndex() {
+        int startIndex = (this.curPage - 1) * this.pageSize;
+        return startIndex < 0 ? 0 : startIndex;
+    }
+
 }
