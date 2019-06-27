@@ -19,6 +19,8 @@ public interface ${javaClassName} {
 
     List<${tableCamelName}DO> queryByIds(List<Long> ids);
 
+    List<${tableCamelName}DO> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query);
+
     Integer batchUpdateById(List<${tableCamelName}DO> list);
 }
 

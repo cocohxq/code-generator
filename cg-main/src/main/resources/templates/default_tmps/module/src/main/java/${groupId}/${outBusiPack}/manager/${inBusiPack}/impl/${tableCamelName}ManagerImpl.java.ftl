@@ -43,6 +43,10 @@ public class ${javaClassName} implements ${tableCamelName}Manager {
         return new PagedResult<>(${tableCamelNameMin}Query.getCurPage(), ${tableCamelNameMin}Query.getPageSize(), totalNum, list);
     }
 
+    public List<${tableCamelName}DO> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query) {
+        return ${tableCamelNameMin}Dao.query(${tableCamelNameMin}Query);
+    }
+
     public ${tableCamelName}DO queryById(Long id) {
         return ${tableCamelNameMin}Dao.queryById(id);
     }

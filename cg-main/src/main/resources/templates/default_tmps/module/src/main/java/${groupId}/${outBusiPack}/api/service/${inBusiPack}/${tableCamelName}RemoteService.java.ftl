@@ -17,6 +17,8 @@ public interface ${javaClassName} {
 
     PagedResultsResponse<${tableCamelName}DTO> query(${tableCamelName}Query ${tableCamelNameMin}Query);
 
+    Response<List<${tableCamelName}DTO>> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query);
+
     Response<${tableCamelName}DTO> queryById(Long id);
 
     Response<List<${tableCamelName}DTO>> queryByIds(List<Long> ids);

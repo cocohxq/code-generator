@@ -93,7 +93,7 @@
         from ${dbName}.${tableMeta.table.tableName}
         where id in
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
-                ${r'#'}{item.id}
+                ${r'#'}{item}
         </foreach>
     </select>
 

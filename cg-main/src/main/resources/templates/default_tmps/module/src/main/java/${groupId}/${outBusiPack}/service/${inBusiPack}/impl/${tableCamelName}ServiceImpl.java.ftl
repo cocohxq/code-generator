@@ -37,6 +37,10 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         return ${tableCamelNameMin}Manager.query(${tableCamelNameMin}Query);
     }
 
+    public List<${tableCamelName}DO> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
+        return ${tableCamelNameMin}Manager.queryAll(${tableCamelNameMin}Query);
+    }
+
     public ${tableCamelName}DO queryById(Long id) {
         return ${tableCamelNameMin}Manager.queryById(id);
     }

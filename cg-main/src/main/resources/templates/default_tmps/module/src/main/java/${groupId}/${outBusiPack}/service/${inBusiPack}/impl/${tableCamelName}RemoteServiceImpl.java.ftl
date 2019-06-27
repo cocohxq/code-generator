@@ -74,6 +74,25 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    Response<List<${tableCamelName}DTO>> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
+        if (null == ${tableCamelNameMin}Query) {
+            return PagedResultsResponse.writeError("查询条件为空");
+        }
+        try {
+            List<${tableCamelName}DO> doList = ${tableCamelNameMin}Manager.queryAll(${tableCamelNameMin}Query);
+            List<${tableCamelName}DTO> dtoList = new ArrayList<>();
+            for(${tableCamelName}DO ${tableCamelNameMin}DO : doList){
+                ${tableCamelName}DTO ${tableCamelNameMin}DTO = new ${tableCamelName}DTO();
+                BeanUtils.copyProperties(${tableCamelNameMin}DO, ${tableCamelNameMin}DTO);
+                dtoList.add(${tableCamelNameMin}DTO);
+            }
+            return Response.writeSuccess(dtoList);
+        } catch (Exception e) {
+            logger.error("${tableMeta.table.comment!''}数据查询异常", e);
+            return Response.writeError("${tableMeta.table.comment!''}数据查询异常");
+        }
+    }
+
     public Response<${tableCamelName}DTO> queryById(Long id) {
 		if (id == null || id <= 0) {
 			return Response.writeError("指定的查询Id无效");
