@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@Service
+@Service("${tableCamelNameMin}Service")
 public class ${javaClassName} implements ${tableCamelName}Service {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
