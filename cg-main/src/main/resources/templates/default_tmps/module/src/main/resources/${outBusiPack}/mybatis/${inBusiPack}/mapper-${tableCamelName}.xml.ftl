@@ -152,7 +152,10 @@
     <#if deleteStr?exists>
     <update id="deleteById" parameterType="java.lang.Long">
         update ${dbName}.${tableMeta.table.tableName}
-        set <#list commonValueStack.getSpecifiedFields(tableMeta.fields,deleteStr) as field>${field.column.columnName}=1</#list>
+        set <#list commonValueStack.getSpecifiedFields(tableMeta.fields,deleteStr) as field>${field.column.columnName}=1</#list>,
+        <#list commonValueStack.getSpecifiedFields(tableMeta.fields,updateTimeStr) as field>
+            ${field.column.columnName}=now()
+        </#list>
         where id = ${r'#'}{id}
     </update>
     <#else>
