@@ -20,6 +20,9 @@
 
     <sql id="queryWhereSql">
         where 1=1
+        <#if deleteStr?exists>
+            <#list commonValueStack.getSpecifiedFields(tableMeta.fields,deleteStr) as field>${field.column.columnName}=0</#list>
+        </#if>
     <#list tableMeta.fields as field>
         <if test="${field.fieldName} != null">
             and ${field.column.columnName}=${r'#'}{${field.fieldName}}
