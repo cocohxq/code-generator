@@ -54,6 +54,15 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    public Response<Integer> deleteById(Long id) {
+        try {
+            return Response.writeSuccess(${tableCamelNameMin}Manager.deleteById(id));
+        } catch (Exception e) {
+            logger.error("${tableMeta.table.comment!''}数据删除异常", e);
+            return PagedResultsResponse.writeError("${tableMeta.table.comment!''}数据删除异常");
+        }
+    }
+
     public PagedResultsResponse<${tableCamelName}DTO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         if (null == ${tableCamelNameMin}Query) {
             return PagedResultsResponse.writeError("查询条件为空");
@@ -126,6 +135,26 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         } catch (Exception e) {
             logger.error("${tableMeta.table.comment!''}数据查询异常", e);
             return Response.writeError("${tableMeta.table.comment!''}数据查询异常");
+        }
+    }
+
+    public Response<Integer> batchUpdateById(List<${tableCamelName}DTO> list) {
+        if (list == null || list.size() == 0) {
+            return Response.writeError("批量更新的数据为空");
+        }
+        try {
+            List<${tableCamelName}DTO> doList = new ArrayList<>();
+            if(null != list && list.size() > 0){
+                for(${tableCamelName}DTO ${tableCamelNameMin}DTO : list){
+                    ${tableCamelName}DO ${tableCamelNameMin}DO = new ${tableCamelName}DO();
+                    BeanUtils.copyProperties(${tableCamelNameMin}DTO, ${tableCamelNameMin}DO);
+                    doList.add(${tableCamelNameMin}DO);
+                }
+            }
+            return Response.writeSuccess(${tableCamelNameMin}Manager.batchUpdateById(doList));
+        } catch (Exception e) {
+            logger.error("${tableMeta.table.comment!''}数据更新异常", e);
+            return Response.writeError("${tableMeta.table.comment!''}数据更新异常");
         }
     }
 }
