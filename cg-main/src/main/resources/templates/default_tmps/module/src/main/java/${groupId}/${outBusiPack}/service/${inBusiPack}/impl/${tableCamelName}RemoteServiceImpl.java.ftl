@@ -55,6 +55,9 @@ public class ${javaClassName} implements ${tableCamelName}Service {
     }
 
     public Response<Integer> deleteById(Long id) {
+        if(null == id){
+            return Response.writeError("删除id为空");
+        }
         try {
             return Response.writeSuccess(${tableCamelNameMin}Manager.deleteById(id));
         } catch (Exception e) {
