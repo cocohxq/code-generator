@@ -86,7 +86,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
-    Response<List<${tableCamelName}DTO>> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
+    public Response<List<${tableCamelName}DTO>> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
         if (null == ${tableCamelNameMin}Query) {
             return PagedResultsResponse.writeError("查询条件为空");
         }
@@ -146,7 +146,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
             return Response.writeError("批量更新的数据为空");
         }
         try {
-            List<${tableCamelName}DTO> doList = new ArrayList<>();
+            List<${tableCamelName}DO> doList = new ArrayList<>();
             if(null != list && list.size() > 0){
                 for(${tableCamelName}DTO ${tableCamelNameMin}DTO : list){
                     ${tableCamelName}DO ${tableCamelNameMin}DO = new ${tableCamelName}DO();
