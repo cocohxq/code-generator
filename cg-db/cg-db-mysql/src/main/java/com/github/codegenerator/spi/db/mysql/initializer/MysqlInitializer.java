@@ -33,7 +33,7 @@ public class MysqlInitializer extends DbInitializer {
     @Override
     public String convertType(String columnType) throws Exception {
         columnType = columnType.toUpperCase();
-        if (columnType.startsWith("VARCHAR") || columnType.startsWith("CHAR") || columnType.contains("TEXT") || columnType.startsWith("VAR")) {
+        if (columnType.startsWith("VARCHAR") || columnType.startsWith("CHAR") || columnType.contains("TEXT") || columnType.startsWith("VAR") || columnType.startsWith("JSON")) {
             return "String";
         } else if (columnType.startsWith("INT") || columnType.startsWith("TINYINT") || columnType.startsWith("MEDIUMINT") || columnType.startsWith("SMALLINT")) {
             return "Integer";

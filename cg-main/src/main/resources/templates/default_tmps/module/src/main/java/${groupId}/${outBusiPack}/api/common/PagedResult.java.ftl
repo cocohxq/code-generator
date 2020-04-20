@@ -1,4 +1,4 @@
-package com.pos.kb.api.common;
+package ${javaPackage};
 
 import java.io.Serializable;
 import java.util.List;

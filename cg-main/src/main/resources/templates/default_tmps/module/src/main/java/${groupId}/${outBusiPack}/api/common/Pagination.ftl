@@ -1,4 +1,4 @@
-package com.wumart.scm.framework.core.arch.service.contract;
+package ${javaPackage};
 
 import java.io.Serializable;
 
