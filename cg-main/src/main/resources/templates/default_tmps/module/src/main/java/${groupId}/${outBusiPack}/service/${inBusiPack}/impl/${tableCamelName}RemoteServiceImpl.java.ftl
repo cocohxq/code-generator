@@ -26,6 +26,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
     private ${tableCamelName}Manager ${tableCamelNameMin}Manager;
 
 
+    @Override
     public Response<Long> insert(${tableCamelName}DTO ${tableCamelNameMin}DTO) {
         if (null == ${tableCamelNameMin}DTO) {
             return Response.writeError("插入数据为空");
@@ -40,6 +41,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public Response<Integer> updateById(${tableCamelName}DTO ${tableCamelNameMin}DTO) {
         if (null == ${tableCamelNameMin}DTO) {
             return Response.writeError("更新数据为空");
@@ -54,6 +56,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public Response<Integer> deleteById(Long id) {
         if(null == id){
             return Response.writeError("删除id为空");
@@ -66,6 +69,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public PagedResultsResponse<${tableCamelName}DTO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         if (null == ${tableCamelNameMin}Query) {
             return PagedResultsResponse.writeError("查询条件为空");
@@ -86,6 +90,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public Response<List<${tableCamelName}DTO>> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
         if (null == ${tableCamelNameMin}Query) {
             return PagedResultsResponse.writeError("查询条件为空");
@@ -105,6 +110,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public Response<${tableCamelName}DTO> queryById(Long id) {
 		if (id == null || id <= 0) {
 			return Response.writeError("指定的查询Id无效");
@@ -120,6 +126,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
 		}
     }
 
+    @Override
     public Response<List<${tableCamelName}DTO>> queryByIds(List<Long> ids) {
         if (ids == null || ids.size() == 0) {
             return Response.writeError("指定的查询Id无效");
@@ -141,6 +148,7 @@ public class ${javaClassName} implements ${tableCamelName}Service {
         }
     }
 
+    @Override
     public Response<Integer> batchUpdateById(List<${tableCamelName}DTO> list) {
         if (list == null || list.size() == 0) {
             return Response.writeError("批量更新的数据为空");

@@ -21,19 +21,22 @@ public class ${javaClassName} implements ${tableCamelName}Manager {
     @Autowired
     private ${tableCamelName}Dao ${tableCamelNameMin}Dao;
 
-
+    @Override
     public Long insert(${tableCamelName}DO ${tableCamelNameMin}DO) {
         return ${tableCamelNameMin}Dao.insert(${tableCamelNameMin}DO);
     }
 
+    @Override
     public Integer updateById(${tableCamelName}DO ${tableCamelNameMin}DO) {
         return ${tableCamelNameMin}Dao.updateById(${tableCamelNameMin}DO);
     }
 
+    @Override
     public Integer deleteById(Long id) {
         return ${tableCamelNameMin}Dao.deleteById(id);
     }
 
+    @Override
     public PagedResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         Integer totalNum = ${tableCamelNameMin}Dao.count(${tableCamelNameMin}Query);
         List<${tableCamelName}DO> list = Collections.EMPTY_LIST;
@@ -43,18 +46,22 @@ public class ${javaClassName} implements ${tableCamelName}Manager {
         return new PagedResult<>(${tableCamelNameMin}Query.getCurPage(), ${tableCamelNameMin}Query.getPageSize(), totalNum, list);
     }
 
+    @Override
     public List<${tableCamelName}DO> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query) {
         return ${tableCamelNameMin}Dao.query(${tableCamelNameMin}Query);
     }
 
+    @Override
     public ${tableCamelName}DO queryById(Long id) {
         return ${tableCamelNameMin}Dao.queryById(id);
     }
 
+    @Override
     public List<${tableCamelName}DO> queryByIds(List<Long> ids) {
         return ${tableCamelNameMin}Dao.queryByIds(ids);
     }
 
+    @Override
     public Integer batchUpdateById(List<${tableCamelName}DO> list) {
         return ${tableCamelNameMin}Dao.batchUpdateById(list);
     }

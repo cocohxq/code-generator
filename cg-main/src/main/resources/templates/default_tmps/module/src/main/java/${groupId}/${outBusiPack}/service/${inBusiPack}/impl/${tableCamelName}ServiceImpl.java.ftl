@@ -20,35 +20,42 @@ public class ${javaClassName} implements ${tableCamelName}Service {
     @Autowired
     private ${tableCamelName}Manager ${tableCamelNameMin}Manager;
 
-
+    @Override
     public Long insert(${tableCamelName}DO ${tableCamelNameMin}DO) {
         return ${tableCamelNameMin}Manager.insert(${tableCamelNameMin}DO);
     }
 
+    @Override
     public Integer updateById(${tableCamelName}DO ${tableCamelNameMin}DO) {
         return ${tableCamelNameMin}Manager.updateById(${tableCamelNameMin}DO);
     }
 
+    @Override
     public Integer deleteById(Long id) {
         return ${tableCamelNameMin}Manager.deleteById(id);
     }
 
+    @Override
     public PagedResult<${tableCamelName}DO> query(${tableCamelName}Query ${tableCamelNameMin}Query) {
         return ${tableCamelNameMin}Manager.query(${tableCamelNameMin}Query);
     }
 
+    @Override
     public List<${tableCamelName}DO> queryAll(${tableCamelName}Query ${tableCamelNameMin}Query){
         return ${tableCamelNameMin}Manager.queryAll(${tableCamelNameMin}Query);
     }
 
+    @Override
     public ${tableCamelName}DO queryById(Long id) {
         return ${tableCamelNameMin}Manager.queryById(id);
     }
 
+    @Override
     public List<${tableCamelName}DO> queryByIds(List<Long> ids) {
         return ${tableCamelNameMin}Manager.queryByIds(ids);
     }
 
+    @Override
     public Integer batchUpdateById(List<${tableCamelName}DO> list) {
         return ${tableCamelNameMin}Manager.batchUpdateById(list);
     }
