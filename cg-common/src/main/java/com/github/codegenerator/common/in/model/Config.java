@@ -1,6 +1,5 @@
 package com.github.codegenerator.common.in.model;
 
-import java.beans.Transient;
 import java.util.List;
 
 public class Config {
@@ -8,27 +7,31 @@ public class Config {
     //当前提交step
     private transient Integer stepType;
 
-    //step0
+    //db配置
     private String configName;
     private String ip;
     private String port;
     private String username;
     private String pwd;
     private String dbName;
-    private String groupId;
     private Integer dbType;
-    private String outBusiPack;
-    private String inBusiPack;
-    private Integer codeLocationType;
-    private String createTimeStr;
-    private String updateTimeStr;
-    private String deleteStr;
     private transient String operation;
 
-    //step1
+    //代码配置
+    private transient String groupId;
+    private transient String outBusiPack;
+    private transient String inBusiPack;
+    private transient Integer codeLocationType;
+    private transient String createTimeStr;
+    private transient String updateTimeStr;
+    private transient String deleteStr;
+    private transient String extendStr;
+
+
+    //表选择
     private transient List<String> tableNames;
 
-    //step2
+    //模板
     private transient List<String> tmps;
 
 
@@ -174,5 +177,13 @@ public class Config {
 
     public void setOperation(String operation) {
         this.operation = operation;
+    }
+
+    public String getExtendStr() {
+        return extendStr;
+    }
+
+    public void setExtendStr(String extendStr) {
+        this.extendStr = extendStr;
     }
 }

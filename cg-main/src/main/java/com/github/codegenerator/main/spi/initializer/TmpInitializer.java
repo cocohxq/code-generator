@@ -2,14 +2,11 @@ package com.github.codegenerator.main.spi.initializer;
 
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.*;
-import com.github.codegenerator.common.in.model.db.FieldMeta;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
 import com.github.codegenerator.common.util.TreeUtils;
-import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.util.*;
 
 public class TmpInitializer extends AbstractInitializer {
@@ -17,7 +14,7 @@ public class TmpInitializer extends AbstractInitializer {
     @Override
     public boolean before(SessionGenerateContext context) {
         context.getGenerateInfo().setCommonValueStack(new CommonValueStack());
-        context.getGenerateInfo().setSelectedTmps(new HashMap<>());
+        context.getGenerateInfo().setTableCodeTemplateInfoList(new ArrayList<>());
         FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(),ContextContainer.MODULE_PATH_ROOT),true);//清除生成的代码文件
         return true;
     }
@@ -35,76 +32,29 @@ public class TmpInitializer extends AbstractInitializer {
             //tmpModulePath不为空是模板节点，且没有被用户编辑过的，就放入，保证编辑过的优先
             if (null != tmpModulePath) {
                 //模板填充内容
-                final TemplateInfo tmp = new TemplateInfo();
-                tmp.setTemplateContent(FileUtils.loadFile(generateInfo.getSelectedTmpTreeName(),tmpModulePath,0));//读取模板
-                tmp.setTemplateFileName(FileUtils.getFileNameByPath(tmpModulePath));
-                generateInfo.getSelectedTmps().put(tmpModulePath, tmp);
+                generateInfo.getTableCodeInfoList().stream().forEach(k-> {
+                    TableCodeTemplateInfo tableCodeTemplateInfo = new TableCodeTemplateInfo();
+                    tableCodeTemplateInfo.setTableCodeInfo(k);
+                    boolean isJavaFile = tmpModulePath.toLowerCase().endsWith(".java.ftl")?true:false;
+                    tableCodeTemplateInfo.setTemplateContent(FileUtils.loadFile(generateInfo.getSelectedTmpTreeName(),tmpModulePath,0));//读取模板
+                    tableCodeTemplateInfo.setTemplateFileName(FileUtils.getFileNameByPath(tmpModulePath));
+                    tableCodeTemplateInfo.setTargetFileName(tableCodeTemplateInfo.getTemplateFileName().replace("${tableCamelName}", k.getTableCamelName()).replace("${tableName}", k.getTableMeta().getTable().getTableName()).replace(".ftl", ""));
 
-                List<Map<String, Object>> tableContentList = new ArrayList<>();
-                generateInfo.getSelectedTables().stream().forEach(k -> {
-                    Map<String, Object> tableRelatedMap = new HashMap<>();//与表强关联的属性
-                    tableRelatedMap.put("groupId", config.getGroupId());//类groupId
-                    tableRelatedMap.put("tableMeta", k);//table对象
-                    tableRelatedMap.put("dbName",config.getDbName());
-                    tableRelatedMap.put("tableCamelName",k.getTableCamelNameMin().substring(0,1).toUpperCase()+k.getTableCamelNameMin().substring(1));//大驼峰  表名对应的大驼峰名称  eg:Car
-                    tableRelatedMap.put("tableCamelNameMin",k.getTableCamelNameMin());//小驼峰  变量 eg:car
-                    //拼接最终可能存放的路径
-                    String targetPackageDir = FileUtils.concatPath(generateInfo.getCodepath(),tmpModulePath.replace("${groupId}", config.getGroupId()).replace(tmp.getTemplateFileName(),""));
-                    if(null != config.getInBusiPack()){
-                        targetPackageDir = targetPackageDir.replace("${inBusiPack}",config.getInBusiPack());
-                    }else{
-                        targetPackageDir = targetPackageDir.replace("/${inBusiPack}","");
-                    }
-
-                    if(null != config.getOutBusiPack()){
-                        targetPackageDir = targetPackageDir.replace("${outBusiPack}",config.getOutBusiPack());
-                    }else{
-                        targetPackageDir = targetPackageDir.replace("/${outBusiPack}","");
-                    }
-                    //替换模板中的表名或表驼峰命名变量
-                    String targetFileName = tmp.getTemplateFileName().replace("${tableCamelName}", k.getTableCamelNameMin()).replace("${tableName}", k.getTable().getTableName()).replace(".ftl", "");
-                    //如果是java模板，会带上一些java特有变量
-                    if (targetFileName.indexOf(".java") > 0) {
-                        targetFileName = FileUtils.concatPath(targetFileName.substring(0, 1).toUpperCase()+targetFileName.substring(1));
-                        tableRelatedMap.put("javaClassName", targetFileName.replace(".java",""));//eg: CarEntity
-                        //java文件，则放置一些import
-                        k.getFields().stream().forEach(t -> {
-                            List<String> importList = (List<String>)tableRelatedMap.get("javaImports");
-                            if(null == importList){
-                                importList = new ArrayList<>();
-                                tableRelatedMap.put("javaImports",importList);
-                            }
-
-                            if(t.getFieldType().indexOf("Date") > -1 && !importList.contains("java.util.Date")){
-                                importList.add("java.util.Date");
-                            }
-                            if(t.getFieldType().indexOf("BigDecimal") > -1 && !importList.contains("java.math.BigDecimal")){
-                                importList.add("java.math.BigDecimal");
-                            }
-                        });
-
-                        //生成模板对应的package路径 a.b.c,java模板package用
-                        String javaPackage = targetPackageDir.replace(generateInfo.getCodepath(), "").replace("module/src/main/java/","").replace("/",".");
-                        if(!javaPackage.trim().equals("")) {
-                            tableRelatedMap.put("javaPackage", javaPackage.substring(0, javaPackage.length() - 1));//xxx.xxx.xxx.xxx
-                        }else{
-                            tableRelatedMap.put("javaPackage","");
-                        }
+                    //路径  module/src/main/java/groupId/${outBusiPack}/xxxx/${inBusiPack}
+                    String moduleDir = tmpModulePath.replace("${groupId}", config.getGroupId()).replace(tableCodeTemplateInfo.getTemplateFileName(),"");
+                    if(isJavaFile) {
+                        tableCodeTemplateInfo.setJavaPackage(parsePackage(config, generateInfo, moduleDir));
+                        tableCodeTemplateInfo.setJavaClassName(tableCodeTemplateInfo.getTargetFileName().replace(".java", ""));//eg: CarEntity
                         //记录所有类的类路径
-                        generateInfo.getCommonValueStack().getCommonRelatedMap().put(tableRelatedMap.get("javaClassName")+".classPath",javaPackage+tableRelatedMap.get("javaClassName"));
+                        generateInfo.getCommonValueStack().getCommonRelatedMap().put(tableCodeTemplateInfo.getJavaClassName()+".classPath", tableCodeTemplateInfo.getJavaPackage()+"."+tableCodeTemplateInfo.getJavaClassName());
                     }
 
                     if(config.getCodeLocationType().intValue() == 1){
-                        tableRelatedMap.put("targetFilePath",FileUtils.concatPath(targetPackageDir,targetFileName));
+                        tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(),moduleDir, tableCodeTemplateInfo.getTargetFileName()));
                     }else{
-                        tableRelatedMap.put("targetFilePath",FileUtils.concatPath(generateInfo.getCodepath(),ContextContainer.MODULE_PATH_ROOT,targetFileName));
+                        tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(),ContextContainer.MODULE_PATH_ROOT, tableCodeTemplateInfo.getTargetFileName()));
                     }
-
-                    tableRelatedMap.put("createTimeStr",config.getCreateTimeStr());
-                    tableRelatedMap.put("updateTimeStr",config.getUpdateTimeStr());
-                    tableRelatedMap.put("deleteStr",config.getDeleteStr());
-                    tableContentList.add(tableRelatedMap);
-                    tmp.setTableContentList(tableContentList);
+                    context.getGenerateInfo().getTableCodeTemplateInfoList().add(tableCodeTemplateInfo);
                 });
             }
         });
@@ -126,5 +76,26 @@ public class TmpInitializer extends AbstractInitializer {
     @Override
     public void after(SessionGenerateContext context) {
 
+    }
+
+    private String parsePackage(Config config,GenerateInfo generateInfo,String moduleDir){
+        if(null != config.getInBusiPack()){
+            moduleDir = moduleDir.replace("${inBusiPack}",config.getInBusiPack());
+        }else{
+            moduleDir = moduleDir.replace("/${inBusiPack}","");
+        }
+
+        if(null != config.getOutBusiPack()){
+            moduleDir = moduleDir.replace("${outBusiPack}",config.getOutBusiPack());
+        }else{
+            moduleDir = moduleDir.replace("/${outBusiPack}","");
+        }
+        //生成模板对应的package路径 a.b.c,java模板package用
+        String javaPackage = moduleDir.replace("module/src/main/java/","").replace("/",".");
+        if(!javaPackage.trim().equals("")) {
+            return javaPackage.substring(0, javaPackage.length() - 1);//xxx.xxx.xxx.xxx
+        }else{
+            return "";
+        }
     }
 }

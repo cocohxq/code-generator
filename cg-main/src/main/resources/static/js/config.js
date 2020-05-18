@@ -8,7 +8,7 @@ $(document).ready(function(){
     initCodeArea();//模板编辑区域
 
     //更换配置重新加载
-    $("#step0 #addConfig").click(function () {
+    $("#step_0 #addConfig").click(function () {
         let href = location.href;
         if(href.indexOf("?") != -1){
             href = href.substring(0,href.indexOf("?"))
@@ -17,7 +17,7 @@ $(document).ready(function(){
     });
 
     //更换配置重新加载
-    $("#step0 #copyAddConfig").click(function () {
+    $("#step_0 #copyAddConfig").click(function () {
         let href = location.href;
         if(href.indexOf("?") != -1){
             href = href.substring(0,href.indexOf("?"))
@@ -31,7 +31,7 @@ $(document).ready(function(){
     });
 
     //更换配置重新加载
-    $("#step0 #editConfig").click(function () {
+    $("#step_0 #editConfig").click(function () {
         let href = location.href;
         if(href.indexOf("?") != -1){
             href = href.substring(0,href.indexOf("?"))
@@ -45,7 +45,7 @@ $(document).ready(function(){
     });
 
     //更换配置重新加载
-    $("#step0 #delConfig").click(function () {
+    $("#step_0 #delConfig").click(function () {
         let selectedConfig = $("#selectedConfig").val();
         if(selectedConfig == "请选择"){
             $.messager.alert('error','请选择配置');
@@ -67,12 +67,12 @@ $(document).ready(function(){
     });
 
     //更换配置重新加载
-    $("#step0 #saveConfig").click(function () {
+    $("#step_0 #saveConfig").click(function () {
         let next = true;
         let param ={};
-        $("#step0 input").each(function (item) {
+        $("#step_0 input").each(function (item) {
             if(!$(this).val() && $(this).attr("notNull")){
-                $("#step0 .errMsg").text("必填项不能为空");
+                $("#step_0 .errMsg").text("必填项不能为空");
                 next=false;
                 return;
             }
@@ -89,19 +89,6 @@ $(document).ready(function(){
         }
         param.dbType=$("#dbType").val();
 
-        //代码位置
-        param.codeLocationType = $("input[name='codeLocationType'][type=radio]:checked").val();
-
-        //包名的位置
-        let businessPackage = $("input[name='businessPackage']").val();
-        let businessLocationType = $("input[name='businessLocationType'][type=radio]:checked").val();
-        if(businessPackage){
-            if(businessLocationType == 1){
-                param.outBusiPack = businessPackage;
-            }else{
-                param.inBusiPack = businessPackage;
-            }
-        }
         //判断操作
         let href = location.href;
         if(href.indexOf("cp=1") != -1){
@@ -124,7 +111,7 @@ $(document).ready(function(){
     });
 
     //选择数据源-下一步
-    $("#step0 .next").click(function(){
+    $("#step_0 .next").click(function(){
         let param ={};
         param.add=false;
         let selectedConfig = $("#selectedConfig").val();
@@ -138,33 +125,80 @@ $(document).ready(function(){
 
 
     //选择表-下一步
-    $("#step1 .next").click(function(){
+    $("#step_5 .next").click(function(){
         let param ={};
         let tableNames = new Array();
         $("#tables option:selected").each(function () {
             tableNames.push($(this).val());
         });
         if(tableNames.length == 0){
-            $("#step1 .errMsg").text("请选择需要的生成代码的表");
+            $("#step_5 .errMsg").text("请选择需要的生成代码的表");
             return;
         }
 
         param.tableNames = tableNames;
-        initData(1,true,param,function(data){return true;});
+        initData(5,true,param,function(data){return true;});
         loadTmpTree();
     });
 
-    $("#step1 .pre").click(function(){
-        $("#step1_classes input:checkbox").prop("checked",false);
-        chooseBar(1,false);
+    $("#step_5 .pre").click(function(){
+        chooseBar(5,false);
     });
 
+
+    //编辑代码配置-下一步
+    $("#step_8 .next").click(function(){
+        let param ={};
+        let next = true;
+        $("#step_8 input").each(function (item) {
+            if(!$(this).val() && $(this).attr("notNull")){
+                $("#step_8 .errMsg").text("必填项不能为空");
+                next=false;
+                return;
+            }
+            let id=$(this).attr("id");
+            if(id){
+                let value=$.trim($(this).val());
+                if(value != ""){
+                    param[id]=value;
+                }
+            }
+        })
+        if(!next){
+            return;
+        }
+        //代码位置
+        param.codeLocationType = $("input[name='codeLocationType'][type=radio]:checked").val();
+
+        //包名的位置
+        let businessPackage = $("input[name='businessPackage']").val();
+        let businessLocationType = $("input[name='businessLocationType'][type=radio]:checked").val();
+        if(businessPackage){
+            if(businessLocationType == 1){
+                param.outBusiPack = businessPackage;
+            }else{
+                param.inBusiPack = businessPackage;
+            }
+        }
+        //初始化库表信息
+        initData(8,true,param,function(){return true;});
+
+    });
+
+    $("#step_8 .pre").click(function(){
+        chooseBar(8,false);
+    });
+    
+    
+    
+    
+
     //选择模板-下一步
-    $("#step2 .next").click(function(){
+    $("#step_10 .next").click(function(){
         let param ={};
         param.tmps = getSelectedTreeNode();
         if(param.tmps){
-            initData(2,true,param,function(data){
+            initData(10,true,param,function(data){
                 return initFileTree(data.stepResult);
             });
         }else{
@@ -173,21 +207,21 @@ $(document).ready(function(){
         }
     });
 
-    $("#step2 .pre").click(function(){
-        chooseBar(2,false);
+    $("#step_10 .pre").click(function(){
+        chooseBar(10,false);
     });
 
 
     //预览导出
-    $("#step3 .next").click(function(){
+    $("#step_15 .next").click(function(){
         let param ={};
-        initData(3,true,param,function(data){
+        initData(15,true,param,function(data){
             return downloadZip(data.stepResult);
         });
     });
 
-    $("#step3 .pre").click(function(){
-        chooseBar(3,false);
+    $("#step_15 .pre").click(function(){
+        chooseBar(15,false);
     });
 
 });
@@ -212,7 +246,7 @@ function getSelectedTreeNode() {
  * @param path
  */
 function downloadZip(fileName) {
-    $("#zip_download").attr("href","/config/downloadZip?fileName="+fileName);
+    $("#zip_download").attr("href","/downloadZip?fileName="+fileName);
     document.getElementById("zip_download").click();//这里只能使用js原生写法才可以触发，jquery不行
     window.location.reload();
     return true;
@@ -248,7 +282,7 @@ function initTmps(treeNode){
                 node.text = originEditNode.text;
                 return;
             }
-            ajaxLoad("/config/editTemplateName",param,function(data){
+            ajaxLoad("/editTemplateName",param,function(data){
                 if(data == 1){
                     loadTmpTree();
                     originEditNode= null;
@@ -287,7 +321,7 @@ function initTmps(treeNode){
                     param.manual = node.attributes.manual;
                 }
                 param.fileType = 0;
-                ajaxLoad("/config/loadFile",param,function(data){
+                ajaxLoad("/loadFile",param,function(data){
                     editor.setValue(data.fileContent);
                 });
             }else{
@@ -313,7 +347,7 @@ function initFileTree(treeNode){
                 let param = {};
                 param.modulePath = node.attributes.modulePath;
                 param.fileType = 1;
-                ajaxLoad("/config/loadFile",param,function(data){
+                ajaxLoad("/loadFile",param,function(data){
                     fileEditor.setValue(data.fileContent);
                 });
             }
@@ -394,7 +428,7 @@ function append(type){
         }
     }
     param.fileType = type;
-    ajaxLoad("/config/addPath",param,function(data){
+    ajaxLoad("/addPath",param,function(data){
         if(data == 1){
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren",node.target);
@@ -497,11 +531,11 @@ function step0Callback(data){
  */
 function initData(curStep,next,param,succ_callback) {
     let result = true;
-    let stepId = "#step"+curStep;
+    let stepId = "#step_"+curStep;
     param.stepType=$(stepId).attr("type");//根据step找到stepType
     $.ajax({
         type: 'POST',
-        url: '/config/initData',
+        url: '/initData',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -535,7 +569,7 @@ function initData(curStep,next,param,succ_callback) {
  */
 function chooseBar(curStep,next) {
     $("#bars .bar").removeClass("cur");
-    let stepId = "#step"+curStep;
+    let stepId = "#step_"+curStep;
     $(stepId).hide();
     let barId = "#bar_"+$(stepId).attr("type");
     let barIndex = $("#bars .bar").index($(barId));
@@ -552,7 +586,7 @@ function chooseBar(curStep,next) {
  * 更新用户模板列表
  */
 function refreshuserTmpTreeList() {
-    ajaxLoad("/config/refreshUserTmpTreeList",{},function(data){
+    ajaxLoad("/refreshUserTmpTreeList",{},function(data){
         if(data){
             $("#userTmpTreeList option").remove();
             for(let i=0;i<data.length;i++){
@@ -577,7 +611,7 @@ function loadTmpTree() {
     let tmpTreeName = $("#userTmpTreeList option:selected").val();
     let param = {};
     param.tmpTreeName = tmpTreeName;
-    ajaxLoad("/config/loadTmpTree",param,function(data){
+    ajaxLoad("/loadTmpTree",param,function(data){
         if(data){
             initTmps(data);
         }else{
@@ -631,7 +665,7 @@ function saveUserTmpTree() {
                     $.messager.alert('error','没有选择保存的模板');
                     return;
                 }
-                ajaxLoad("/config/saveUserTmpTree",param,function(data){
+                ajaxLoad("/saveUserTmpTree",param,function(data){
                     $('#dd').dialog('close');
                     if(data.msg == "提交成功"){
                         refreshuserTmpTreeList();
@@ -664,7 +698,7 @@ function del(node) {
     }
     let param = {};
     param.modulePath = node.attributes.modulePath;
-    ajaxLoad("/config/deleteTmp",param,function(data){
+    ajaxLoad("/deleteTmp",param,function(data){
         if(data.msg == "删除成功"){
             loadTmpTree();
         }else{
@@ -720,7 +754,7 @@ function doCopy(node){
     param.tmpTreeName = tmpTreeName;
     param.sourceTmpModulePath = node.attributes.modulePath;
     param.targetTmpModulePath = targetNode.attributes.modulePath;
-    ajaxLoad("/config/copyPath",param,function(data){
+    ajaxLoad("/copyPath",param,function(data){
         if(data == 1){
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren",node.target);
@@ -748,7 +782,7 @@ function doMove(node){
     param.tmpTreeName = tmpTreeName;
     param.sourceTmpModulePath = node.attributes.modulePath;
     param.targetTmpModulePath = targetNode.attributes.modulePath;
-    ajaxLoad("/config/movePath",param,function(data){
+    ajaxLoad("/movePath",param,function(data){
         if(data == 1){
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren",node.target);
@@ -782,7 +816,7 @@ function commitCode() {
         param = {};
         param.templateContent = templateContent;
         param.tmpModulePath = node.attributes.modulePath;
-        ajaxLoad("/config/commit",param,function(data){
+        ajaxLoad("/commit",param,function(data){
             if(data== 0){
                 $.messager.alert('info',"提交失败");
             }

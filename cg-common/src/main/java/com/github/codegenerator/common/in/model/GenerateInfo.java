@@ -3,7 +3,7 @@ package com.github.codegenerator.common.in.model;
 import com.github.codegenerator.common.in.model.db.Database;
 import com.github.codegenerator.common.in.model.db.TableMeta;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +22,16 @@ public class GenerateInfo {
      */
     private List<TableMeta> selectedTables;
 
+    /**
+     * 表解析的模板对应变量,每张表的信息   类名、类字段、类imports等
+     */
+    private List<TableCodeInfo> tableCodeInfoList;
+
 
     /**
-     * 所有最后选中的模板  key:tmp package路径 module/...  module存放的路径   value：tmp
+     * 表结合模板解析的相关信息  文件名、路径等
      */
-    private Map<String,TemplateInfo> selectedTmps = new HashMap<>();
+    private List<TableCodeTemplateInfo> tableCodeTemplateInfoList = new ArrayList<>();
 
     /**
      * 选中的模板树名称
@@ -37,7 +42,6 @@ public class GenerateInfo {
      * 公共属性
      */
     private CommonValueStack commonValueStack = new CommonValueStack();
-
 
     public Database getDatabase() {
         return database;
@@ -71,12 +75,12 @@ public class GenerateInfo {
         this.commonValueStack = commonValueStack;
     }
 
-    public Map<String, TemplateInfo> getSelectedTmps() {
-        return selectedTmps;
+    public List<TableCodeTemplateInfo> getTableCodeTemplateInfoList() {
+        return tableCodeTemplateInfoList;
     }
 
-    public void setSelectedTmps(Map<String, TemplateInfo> selectedTmps) {
-        this.selectedTmps = selectedTmps;
+    public void setTableCodeTemplateInfoList(List<TableCodeTemplateInfo> tableCodeTemplateInfoList) {
+        this.tableCodeTemplateInfoList = tableCodeTemplateInfoList;
     }
 
     public String getSelectedTmpTreeName() {
@@ -85,5 +89,13 @@ public class GenerateInfo {
 
     public void setSelectedTmpTreeName(String selectedTmpTreeName) {
         this.selectedTmpTreeName = selectedTmpTreeName;
+    }
+
+    public List<TableCodeInfo> getTableCodeInfoList() {
+        return tableCodeInfoList;
+    }
+
+    public void setTableCodeInfoList(List<TableCodeInfo> tableCodeInfoList) {
+        this.tableCodeInfoList = tableCodeInfoList;
     }
 }

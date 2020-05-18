@@ -29,11 +29,10 @@ import java.util.*;
  * 配置入口
  */
 @Controller
-@RequestMapping("/config")
 public class ConfigController {
 
     //step1 进入选择页
-    @GetMapping("/init")
+    @GetMapping(value={"/init","/"})
     public String init(Model model, HttpServletRequest request) {
         //存在操作
         String operation = request.getParameter("op");
@@ -48,15 +47,15 @@ public class ConfigController {
                 if(!StringUtils.isEmpty(request.getParameter("cp"))){
                     config.setConfigName("");
                 }
-                model.addAttribute("config",config);
+                model.addAttribute("dbConfig",config);
             }else{
-                model.addAttribute("config",new Config());
+                model.addAttribute("dbConfig",new Config());
             }
         }else{
             List<String> configList = DataUtil.getDataNameList();
             configList.add(0,"请选择");
             if(null != configList){
-                model.addAttribute("configList", configList);
+                model.addAttribute("dbConfigList", configList);
             }
         }
 
@@ -64,10 +63,15 @@ public class ConfigController {
         return "config";
     }
 
-    //step  初始化数据的初始化
+    /**
+     * 每一步的操作都是对config对象的完善
+     * @param config
+     * @return
+     */
     @PostMapping("/initData")
     @ResponseBody
     public Map<String, Object> initData(@RequestBody Config config) {
+        ContextContainer.getContext().getConfig().setOperation(null);
         BeanUtils.copyProperties(config,ContextContainer.getContext().getConfig(),getNullPropertyNames(config));
         for (Initializer initializer : ContextContainer.getStepInitializer(config.getStepType())) {
             initializer.initialize(ContextContainer.getContext());

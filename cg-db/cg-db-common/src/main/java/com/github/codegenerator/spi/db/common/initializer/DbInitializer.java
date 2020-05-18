@@ -142,6 +142,7 @@ public abstract class DbInitializer extends AbstractInitializer {
 
     @Override
     public void after(SessionGenerateContext context) {
+
     }
 
     /**

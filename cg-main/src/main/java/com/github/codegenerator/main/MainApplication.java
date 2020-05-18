@@ -9,7 +9,7 @@ import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.jmx.support.RegistrationPolicy;
 
 @EnableMBeanExport(registration = RegistrationPolicy.IGNORE_EXISTING)
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},scanBasePackages = "com.github.codegenerator")
 @ServletComponentScan
 public class MainApplication {
 

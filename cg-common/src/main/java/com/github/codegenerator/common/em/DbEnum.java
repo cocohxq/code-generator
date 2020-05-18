@@ -23,6 +23,7 @@ public enum DbEnum implements TupleEnum {
         return null;
     }
 
+    @Override
     public Integer getType() {
         return type;
     }
@@ -31,6 +32,7 @@ public enum DbEnum implements TupleEnum {
         this.type = type;
     }
 
+    @Override
     public String getName() {
         return name;
     }

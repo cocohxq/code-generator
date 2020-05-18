@@ -7,7 +7,7 @@ import java.util.List;
 
 public enum StepEnum implements TupleEnum{
 
-    STEP_DB(0, "选择数据源"), STEP_TABLE(5, "选择需要的表"),STEP_TMP(10, "选择/编辑模板"), STEP_PREVIEW(15, "预览导出");
+    STEP_DB(0, "选择数据源"), STEP_TABLE(5, "选择需要的表"),STEP_CODE(8, "编辑代码配置"),STEP_TMP(10, "选择/编辑模板"), STEP_PREVIEW(15, "预览导出");
 
     private Integer type;//大类型
     private String name;

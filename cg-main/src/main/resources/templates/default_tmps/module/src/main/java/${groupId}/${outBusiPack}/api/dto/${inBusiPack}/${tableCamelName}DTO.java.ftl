@@ -11,15 +11,17 @@ import ${commonValueStack.getValue("BaseDTO.classPath")!""};
  */
 public class ${javaClassName} extends BaseDTO{
 
-<#list tableMeta.fields as field>
-	// ${field.column.comment!''}
+<#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,extendStr) as field>
+	/**
+	 * ${field.column.comment!''}
+	 */
 	private ${field.fieldType} ${field.fieldName};
 </#list>
 
 
 
 
-<#list tableMeta.fields as field>
+<#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,extendStr) as field>
 
 	public ${field.fieldType} get${field.fieldName?cap_first}() {
 		return ${field.fieldName};
