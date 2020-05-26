@@ -174,7 +174,8 @@
         "columnType": "BIGINT",
         "comment": ""
       },
-      "fieldName": "id",
+      "fieldCamelNameMin": "id",
+      "fieldCamelNameMax": "Id",
       "fieldType": "Long"
     }, {
       "column": {
@@ -182,7 +183,8 @@
         "columnType": "VARCHAR",
         "comment": "姓名"
       },
-      "fieldName": "userName",
+      "fieldCamelNameMin": "userName",
+      "fieldCamelNameMax": "UserName",
       "fieldType": "String"
     }, {
       "column": {
@@ -190,28 +192,32 @@
         "columnType": "DATETIME",
         "comment": "生日"
       },
-      "fieldName": "birthday",
+      "fieldCamelNameMin": "birthday",
+      "fieldCamelNameMax": "Birthday",
       "fieldType": "Date"
     }],
     "table": {
       "comment": "",
       "tableName": "user_info"
     },
-    "tableCamelNameMin": "userInfo"
+    "tableCamelNameMin": "userInfo",
+    "tableCamelNameMax": "UserInfo"
   },
   "groupId": "com.hxq",
   "tableCamelNameMin": "userInfo",
-  "tableCamelName": "UserInfo",
+  "tableCamelNameMax": "UserInfo",
   "createTimeStr":"created_time",
   "updateTimeStr":"update_time",
-  "deleteStr":"deleted"
+  "deleteStr":"deleted",
+  "extendStr":"deleted",
+  "inStr":"deleted"
 }
 </textarea>
 
 <div style="border-top: 1px solid #e5e5e5;padding-left:600px;margin-top:150px">
         <span>
                 Copyright &copy; 2018-${.now?string('yyyy')} &nbsp;by hanxianqiang&nbsp;
-                <a href="https://github.com/" target="_blank" >github</a>
+                <a href="https://github.com/cocohxq/code-generator" target="_blank" >github</a>
         </span>
 </div>
 

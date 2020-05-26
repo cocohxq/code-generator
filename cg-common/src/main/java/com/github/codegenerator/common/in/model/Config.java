@@ -17,19 +17,22 @@ public class Config {
     private Integer dbType;
     private transient String operation;
 
+
+
+    //表选择
+    private transient String tableName;
+    private transient String createTimeStr;
+    private transient String updateTimeStr;
+    private transient String deleteStr;
+    private transient String extendStr;
+    private transient String inStr;
+
     //代码配置
     private transient String groupId;
     private transient String outBusiPack;
     private transient String inBusiPack;
     private transient Integer codeLocationType;
-    private transient String createTimeStr;
-    private transient String updateTimeStr;
-    private transient String deleteStr;
-    private transient String extendStr;
 
-
-    //表选择
-    private transient List<String> tableNames;
 
     //模板
     private transient List<String> tmps;
@@ -75,12 +78,12 @@ public class Config {
         this.stepType = stepType;
     }
 
-    public List<String> getTableNames() {
-        return tableNames;
+    public String getTableName() {
+        return tableName;
     }
 
-    public void setTableNames(List<String> tableNames) {
-        this.tableNames = tableNames;
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public List<String> getTmps() {
@@ -185,5 +188,13 @@ public class Config {
 
     public void setExtendStr(String extendStr) {
         this.extendStr = extendStr;
+    }
+
+    public String getInStr() {
+        return inStr;
+    }
+
+    public void setInStr(String inStr) {
+        this.inStr = inStr;
     }
 }

@@ -1,11 +1,5 @@
 package com.github.codegenerator.common.util;
 
-import com.github.codegenerator.common.in.model.GenerateInfo;
-import com.github.codegenerator.common.in.model.StringTemplateLoader;
-import freemarker.core.Environment;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -38,79 +31,6 @@ public class FileUtils {
 
     private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
-
-    /**
-     * 生成类文件
-     *
-     * @param info
-     */
-    public static void generateFile(GenerateInfo info) {
-        Configuration configration = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        configration.setDefaultEncoding("UTF-8");
-        configration.setTemplateExceptionHandler((TemplateException te, Environment env, Writer out) -> {
-            logger.error("模板解析报错" + env.getConfiguration().getSharedVariable("templateFileName").toString(), "中${", te.getBlamedExpressionString(), "}无法识别", te.toString());
-            ContextContainer.getContext().error(env.getConfiguration().getSharedVariable("templateFileName").toString(), "中${", te.getBlamedExpressionString(), "}无法识别");
-        });
-        File codeDir = new File(info.getCodepath());
-        if (codeDir.exists()) {
-            deleteDir(info.getCodepath(), true);
-        }
-        //遍历选中的模板
-        info.getTableCodeTemplateInfoList().stream().forEach(template -> {
-            try {
-                StringTemplateLoader loader = new StringTemplateLoader(template.getTemplateContent());
-                configration.setTemplateLoader(loader);
-                configration.setSharedVariable("templateFileName", template.getTemplateFileName());
-                Template tmp = configration.getTemplate("");
-
-                String targetFilePath = template.getTargetFilePath();
-                String targetFileDir = targetFilePath.substring(0, targetFilePath.lastIndexOf(File.separator));
-                File dir = new File(targetFileDir);
-                dir.mkdirs();
-                Writer writer = null;
-                try {
-                    File targetFile = new File(targetFilePath);
-                    if (targetFile.exists()) {
-                        FileUtils.delete(targetFile.getPath());
-                    }
-                    writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile), "UTF-8"));
-                    tmp.process(template.getTmpValMap(info), writer);
-                    writer.flush();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (null != writer) {
-                            writer.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });
-
-    }
-
-    /**
-     * 生成模板文件
-     *
-     * @param
-     */
-    public static Integer generateTmpTreeFiles(String sourceTmpTreeName, String targetTmpTreeName, List<String> tmps) {
-        String targetTreePath = FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, targetTmpTreeName);
-        String sourceTreePath = FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, sourceTmpTreeName);
-        //拼接上全路径
-        List<String> actualPathList = new ArrayList<>(tmps.size());
-        tmps.stream().forEach(l -> actualPathList.add(FileUtils.concatPath(sourceTreePath, l)));
-
-        FileUtils.copyDirWithFilter(sourceTreePath, targetTreePath, actualPathList);
-        return 1;
-
-    }
 
     /**
      * 加载文件
@@ -491,7 +411,7 @@ public class FileUtils {
             JarEntry jarEntry = null;
             while (enums.hasMoreElements()) {
                 jarEntry = enums.nextElement();
-                //jarEntry.getName() 返回的是带路径的名称，eg：BOOT-INF/classes/templates/default_tmps/module/src/main/java/${groupId}/entity/${tableCamelName}Entity.java.ftl
+                //jarEntry.getName() 返回的是带路径的名称，eg：BOOT-INF/classes/templates/default_tmps/module/src/main/java/${groupId}/entity/${tableCamelNameMax}Entity.java.ftl
                 //只处理BOOT-INF/classes/templates/default_tmps/ 以下的文件和目录
                 if (!jarEntry.getName().startsWith(sourcePath) || jarEntry.getName().equals(sourcePath)) {
                     continue;

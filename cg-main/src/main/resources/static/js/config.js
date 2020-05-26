@@ -68,23 +68,8 @@ $(document).ready(function(){
 
     //更换配置重新加载
     $("#step_0 #saveConfig").click(function () {
-        let next = true;
         let param ={};
-        $("#step_0 input").each(function (item) {
-            if(!$(this).val() && $(this).attr("notNull")){
-                $("#step_0 .errMsg").text("必填项不能为空");
-                next=false;
-                return;
-            }
-            let id=$(this).attr("id");
-            if(id){
-                let value=$.trim($(this).val());
-                if(value != ""){
-                    param[id]=value;
-                }
-            }
-        })
-        if(!next){
+        if(!fillInputParam("#step_0",param)){
             return;
         }
         param.dbType=$("#dbType").val();
@@ -127,6 +112,9 @@ $(document).ready(function(){
     //选择表-下一步
     $("#step_5 .next").click(function(){
         let param ={};
+        if(!fillInputParam("#step_5",param)){
+            return;
+        }
         let tableNames = new Array();
         $("#tables option:selected").each(function () {
             tableNames.push($(this).val());
@@ -135,8 +123,12 @@ $(document).ready(function(){
             $("#step_5 .errMsg").text("请选择需要的生成代码的表");
             return;
         }
+        if(tableNames.length > 1){
+            $("#step_5 .errMsg").text("只支持按单表生成代码");
+            return;
+        }
 
-        param.tableNames = tableNames;
+        param.tableName = tableNames[0];
         initData(5,true,param,function(data){return true;});
         loadTmpTree();
     });
@@ -145,26 +137,39 @@ $(document).ready(function(){
         chooseBar(5,false);
     });
 
+    $("#step_5 .field").click(function(){
+        if($("#columns option:selected").length == 0){
+            $.messager.alert('error',"请先选择字段");
+            return false;
+        }
+
+        let existedVal = $("#"+$(this).attr("at")).val();
+
+        let existedSet = new Set();
+        if(existedVal){
+            let arr = existedVal.split(",");
+            for(let i=0;i<arr.length;i++){
+                existedSet.add(arr[i]);
+            }
+        }
+
+        $("#columns option:selected").each(function () {
+            if(!existedSet.has($(this).val())){
+                if(existedVal){
+                    existedVal+=",";
+                }
+                existedVal+=$(this).val();
+                $(this).attr("selected",false);
+            }
+        });
+        $("#"+$(this).attr("at")).val(existedVal);
+    });
+
 
     //编辑代码配置-下一步
     $("#step_8 .next").click(function(){
         let param ={};
-        let next = true;
-        $("#step_8 input").each(function (item) {
-            if(!$(this).val() && $(this).attr("notNull")){
-                $("#step_8 .errMsg").text("必填项不能为空");
-                next=false;
-                return;
-            }
-            let id=$(this).attr("id");
-            if(id){
-                let value=$.trim($(this).val());
-                if(value != ""){
-                    param[id]=value;
-                }
-            }
-        })
-        if(!next){
+        if(!fillInputParam("#step_8",param)){
             return;
         }
         //代码位置
@@ -422,9 +427,9 @@ function append(type){
         param.tmpModulePath = node.attributes.modulePath+"/new_dir";
     }else{
         if(node.attributes.modulePath.indexOf("${groupId}") == -1){
-            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelName}_NEW.xml.ftl";
+            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelNameMax}_NEW.xml.ftl";
         }else{
-            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelName}_NEW.java.ftl";
+            param.tmpModulePath = node.attributes.modulePath + "/${tableCamelNameMax}_NEW.java.ftl";
         }
     }
     param.fileType = type;
@@ -508,7 +513,7 @@ function step0Callback(data){
                         }else{
                             columnComment="&nbsp;&nbsp;&nbsp;&nbsp;"+columnComment;
                         }
-                        $("#columns").append("<option>"+columnName+columnComment+"</option>");
+                        $("#columns").append("<option value='"+columnName+"'>"+columnName+columnComment+"</option>");
                     }
                 }
             }
@@ -832,4 +837,23 @@ function isDefaultTree(){
         return true;
     }
     return false;
+}
+
+function fillInputParam(id,param){
+    let next = true;
+    $(id+" input").each(function (item) {
+        if(!$(this).val() && $(this).attr("notNull")){
+            $(id+ ".errMsg").text("必填项不能为空");
+            next=false;
+            return;
+        }
+        let param_id=$(this).attr("id");
+        if(param_id){
+            let value=$.trim($(this).val());
+            if(value != ""){
+                param[param_id]=value;
+            }
+        }
+    });
+    return next;
 }

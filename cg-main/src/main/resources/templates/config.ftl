@@ -254,6 +254,54 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="controls" style="margin-left:850px;">
+                    <button class="btn btn-success field" at="createTimeStr">选为新增时间</button><br>
+                    <button class="btn btn-success field" at="updateTimeStr">选为更新时间</button><br>
+                    <button class="btn btn-success field" at="deleteStr">选为删除标识</button><br>
+                    <button class="btn btn-success field" at="extendStr">选为extend字段</button><br>
+                    <button class="btn btn-success field" at="inStr">选为in字段</button><br>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">时间戳-新增</label>
+                <div class="controls">
+                    <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large" value="">(用于创建sql生成识别，表字段不同用","分隔)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">时间戳-更新</label>
+                <div class="controls">
+                    <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time" class="input-large" value="">(用于更新sql生成识别,表字段不同用","分隔)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">逻辑删除标记</label>
+                <div class="controls">
+                    <input id="deleteStr" type="text" placeholder="deleted,is_deleted" class="input-large" value="">(用于删除sql生成识别,不配置默认物理删除，表字段不同用","分隔)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">pojo类extend字段</label>
+                <div class="controls">
+                    <input id="extendStr" type="text" placeholder="id,created_time,last_modified_time" class="input-large" value="">(pojo类[model,DO,DTO,query,Entity]的某些字段可能在继承的model基类中已经定义，生成pojo时进行排除)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">支持in查询字段</label>
+                <div class="controls">
+                    <input id="inStr" type="text" placeholder="xxx1,xxx2" class="input-large" value="">(在query和sql生成的时候支持in条件)
+                    <p class="help-block"></p>
+                </div>
             </div>
 
             <div class="control-group">
@@ -301,38 +349,6 @@
                         <input name="businessLocationType" type="radio" value="2"> 相对内置
                         &nbsp;&nbsp;&nbsp;&nbsp;(包名相对dao、service包的放置位置)
                     </label>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="input01">时间戳-新增</label>
-                <div class="controls">
-                    <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large" value="">(用于创建sql生成识别，表字段不同用","分隔)
-                    <p class="help-block"></p>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="input01">时间戳-更新</label>
-                <div class="controls">
-                    <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time" class="input-large" value="">(用于更新sql生成识别,表字段不同用","分隔)
-                    <p class="help-block"></p>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="input01">逻辑删除标记</label>
-                <div class="controls">
-                    <input id="deleteStr" type="text" placeholder="deleted,is_deleted" class="input-large" value="">(用于删除sql生成识别,不配置默认物理删除，表字段不同用","分隔)
-                    <p class="help-block"></p>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="input01">pojo类extend字段</label>
-                <div class="controls">
-                    <input id="extendStr" type="text" placeholder="id,created_time,last_modified_time" class="input-large" value="">(pojo类的某些字段可能在继承的model基类中已经定义，生成pojo时进行排除)
-                    <p class="help-block"></p>
                 </div>
             </div>
 

@@ -1,27 +1,33 @@
 package com.github.codegenerator.main.spi.initializer;
 
 import com.github.codegenerator.common.em.StepEnum;
-import com.github.codegenerator.common.in.model.*;
+import com.github.codegenerator.common.in.model.GenerateInfo;
+import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PreviewInitializer extends AbstractInitializer {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        //清除zip
-        FileUtils.delete(FileUtils.concatPath(context.getGenerateInfo().getCodepath(),"code.zip"));
         return true;
     }
 
     @Override
     public void doInitialize(SessionGenerateContext context) {
         GenerateInfo generateInfo = context.getGenerateInfo();
-        FileUtils.generateZip(FileUtils.loadDirAllFilePathList(generateInfo.getCodepath()),generateInfo.getCodepath(),"code.zip");
-        context.setStepInitResult("code.zip");//返回zip的路径
+        DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        String zipName = String.format("%s_%s_%s",generateInfo.getTableConfigInfo().getTableMeta().getTable().getTableName(),df.format(new Date()),"code.zip");
+        FileUtils.generateZip(FileUtils.loadDirAllFilePathList(generateInfo.getCodepath()), generateInfo.getCodepath(), zipName);
+        //返回zip的路径
+        context.setStepInitResult(zipName);
         //删除生成的代码
-        FileUtils.deleteDir(FileUtils.concatPath(generateInfo.getCodepath(), ContextContainer.MODULE_PATH_ROOT),true);
+        FileUtils.deleteDir(FileUtils.concatPath(generateInfo.getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);
     }
 
     @Override

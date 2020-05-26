@@ -12,8 +12,6 @@ import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +99,10 @@ public abstract class DbInitializer extends AbstractInitializer {
                 TableMeta tableMeta = new TableMeta();
                 tableList.add(tableMeta);
                 tableMeta.setTable(table);
-                tableMeta.setTableCamelNameMin(BuildUtils.conver2CameltName(table.getTableName()));//表名转换为驼峰命名
+                //表名转换为驼峰命名
+                tableMeta.setTableCamelNameMin(BuildUtils.conver2CameltNameMin(table.getTableName()));
+                //表名转换为驼峰命名
+                tableMeta.setTableCamelNameMax(BuildUtils.converMinCameltNameMax(tableMeta.getTableCamelNameMin()));
                 List<FieldMeta> list = new ArrayList<>(columns.size());
 
                 try {
@@ -109,7 +110,8 @@ public abstract class DbInitializer extends AbstractInitializer {
                 columns.stream().forEach(l -> {
                     FieldMeta fieldMeta = new FieldMeta();
                     fieldMeta.setColumn(l);
-                    fieldMeta.setFieldName(BuildUtils.conver2CameltName(l.getColumnName()));
+                    fieldMeta.setFieldCamelNameMin(BuildUtils.conver2CameltNameMin(l.getColumnName()));
+                    fieldMeta.setFieldCamelNameMax(BuildUtils.converMinCameltNameMax(fieldMeta.getFieldCamelNameMin()));
                     try {
                         fieldMeta.setFieldType(convertType(l.getColumnType()));
                     } catch (Exception e) {

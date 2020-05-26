@@ -56,7 +56,7 @@ public class CommonValueStack {
      */
     public List<FieldMeta> getSpecifiedFields(List<FieldMeta> fieldMetaList,String... specifiedStrs){
         if(fieldMetaList == null || fieldMetaList.size() == 0|| specifiedStrs == null || specifiedStrs.length == 0){
-            return fieldMetaList;
+            return new ArrayList<>(0);
         }
 
         Set<String> specifiedSet = new HashSet<>();

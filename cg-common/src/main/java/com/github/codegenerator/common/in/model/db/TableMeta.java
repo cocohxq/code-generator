@@ -6,6 +6,8 @@ public class TableMeta {
 
     private String tableCamelNameMin;
 
+    private String tableCamelNameMax;
+
     private List<FieldMeta> fields;
 
     private Table table;
@@ -35,4 +37,11 @@ public class TableMeta {
         this.table = table;
     }
 
+    public String getTableCamelNameMax() {
+        return tableCamelNameMax;
+    }
+
+    public void setTableCamelNameMax(String tableCamelNameMax) {
+        this.tableCamelNameMax = tableCamelNameMax;
+    }
 }

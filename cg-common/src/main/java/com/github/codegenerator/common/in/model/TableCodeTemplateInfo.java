@@ -14,10 +14,12 @@ public class TableCodeTemplateInfo {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private TableCodeInfo tableCodeInfo;
+    private CodeConfigInfo codeConfigInfo;
+
+    private TableConfigInfo tableConfigInfo;
 
     /**
-     * ${tableCamelName}DTO.java.ftl
+     * ${tableCamelNameMax}DTO.java.ftl
      */
     private String templateFileName;
 
@@ -33,20 +35,20 @@ public class TableCodeTemplateInfo {
     private String javaPackage;
     /**
      * java类名
-     * ${tableCamelName}DTO
+     * ${tableCamelNameMax}DTO
      */
     private String javaClassName;
 
     /**
      * 生成的代码文件名
-     * ${tableCamelName}DTO.java
+     * ${tableCamelNameMax}DTO.java
      */
     private String targetFileName;
 
 
     /**
      * 生成的代码文件最终存放路径
-     * a/b/c/d/${tableCamelName}DTO.java
+     * a/b/c/d/${tableCamelNameMax}DTO.java
      */
     private String targetFilePath;
 
@@ -57,23 +59,22 @@ public class TableCodeTemplateInfo {
     public static Map<String, Object> getObjectToMap(Object obj) throws IllegalAccessException {
         Map<String, Object> map = new HashMap<>();
         Class<?> clazz = obj.getClass();
-        System.out.println(clazz);
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
-            String fieldName = field.getName();
+            String fieldCamelNameMin = field.getName();
             Object value = field.get(obj);
             if (value == null) {
                 value = "";
             }
-            map.put(fieldName, value);
+            map.put(fieldCamelNameMin, value);
         }
         return map;
     }
 
-    public Map<String, Object> getTmpValMap(GenerateInfo info) {
+    public Map<String, Object> getTmpValMap() {
         try {
-            Map<String, Object> valMap = getObjectToMap(this.getTableCodeInfo());
-            valMap.put("commonValueStack", info.getCommonValueStack());
+            Map<String, Object> valMap = getObjectToMap(this.getCodeConfigInfo());
+            valMap.putAll(getObjectToMap(this.getTableConfigInfo()));
             valMap.put("javaPackage", this.getJavaPackage());
             valMap.put("javaClassName", this.getJavaClassName());
             return valMap;
@@ -99,12 +100,12 @@ public class TableCodeTemplateInfo {
         this.templateFileName = templateFileName;
     }
 
-    public TableCodeInfo getTableCodeInfo() {
-        return tableCodeInfo;
+    public CodeConfigInfo getCodeConfigInfo() {
+        return codeConfigInfo;
     }
 
-    public void setTableCodeInfo(TableCodeInfo tableCodeInfo) {
-        this.tableCodeInfo = tableCodeInfo;
+    public void setCodeConfigInfo(CodeConfigInfo codeConfigInfo) {
+        this.codeConfigInfo = codeConfigInfo;
     }
 
     public String getJavaPackage() {
@@ -137,5 +138,13 @@ public class TableCodeTemplateInfo {
 
     public void setTargetFilePath(String targetFilePath) {
         this.targetFilePath = targetFilePath;
+    }
+
+    public TableConfigInfo getTableConfigInfo() {
+        return tableConfigInfo;
+    }
+
+    public void setTableConfigInfo(TableConfigInfo tableConfigInfo) {
+        this.tableConfigInfo = tableConfigInfo;
     }
 }

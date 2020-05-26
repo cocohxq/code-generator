@@ -1,11 +1,9 @@
 package com.github.codegenerator.common.in.model;
 
 import com.github.codegenerator.common.in.model.db.Database;
-import com.github.codegenerator.common.in.model.db.TableMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GenerateInfo {
 
@@ -20,12 +18,12 @@ public class GenerateInfo {
     /**
      * 选中的表
      */
-    private List<TableMeta> selectedTables;
+    private TableConfigInfo tableConfigInfo;
 
     /**
      * 表解析的模板对应变量,每张表的信息   类名、类字段、类imports等
      */
-    private List<TableCodeInfo> tableCodeInfoList;
+    private CodeConfigInfo codeConfigInfo;
 
 
     /**
@@ -51,12 +49,12 @@ public class GenerateInfo {
         this.database = database;
     }
 
-    public List<TableMeta> getSelectedTables() {
-        return selectedTables;
+    public TableConfigInfo getTableConfigInfo() {
+        return tableConfigInfo;
     }
 
-    public void setSelectedTables(List<TableMeta> selectedTables) {
-        this.selectedTables = selectedTables;
+    public void setTableConfigInfo(TableConfigInfo tableConfigInfo) {
+        this.tableConfigInfo = tableConfigInfo;
     }
 
     public String getCodepath() {
@@ -91,11 +89,11 @@ public class GenerateInfo {
         this.selectedTmpTreeName = selectedTmpTreeName;
     }
 
-    public List<TableCodeInfo> getTableCodeInfoList() {
-        return tableCodeInfoList;
+    public CodeConfigInfo getCodeConfigInfo() {
+        return codeConfigInfo;
     }
 
-    public void setTableCodeInfoList(List<TableCodeInfo> tableCodeInfoList) {
-        this.tableCodeInfoList = tableCodeInfoList;
+    public void setCodeConfigInfo(CodeConfigInfo codeConfigInfo) {
+        this.codeConfigInfo = codeConfigInfo;
     }
 }

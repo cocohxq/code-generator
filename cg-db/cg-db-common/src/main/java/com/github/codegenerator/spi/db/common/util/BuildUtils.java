@@ -4,12 +4,12 @@ public class BuildUtils {
 
 
     /**
-     * 将数据库的_分隔的命名改成java的驼峰命名,首字母也大写
+     * 将数据库的_分隔的命名改成java的驼峰命名,首字母小写
      *
      * @param sourceName
      * @return
      */
-    public static String conver2CameltName(String sourceName) {
+    public static String conver2CameltNameMin(String sourceName) {
         if (null == sourceName || "".equals(sourceName.trim())) {
             throw new RuntimeException("tableName: " + sourceName + "is valid!");
         }
@@ -30,5 +30,9 @@ public class BuildUtils {
             sb.append(names[i].substring(1));
         }
         return sb.toString();
+    }
+
+    public static String converMinCameltNameMax(String camelNameMin) {
+        return camelNameMin.substring(0, 1).toUpperCase()+camelNameMin.substring(1);
     }
 }

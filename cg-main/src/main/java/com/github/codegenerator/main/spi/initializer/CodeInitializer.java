@@ -4,16 +4,26 @@ import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
-import com.github.codegenerator.common.in.model.TableCodeInfo;
+import com.github.codegenerator.common.in.model.CodeConfigInfo;
+import com.github.codegenerator.common.in.model.TableConfigInfo;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 代码生成的配置
+ */
 public class CodeInitializer extends AbstractInitializer {
 
     @Override
     public boolean before(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        if (null == config.getGroupId()) {
+            context.error("请填入groupId");
+            return false;
+        }
+        context.getGenerateInfo().setCodeConfigInfo(null);
         return true;
     }
 
@@ -22,39 +32,38 @@ public class CodeInitializer extends AbstractInitializer {
         //解析table的java模板变量
         Config config = context.getConfig();
         GenerateInfo generateInfo = context.getGenerateInfo();
+        TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
 
-        List<TableCodeInfo> tableCodeInfoList = new ArrayList<>();
-        generateInfo.getSelectedTables().stream().forEach(k -> {
-            TableCodeInfo tableCodeInfo = new TableCodeInfo();//与表强关联的属性
-            tableCodeInfo.setGroupId(config.getGroupId());//类groupId
-            tableCodeInfo.setTableMeta(k);//table对象
-            tableCodeInfo.setDbName(config.getDbName());
-            tableCodeInfo.setTableCamelName(k.getTableCamelNameMin().substring(0, 1).toUpperCase() + k.getTableCamelNameMin().substring(1));//大驼峰  表名对应的大驼峰名称  eg:Car
-            tableCodeInfo.setTableCamelNameMin(k.getTableCamelNameMin());//小驼峰  变量 eg:car
-            //如果是java模板，会带上一些java特有变量,则放置一些import
-            k.getFields().stream().forEach(t -> {
-                List<String> importList = tableCodeInfo.getJavaImports();
-                if (null == importList) {
-                    importList = new ArrayList<>();
-                    tableCodeInfo.setJavaImports(importList);
-                }
+        CodeConfigInfo codeConfigInfo = new CodeConfigInfo();
+        //类groupId
+        codeConfigInfo.setGroupId(config.getGroupId());
 
-                if (t.getFieldType().indexOf("Date") > -1 && !importList.contains("java.util.Date")) {
-                    importList.add("java.util.Date");
-                }
-                if (t.getFieldType().indexOf("BigDecimal") > -1 && !importList.contains("java.math.BigDecimal")) {
-                    importList.add("java.math.BigDecimal");
-                }
-            });
+        //大驼峰  表名对应的大驼峰名称  eg:Car
+        codeConfigInfo.setTableCamelNameMax(tableConfigInfo.getTableMeta().getTableCamelNameMin().substring(0, 1).toUpperCase() + tableConfigInfo.getTableMeta().getTableCamelNameMin().substring(1));
+        //小驼峰  变量 eg:car
+        codeConfigInfo.setTableCamelNameMin(tableConfigInfo.getTableMeta().getTableCamelNameMin());
 
-            tableCodeInfo.setCreateTimeStr(config.getCreateTimeStr());
-            tableCodeInfo.setUpdateTimeStr(config.getUpdateTimeStr());
-            tableCodeInfo.setDeleteStr(config.getDeleteStr());
-            tableCodeInfo.setExtendStr(config.getExtendStr());
+        codeConfigInfo.setInBusiPack(config.getInBusiPack());
+        codeConfigInfo.setOutBusiPack(config.getOutBusiPack());
+        codeConfigInfo.setCodeLocationType(config.getCodeLocationType());
 
-            tableCodeInfoList.add(tableCodeInfo);
+        //如果是java模板，会带上一些java特有变量,则放置一些import
+        tableConfigInfo.getTableMeta().getFields().stream().forEach(t -> {
+            List<String> importList = codeConfigInfo.getJavaImports();
+            if (null == importList) {
+                importList = new ArrayList<>();
+                codeConfigInfo.setJavaImports(importList);
+            }
+
+            if (t.getFieldType().indexOf("Date") > -1 && !importList.contains("java.util.Date")) {
+                importList.add("java.util.Date");
+            }
+            if (t.getFieldType().indexOf("BigDecimal") > -1 && !importList.contains("java.math.BigDecimal")) {
+                importList.add("java.math.BigDecimal");
+            }
         });
-        generateInfo.setTableCodeInfoList(tableCodeInfoList);
+
+        generateInfo.setCodeConfigInfo(codeConfigInfo);
     }
 
     @Override

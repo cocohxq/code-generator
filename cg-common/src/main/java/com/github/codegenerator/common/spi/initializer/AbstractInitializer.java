@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractInitializer implements Initializer {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void initialize(SessionGenerateContext context) {

@@ -23,7 +23,7 @@ public class RequestContextFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         //多会话的支持
         SessionGenerateContext context = null;
-        if (req.getRequestURI().endsWith("/init")) {
+        if (req.getRequestURI().endsWith("/init") || req.getRequestURI().endsWith("/")) {
             context = new SessionGenerateContext();
             context.setSessionId(req.getSession().getId());
             context.getGenerateInfo().setCodepath(FileUtils.concatPath(ContextContainer.USER_CODE_DIR, context.getSessionId(), "/"));
@@ -33,7 +33,7 @@ public class RequestContextFilter implements Filter {
             //设置当前当前线程的context为session对应的context，一个session中的所有请求共用一个context
             context = ContextContainer.getSessionContext().get(req.getSession().getId());
             if (null == context) {
-                ((HttpServletResponse) response).sendRedirect("/config/init");//会话过期了就跳转到首页
+                ((HttpServletResponse) response).sendRedirect("/");//会话过期了就跳转到首页
                 return;
             }
         }

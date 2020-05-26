@@ -2,21 +2,19 @@ package com.github.codegenerator.common.in.model.db;
 
 public class FieldMeta {
 
-    private String fieldName;
+    private String fieldCamelNameMin;
+    private String fieldCamelNameMax;
 
     private String  fieldType;
 
     private Column column;
 
-    //orm框架中对应的常量值  比如时间now(),deleted的1
-    private String ormConstantValue;
-
-    public String getFieldName() {
-        return fieldName;
+    public String getFieldCamelNameMin() {
+        return fieldCamelNameMin;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setFieldCamelNameMin(String fieldCamelNameMin) {
+        this.fieldCamelNameMin = fieldCamelNameMin;
     }
 
     public String getFieldType() {
@@ -33,5 +31,13 @@ public class FieldMeta {
 
     public void setColumn(Column column) {
         this.column = column;
+    }
+
+    public String getFieldCamelNameMax() {
+        return fieldCamelNameMax;
+    }
+
+    public void setFieldCamelNameMax(String fieldCamelNameMax) {
+        this.fieldCamelNameMax = fieldCamelNameMax;
     }
 }

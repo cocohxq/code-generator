@@ -6,7 +6,7 @@ import java.util.List;
 public class SessionGenerateContext {
 
     //step配置
-    private Config config = new Config();
+    private Config config;
 
     //step提交后生成的构建信息
     private GenerateInfo generateInfo = new GenerateInfo();

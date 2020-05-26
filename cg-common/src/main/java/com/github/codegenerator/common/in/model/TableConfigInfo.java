@@ -2,17 +2,11 @@ package com.github.codegenerator.common.in.model;
 
 import com.github.codegenerator.common.in.model.db.TableMeta;
 
-import java.util.List;
-
 /**
- * 表与表对应变量的对象
+ * 表配置对象
  */
-public class TableCodeInfo {
+public class TableConfigInfo {
 
-    /**
-     * groupId
-     */
-    private String groupId;
     /**
      * 表元数据
      */
@@ -21,18 +15,6 @@ public class TableCodeInfo {
      * 表对应db名称
      */
     private String dbName;
-    /**
-     * 驼峰名（首字母大写）
-     */
-    private String tableCamelName;
-    /**
-     * 驼峰名(首字母小写)
-     */
-    private String tableCamelNameMin;
-    /**
-     * java文件的imports
-     */
-    private List<String> javaImports;
     /**
      * 创建时间字段
      */
@@ -51,13 +33,10 @@ public class TableCodeInfo {
      */
     private String extendStr;
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
+    /**
+     * pojo继承字段
+     */
+    private String inStr;
 
     public TableMeta getTableMeta() {
         return tableMeta;
@@ -73,30 +52,6 @@ public class TableCodeInfo {
 
     public void setDbName(String dbName) {
         this.dbName = dbName;
-    }
-
-    public String getTableCamelName() {
-        return tableCamelName;
-    }
-
-    public void setTableCamelName(String tableCamelName) {
-        this.tableCamelName = tableCamelName;
-    }
-
-    public String getTableCamelNameMin() {
-        return tableCamelNameMin;
-    }
-
-    public void setTableCamelNameMin(String tableCamelNameMin) {
-        this.tableCamelNameMin = tableCamelNameMin;
-    }
-
-    public List<String> getJavaImports() {
-        return javaImports;
-    }
-
-    public void setJavaImports(List<String> javaImports) {
-        this.javaImports = javaImports;
     }
 
     public String getCreateTimeStr() {
@@ -129,5 +84,13 @@ public class TableCodeInfo {
 
     public void setExtendStr(String extendStr) {
         this.extendStr = extendStr;
+    }
+
+    public String getInStr() {
+        return inStr;
+    }
+
+    public void setInStr(String inStr) {
+        this.inStr = inStr;
     }
 }
