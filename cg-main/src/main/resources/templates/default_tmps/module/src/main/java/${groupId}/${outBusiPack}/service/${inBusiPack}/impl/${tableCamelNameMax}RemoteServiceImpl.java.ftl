@@ -172,4 +172,39 @@ public class ${javaClassName} implements ${tableCamelNameMax}Service {
             return Response.writeError("${tableMeta.table.comment!''}数据更新异常");
         }
     }
+
+    @Override
+    Response<List<Long>> batchInsert(List<${tableCamelNameMax}DTO> list) {
+        if (list == null || list.size() == 0) {
+            return Response.writeError("批量新增的数据为空");
+        }
+        try {
+            List<${tableCamelNameMax}DO> doList = new ArrayList<>();
+            if(null != list && list.size() > 0){
+                for(${tableCamelNameMax}DTO ${tableCamelNameMin}DTO : list){
+                    ${tableCamelNameMax}DO ${tableCamelNameMin}DO = new ${tableCamelNameMax}DO();
+                    BeanUtils.copyProperties(${tableCamelNameMin}DTO, ${tableCamelNameMin}DO);
+                    doList.add(${tableCamelNameMin}DO);
+                }
+            }
+            ${tableCamelNameMin}Manager.batchInsert(doList);
+            return Response.writeSuccess(doList.stream().map(e -> e.getId()).collect(Collectors.toList()));
+        } catch (Exception e) {
+            logger.error("${tableMeta.table.comment!''}数据新增异常", e);
+            return Response.writeError("${tableMeta.table.comment!''}数据新增异常");
+        }
+    }
+
+    @Override
+    public Response<Integer> count(${tableCamelNameMax}Query ${tableCamelNameMin}Query) {
+        try {
+            if (null == ${tableCamelNameMin}Query) {
+                return Response.writeError("查询条件为空");
+            }
+            return Response.writeSuccess(${tableCamelNameMin}Manager.count(${tableCamelNameMin}Query));
+        } catch (Exception e) {
+            logger.error("${tableMeta.table.comment!''}数据查询异常", e);
+            return Response.writeError("${tableMeta.table.comment!''}数据查询异常");
+        }
+    }
 }

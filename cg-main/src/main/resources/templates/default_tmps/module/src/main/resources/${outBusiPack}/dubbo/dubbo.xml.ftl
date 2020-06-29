@@ -23,7 +23,7 @@
 
 
     <!-- 调用方配置-->
-    <dubbo:reference id="${tableCamelNameMax}Service"
+    <dubbo:reference id="${tableCamelNameMin}Service"
                      interface="${commonValueStack.getValue(tableCamelNameMax + "Service.classPath")!""}"
                      version="xxxx"
                      group="xxxx"/>

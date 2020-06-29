@@ -28,6 +28,8 @@ public interface ${javaClassName} {
 
     Integer batchUpdateById(List<${tableCamelNameMax}DO> list);
 
+    void batchInsert(List<${tableCamelNameMax}DO> list);
 
+    Integer count(${tableCamelNameMax}Query ${tableCamelNameMin}Query);
 }
 

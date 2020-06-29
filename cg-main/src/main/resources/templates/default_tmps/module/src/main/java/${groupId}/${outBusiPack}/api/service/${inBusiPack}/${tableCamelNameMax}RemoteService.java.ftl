@@ -29,5 +29,7 @@ public interface ${javaClassName} {
 
     Response<Integer> batchUpdateById(List<${tableCamelNameMax}DTO> list);
 
+    Response<List<Long>> batchInsert(List<${tableCamelNameMax}DTO> list);
 
+    Response<Integer> count(${tableCamelNameMax}Query ${tableCamelNameMin}Query);
 }

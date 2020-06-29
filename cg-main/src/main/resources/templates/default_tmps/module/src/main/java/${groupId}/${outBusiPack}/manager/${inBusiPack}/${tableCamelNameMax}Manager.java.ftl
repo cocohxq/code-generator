@@ -26,5 +26,9 @@ public interface ${javaClassName} {
     List<${tableCamelNameMax}DO> queryAll(${tableCamelNameMax}Query ${tableCamelNameMin}Query);
 
     Integer batchUpdateById(List<${tableCamelNameMax}DO> list);
+
+    void batchInsert(List<${tableCamelNameMax}DO> list);
+
+    Integer count(${tableCamelNameMax}Query ${tableCamelNameMin}Query);
 }
 

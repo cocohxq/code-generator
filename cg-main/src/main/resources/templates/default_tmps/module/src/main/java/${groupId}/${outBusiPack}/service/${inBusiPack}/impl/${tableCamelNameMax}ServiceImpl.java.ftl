@@ -63,5 +63,15 @@ public class ${javaClassName} implements ${tableCamelNameMax}Service {
     public Integer batchUpdateById(List<${tableCamelNameMax}DO> list) {
         return ${tableCamelNameMin}Manager.batchUpdateById(list);
     }
+
+    @Override
+    public void batchInsert(List<${tableCamelNameMax}DO> list) {
+        ${tableCamelNameMin}Manager.batchInsert(list);
+    }
+
+    @Override
+    public Integer count(${tableCamelNameMax}Query ${tableCamelNameMin}Query) {
+        return ${tableCamelNameMin}Manager.count(${tableCamelNameMin}Query);
+    }
 }
 
