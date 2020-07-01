@@ -1,6 +1,7 @@
 package com.github.codegenerator.common.in.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class Config {
 
@@ -15,8 +16,6 @@ public class Config {
     private String pwd;
     private String dbName;
     private Integer dbType;
-    private transient String operation;
-
 
 
     //表选择
@@ -37,6 +36,11 @@ public class Config {
     //模板
     private transient List<String> tmps;
 
+    //操作
+    private transient String operation = "next";
+
+    //参数
+    private transient Map<String, Object> extParams;
 
     public String getUsername() {
         return username;
@@ -196,5 +200,13 @@ public class Config {
 
     public void setInStr(String inStr) {
         this.inStr = inStr;
+    }
+
+    public Map<String, Object> getExtParams() {
+        return extParams;
+    }
+
+    public void setExtParams(Map<String, Object> extParams) {
+        this.extParams = extParams;
     }
 }

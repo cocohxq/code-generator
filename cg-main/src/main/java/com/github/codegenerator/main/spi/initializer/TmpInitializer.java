@@ -1,5 +1,6 @@
 package com.github.codegenerator.main.spi.initializer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.CodeConfigInfo;
 import com.github.codegenerator.common.in.model.CommonValueStack;
@@ -13,6 +14,7 @@ import com.github.codegenerator.common.in.model.TreeNode;
 import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
+import com.github.codegenerator.common.util.LockUtils;
 import com.github.codegenerator.common.util.TreeUtils;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -27,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,61 +37,72 @@ import java.util.Map;
  */
 public class TmpInitializer extends AbstractInitializer {
 
+    private static final String TMP_OP_KEY = "tmp_op_%s";
+
     @Override
     public boolean before(SessionGenerateContext context) {
-        context.getGenerateInfo().setCommonValueStack(new CommonValueStack());
-        context.getGenerateInfo().setTableCodeTemplateInfoList(new ArrayList<>());
-        FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);//清除生成的代码文件
+        Config config = context.getConfig();
+        //模板操作
+//        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+//        String key = String.format(TMP_OP_KEY, tmpTreeName);
+        if (OPERATION_NEXT.equals(config.getOperation())) {
+//            if (!LockUtils.tryReadLock(key)) {
+//                context.error("该同名模板树正在被其他人写操作中");
+//                return false;
+//            }
+            context.getGenerateInfo().setCommonValueStack(new CommonValueStack());
+            context.getGenerateInfo().setTableCodeTemplateInfoList(new ArrayList<>());
+            FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);//清除生成的代码文件
+
+        } else {
+//            if (!LockUtils.tryWriteLock(key)) {
+//                context.error("该同名模板树正在被其他人写操作中");
+//                return false;
+//            }
+        }
         return true;
     }
 
     @Override
     public void doInitialize(SessionGenerateContext context) {
         Config config = context.getConfig();
-        GenerateInfo generateInfo = context.getGenerateInfo();
-        CodeConfigInfo codeConfigInfo = generateInfo.getCodeConfigInfo();
-        TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
 
-        //遍历选中的模板
-        config.getTmps().stream().forEach(l -> {
-            String tmpModulePath = l;
-
-            //模板实际路径
-            //tmpModulePath不为空是模板节点，且没有被用户编辑过的，就放入，保证编辑过的优先
-            if (null != tmpModulePath) {
-                //模板填充内容
-                TableCodeTemplateInfo tableCodeTemplateInfo = new TableCodeTemplateInfo();
-                tableCodeTemplateInfo.setCodeConfigInfo(codeConfigInfo);
-                tableCodeTemplateInfo.setTableConfigInfo(tableConfigInfo);
-                boolean isJavaFile = tmpModulePath.toLowerCase().endsWith(".java.ftl") ? true : false;
-                tableCodeTemplateInfo.setTemplateContent(FileUtils.loadFile(generateInfo.getSelectedTmpTreeName(), tmpModulePath, 0));//读取模板
-                tableCodeTemplateInfo.setTemplateFileName(FileUtils.getFileNameByPath(tmpModulePath));
-                tableCodeTemplateInfo.setTargetFileName(tableCodeTemplateInfo.getTemplateFileName().replace("${tableCamelNameMax}", codeConfigInfo.getTableCamelNameMax()).replace("${tableName}", tableConfigInfo.getTableMeta().getTable().getTableName()).replace(".ftl", ""));
-
-                //路径  module/src/main/java/groupId/${outBusiPack}/xxxx/${inBusiPack}
-                String moduleDir = parseModuleDir(tmpModulePath,codeConfigInfo,tableCodeTemplateInfo.getTemplateFileName());
-                if (isJavaFile) {
-                    tableCodeTemplateInfo.setJavaPackage(parsePackage(codeConfigInfo, generateInfo, moduleDir));
-                    tableCodeTemplateInfo.setJavaClassName(tableCodeTemplateInfo.getTargetFileName().replace(".java", ""));//eg: CarEntity
-                    //记录所有类的类路径
-                    generateInfo.getCommonValueStack().getCommonRelatedMap().put(tableCodeTemplateInfo.getJavaClassName() + ".classPath", tableCodeTemplateInfo.getJavaPackage() + "." + tableCodeTemplateInfo.getJavaClassName());
-                }
-
-                if (codeConfigInfo.getCodeLocationType().intValue() == 1) {
-                    tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(), moduleDir, tableCodeTemplateInfo.getTargetFileName()));
-                } else {
-                    tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(), ContextContainer.MODULE_PATH_ROOT, tableCodeTemplateInfo.getTargetFileName()));
-                }
-                context.getGenerateInfo().getTableCodeTemplateInfoList().add(tableCodeTemplateInfo);
-            }
-        });
+        switch (config.getOperation()) {
+            case "loadFile":
+                loadFile(context);
+                break;
+            case "addPath":
+                addPath(context);
+                break;
+            case "movePath":
+                movePath(context);
+                break;
+            case "copyPath":
+                copyPath(context);
+                break;
+            case "editTemplateName":
+                editTemplateName(context);
+                break;
+            case "refreshUserTmpTreeList":
+                refreshUserTmpTreeList(context);
+                break;
+            case "loadTmpTree":
+                loadTmpTree(context);
+                break;
+            case "saveUserTmpTree":
+                saveUserTmpTree(context);
+                break;
+            case "commit":
+                commit(context);
+                break;
+            case "deleteTmp":
+                deleteTmp(context);
+                break;
+            default:
+                buildCodeFile(context);
+        }
 
 
-        //生成所有选中的文件
-        generateFile(generateInfo);
-        //读取用户文件树
-        TreeNode treeRoot = TreeUtils.loadTree(context.getSessionId(), 1);
-        context.setStepInitResult(Arrays.asList(treeRoot));
     }
 
     @Override
@@ -101,7 +115,14 @@ public class TmpInitializer extends AbstractInitializer {
 
     }
 
-    private String parseModuleDir(String tmpModulePath,CodeConfigInfo codeConfigInfo,String templateFileName){
+    @Override
+    public void finalize(SessionGenerateContext context) {
+        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+        String key = String.format(TMP_OP_KEY, tmpTreeName);
+        LockUtils.unLock(key);
+    }
+
+    private String parseModuleDir(String tmpModulePath, CodeConfigInfo codeConfigInfo, String templateFileName) {
         //路径  module/src/main/java/groupId/${outBusiPack}/xxxx/${inBusiPack}
         String moduleDir = tmpModulePath.replace("${groupId}", codeConfigInfo.getGroupId()).replace(templateFileName, "");
         if (null != codeConfigInfo.getInBusiPack()) {
@@ -185,5 +206,231 @@ public class TmpInitializer extends AbstractInitializer {
 
         });
 
+    }
+
+    private void buildCodeFile(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        GenerateInfo generateInfo = context.getGenerateInfo();
+        CodeConfigInfo codeConfigInfo = generateInfo.getCodeConfigInfo();
+        TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
+
+        //遍历选中的模板
+        config.getTmps().stream().forEach(l -> {
+            String tmpModulePath = l;
+
+            //模板实际路径
+            //tmpModulePath不为空是模板节点，且没有被用户编辑过的，就放入，保证编辑过的优先
+            if (null != tmpModulePath) {
+                //模板填充内容
+                TableCodeTemplateInfo tableCodeTemplateInfo = new TableCodeTemplateInfo();
+                tableCodeTemplateInfo.setCodeConfigInfo(codeConfigInfo);
+                tableCodeTemplateInfo.setTableConfigInfo(tableConfigInfo);
+                boolean isJavaFile = tmpModulePath.toLowerCase().endsWith(".java.ftl") ? true : false;
+                tableCodeTemplateInfo.setTemplateContent(FileUtils.loadFile(generateInfo.getSelectedTmpTreeName(), tmpModulePath, 0));//读取模板
+                tableCodeTemplateInfo.setTemplateFileName(FileUtils.getFileNameByPath(tmpModulePath));
+                tableCodeTemplateInfo.setTargetFileName(tableCodeTemplateInfo.getTemplateFileName().replace("${tableCamelNameMax}", codeConfigInfo.getTableCamelNameMax()).replace("${tableName}", tableConfigInfo.getTableMeta().getTable().getTableName()).replace(".ftl", ""));
+
+                //路径  module/src/main/java/groupId/${outBusiPack}/xxxx/${inBusiPack}
+                String moduleDir = parseModuleDir(tmpModulePath, codeConfigInfo, tableCodeTemplateInfo.getTemplateFileName());
+                if (isJavaFile) {
+                    tableCodeTemplateInfo.setJavaPackage(parsePackage(codeConfigInfo, generateInfo, moduleDir));
+                    tableCodeTemplateInfo.setJavaClassName(tableCodeTemplateInfo.getTargetFileName().replace(".java", ""));//eg: CarEntity
+                    //记录所有类的类路径
+                    generateInfo.getCommonValueStack().getCommonRelatedMap().put(tableCodeTemplateInfo.getJavaClassName() + ".classPath", tableCodeTemplateInfo.getJavaPackage() + "." + tableCodeTemplateInfo.getJavaClassName());
+                }
+
+                if (codeConfigInfo.getCodeLocationType().intValue() == 1) {
+                    tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(), moduleDir, tableCodeTemplateInfo.getTargetFileName()));
+                } else {
+                    tableCodeTemplateInfo.setTargetFilePath(FileUtils.concatPath(generateInfo.getCodepath(), ContextContainer.MODULE_PATH_ROOT, tableCodeTemplateInfo.getTargetFileName()));
+                }
+                context.getGenerateInfo().getTableCodeTemplateInfoList().add(tableCodeTemplateInfo);
+            }
+        });
+
+
+        //生成所有选中的文件
+        generateFile(generateInfo);
+        //读取用户文件树
+        TreeNode treeRoot = TreeUtils.loadTree(context.getSessionId(), 1);
+        context.setStepInitResult(Arrays.asList(treeRoot));
+    }
+
+    private void loadFile(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        String fileModulePath = (String) param.get("modulePath");
+        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+        Integer fileType = (Integer) param.get("fileType");
+        //代码树的根节点是session
+        if (fileType.intValue() == 1) {
+            tmpTreeName = ContextContainer.getContext().getSessionId();
+        }
+        context.setStepInitResult(FileUtils.loadFile(tmpTreeName, fileModulePath, fileType));
+    }
+
+    private void addPath(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String tmpModulePath = (String) param.get("tmpModulePath");
+            Integer fileType = (Integer) param.get("fileType");
+            FileUtils.addFile(tmpTreeName, tmpModulePath, fileType);
+            context.setStepInitResult(1);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+            context.setStepInitResult(0);
+        }
+    }
+
+    private void movePath(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String sourceTmpModulePath = (String) param.get("sourceTmpModulePath");
+            String targetTmpModulePath = (String) param.get("targetTmpModulePath");
+            FileUtils.move(getActualPath(tmpTreeName, sourceTmpModulePath), getActualPath(tmpTreeName, targetTmpModulePath));
+            context.setStepInitResult(1);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+            context.setStepInitResult(0);
+        }
+    }
+
+    private void copyPath(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String sourceTmpModulePath = (String) param.get("sourceTmpModulePath");
+            String targetTmpModulePath = (String) param.get("targetTmpModulePath");
+            FileUtils.copy(getActualPath(tmpTreeName, sourceTmpModulePath), getActualPath(tmpTreeName, targetTmpModulePath));
+            context.setStepInitResult(1);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+            context.setStepInitResult(0);
+        }
+    }
+
+    private void editTemplateName(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String tmpModulePath = (String) param.get("tmpModulePath");
+            String newTmpModulePath = (String) param.get("newTmpModulePath");
+            if (null == tmpModulePath || null == tmpTreeName || null == newTmpModulePath) {
+                context.setStepInitResult(0);
+            }
+            FileUtils.modifyFileName(getActualPath(tmpTreeName, tmpModulePath), getActualPath(tmpTreeName, newTmpModulePath));
+            context.setStepInitResult(1);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+            context.setStepInitResult(0);
+        }
+    }
+
+    private void refreshUserTmpTreeList(SessionGenerateContext context) {
+        try {
+            List<String> list = FileUtils.loadDirDirectFileList(ContextContainer.USER_TMPTREE_DIR);
+            if (null == list) {
+                list = new ArrayList<>();
+            }
+            context.setStepInitResult(list);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+        }
+    }
+
+    private void loadTmpTree(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = (String) param.get("tmpTreeName");
+            TreeNode treeNode = TreeUtils.loadTree(tmpTreeName, 0);
+            ContextContainer.getContext().getGenerateInfo().setSelectedTmpTreeName(tmpTreeName);
+            context.setStepInitResult(new TreeNode[]{treeNode});
+        } catch (Exception e) {
+            context.error(e.getMessage());
+        }
+    }
+
+
+    private void saveUserTmpTree(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String userTmpTreeName = (String) param.get("userTmpTreeName");
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String templateContent = (String) param.get("templateContent");
+            String tmpModulePath = (String) param.get("tmpModulePath");
+            List<String> selectTmps = (List<String>) param.get("tmps");
+            JSONObject jsonObject = new JSONObject();
+            //如果提交到新模板树，先创建一个
+            if (!userTmpTreeName.equals(tmpTreeName)) {
+                if (new File(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, userTmpTreeName)).exists()) {
+                    jsonObject.put("msg", "不能提交到已存在的其它模板树");
+                    return;
+                }
+                generateTmpTreeFiles(tmpTreeName, userTmpTreeName, selectTmps);
+            }
+
+            //保存之后再更新
+            if (null != tmpModulePath && null != templateContent && !templateContent.equals("")) {
+                FileUtils.updateFile(userTmpTreeName, tmpModulePath, templateContent);
+            }
+            jsonObject.put("msg", "提交成功");
+            context.setStepInitResult(jsonObject);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+        }
+    }
+
+    private void commit(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            String templateContent = (String) param.get("templateContent");
+            String tmpModulePath = (String) param.get("tmpModulePath");
+            if (null != tmpModulePath && null != templateContent && !templateContent.equals("")) {
+                context.setStepInitResult(FileUtils.updateFile(tmpTreeName, tmpModulePath, templateContent));
+            } else {
+                context.setStepInitResult(0);
+            }
+        } catch (Exception e) {
+            context.setStepInitResult(0);
+            context.error(e.getMessage());
+        }
+    }
+
+    private void deleteTmp(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        try {
+            String modulePath = (String) param.get("modulePath");
+            String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
+            JSONObject jsonObject = new JSONObject();
+            FileUtils.delete(FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, tmpTreeName, modulePath));
+            jsonObject.put("msg", "删除成功");
+            context.setStepInitResult(jsonObject);
+        } catch (Exception e) {
+            context.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 生成模板文件
+     *
+     * @param
+     */
+    private Integer generateTmpTreeFiles(String sourceTmpTreeName, String targetTmpTreeName, List<String> tmps) {
+        String targetTreePath = FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, targetTmpTreeName);
+        String sourceTreePath = FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, sourceTmpTreeName);
+        //拼接上全路径
+        List<String> actualPathList = new ArrayList<>(tmps.size());
+        tmps.stream().forEach(l -> actualPathList.add(FileUtils.concatPath(sourceTreePath, l)));
+
+        FileUtils.copyDirWithFilter(sourceTreePath, targetTreePath, actualPathList);
+        return 1;
+
+    }
+
+
+    private String getActualPath(String tmpTreeName, String modulePath) {
+        return FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, tmpTreeName, modulePath);
     }
 }

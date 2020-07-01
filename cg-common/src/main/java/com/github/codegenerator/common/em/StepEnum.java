@@ -7,14 +7,16 @@ import java.util.List;
 
 public enum StepEnum implements TupleEnum{
 
-    STEP_DB(0, "选择数据源"), STEP_TABLE(5, "选择需要的表"),STEP_CODE(8, "编辑代码配置"),STEP_TMP(10, "选择/编辑模板"), STEP_PREVIEW(15, "预览导出");
+    STEP_DB(0, "db","选择数据源"), STEP_TABLE(5, "table","选择需要的表"),STEP_CODE(8, "code","编辑代码配置"),STEP_TMP(10, "tmp","选择/编辑模板"), STEP_PREVIEW(15, "preview","预览导出");
 
     private Integer type;//大类型
+    private String code;
     private String name;
 
-    StepEnum(Integer type, String name) {
+    StepEnum(Integer type, String code,String name) {
         this.type = type;
         this.name = name;
+        this.code = code;
     }
 
     public static StepEnum getDbByType(int type) {
@@ -53,4 +55,11 @@ public enum StepEnum implements TupleEnum{
         this.name = name;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 }

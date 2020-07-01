@@ -4,6 +4,7 @@ public class Tuple {
 
     private int type;
     private String name;
+    private String code;
     private String remark;
 
     public int getType() {
@@ -28,5 +29,13 @@ public class Tuple {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

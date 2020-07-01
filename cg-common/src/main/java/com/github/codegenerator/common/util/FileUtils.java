@@ -446,42 +446,50 @@ public class FileUtils {
             if (childFile.isDirectory()) {
                 copyDir(childFile.getPath(), targetPath, true);
             } else {
-                copyFile(childFile.getPath(), concatPath(targetPath, childFile.getName()));
+                copyFile(childFile.getPath(), targetPath);
             }
         }
     }
 
-    public static void copy(String sourcePath, String targetPath) {
-        if (new File(concatPath(targetPath, sourcePath.substring(sourcePath.lastIndexOf(File.separator)))).exists()) {
+    public static void copy(String sourcePath, String targetDirPath) {
+        if (new File(concatPath(targetDirPath, sourcePath.substring(sourcePath.lastIndexOf(File.separator)))).exists()) {
             throw new RuntimeException("目标文件已存在");
+        }
+        if(targetDirPath.startsWith(sourcePath)){
+            throw new RuntimeException("不支持把父级文件夹往子级文件夹复制");
         }
         //目录往自己内部copy的时候需要用临时目录来存档,再rename,避免遍历死循环
         String actualTargetPath = null;
-        if (sourcePath.equals(targetPath)) {
-            actualTargetPath = targetPath;
-            targetPath = targetPath + "_tmp";
+        if (sourcePath.equals(targetDirPath)) {
+            actualTargetPath = targetDirPath;
+            targetDirPath = targetDirPath + "_tmp";
             //先copy源文件目录下所有子文件，保证xxx和xxx_tmp一模一样,下面再去把源文件夹往目标文件夹copy一次
-            copyDir(sourcePath, targetPath, false);
+            copyDir(sourcePath, targetDirPath, false);
         }
         File sourceFile = new File(sourcePath);
         if (sourceFile.isDirectory()) {
-            copyDir(sourcePath, targetPath, true);
+            copyDir(sourcePath, targetDirPath, true);
         } else {
-            copyFile(sourcePath, targetPath);
+            copyFile(sourcePath, targetDirPath);
         }
         //重命名临时文件夹成目标文件夹
         if (actualTargetPath != null) {
             delete(actualTargetPath);
-            modifyFileName(targetPath, actualTargetPath);
+            modifyFileName(targetDirPath, actualTargetPath);
         }
     }
 
-    public static void copyFile(String sourcePath, String targetPath) {
+    public static void copyFile(String sourcePath, String targetDirPath) {
+        File file = new File(targetDirPath);
+        if(file.isFile()){
+            targetDirPath = file.getPath().substring(0,file.getPath().lastIndexOf(File.separator));
+        }
+        String targetFilePath = concatPath(targetDirPath,sourcePath.substring(sourcePath.lastIndexOf(File.separator)+1));
         InputStreamReader isr = null;
         OutputStreamWriter osw = null;
         try {
             isr = new InputStreamReader(new FileInputStream(sourcePath));
-            osw = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(new File(targetPath))));
+            osw = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(new File(targetFilePath))));
             char[] buffer = new char[1024];
             int count = 0;
             while ((count = isr.read(buffer, 0, buffer.length)) > 0) {

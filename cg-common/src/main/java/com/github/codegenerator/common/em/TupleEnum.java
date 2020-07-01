@@ -12,6 +12,7 @@ public interface TupleEnum {
         Tuple tuple = new Tuple();
         tuple.setType(getType());
         tuple.setName(getName());
+        tuple.setCode(getCode());
         tuple.setRemark(getRemark());
         return tuple;
     }
@@ -19,6 +20,8 @@ public interface TupleEnum {
     Integer getType();
 
     String getName();
+
+    String getCode();
 
     default String getRemark(){
         return "";

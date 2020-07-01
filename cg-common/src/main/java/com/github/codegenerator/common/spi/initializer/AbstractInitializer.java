@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractInitializer implements Initializer {
 
+    protected static final String OPERATION_NEXT = "next";
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -18,8 +19,10 @@ public abstract class AbstractInitializer implements Initializer {
             doInitialize(context);
             after(context);
         } catch (Exception e) {
-            logger.error("处理异常",e);
-            context.error("处理失败，异常：",e.toString());
+            logger.error("处理异常", e);
+            context.error("处理失败，异常：", e.toString());
+        } finally {
+            finalize(context);
         }
     }
 
@@ -29,4 +32,6 @@ public abstract class AbstractInitializer implements Initializer {
 
     public abstract void after(SessionGenerateContext context);
 
+    public void finalize(SessionGenerateContext context) {
+    }
 }
