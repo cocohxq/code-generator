@@ -1,4 +1,4 @@
-package com.github.codegenerator.main.spi.initializer;
+package com.github.codegenerator.main.spi.stephandler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.StepEnum;
@@ -11,7 +11,7 @@ import com.github.codegenerator.common.in.model.StringTemplateLoader;
 import com.github.codegenerator.common.in.model.TableCodeTemplateInfo;
 import com.github.codegenerator.common.in.model.TableConfigInfo;
 import com.github.codegenerator.common.in.model.TreeNode;
-import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
+import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
 import com.github.codegenerator.common.util.LockUtils;
@@ -35,70 +35,62 @@ import java.util.Map;
 /**
  * 模板相关的配置
  */
-public class TmpInitializer extends AbstractInitializer {
+public class TmpStepHandler extends AbstractStepHandler {
 
     private static final String TMP_OP_KEY = "tmp_op_%s";
 
+    private static final String OPERATION_LOAD_FILE = "loadFile";
+    private static final String OPERATION_ADD_PATH = "addPath";
+    private static final String OPERATION_MOVE_PATH = "movePath";
+    private static final String OPERATION_COPY_PATH = "copyPath";
+    private static final String OPERATION_EDIT_TMP_NAME = "editTemplateName";
+    private static final String OPERATION_REFRESH = "refreshUserTmpTreeList";
+    private static final String OPERATION_LOAD_TREE = "loadTmpTree";
+    private static final String OPERATION_SAVE_TREE = "saveUserTmpTree";
+    private static final String OPERATION_COMMIT = "commit";
+    private static final String OPERATION_DELETE_TMP = "deleteTmp";
+
     @Override
     public boolean before(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        //模板操作
-//        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
-//        String key = String.format(TMP_OP_KEY, tmpTreeName);
-        if (OPERATION_NEXT.equals(config.getOperation())) {
-//            if (!LockUtils.tryReadLock(key)) {
-//                context.error("该同名模板树正在被其他人写操作中");
-//                return false;
-//            }
-            context.getGenerateInfo().setCommonValueStack(new CommonValueStack());
-            context.getGenerateInfo().setTableCodeTemplateInfoList(new ArrayList<>());
-            FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);//清除生成的代码文件
-
-        } else {
-//            if (!LockUtils.tryWriteLock(key)) {
-//                context.error("该同名模板树正在被其他人写操作中");
-//                return false;
-//            }
-        }
-        return true;
+        return tryLock(context);
     }
 
     @Override
-    public void doInitialize(SessionGenerateContext context) {
+    public void doHandle(SessionGenerateContext context) {
         Config config = context.getConfig();
 
         switch (config.getOperation()) {
-            case "loadFile":
+            case OPERATION_LOAD_FILE:
                 loadFile(context);
                 break;
-            case "addPath":
+            case OPERATION_ADD_PATH:
                 addPath(context);
                 break;
-            case "movePath":
+            case OPERATION_MOVE_PATH:
                 movePath(context);
                 break;
-            case "copyPath":
+            case OPERATION_COPY_PATH:
                 copyPath(context);
                 break;
-            case "editTemplateName":
+            case OPERATION_EDIT_TMP_NAME:
                 editTemplateName(context);
                 break;
-            case "refreshUserTmpTreeList":
+            case OPERATION_REFRESH:
                 refreshUserTmpTreeList(context);
                 break;
-            case "loadTmpTree":
+            case OPERATION_LOAD_TREE:
                 loadTmpTree(context);
                 break;
-            case "saveUserTmpTree":
+            case OPERATION_SAVE_TREE:
                 saveUserTmpTree(context);
                 break;
-            case "commit":
+            case OPERATION_COMMIT:
                 commit(context);
                 break;
-            case "deleteTmp":
+            case OPERATION_DELETE_TMP:
                 deleteTmp(context);
                 break;
-            default:
+            case OPERATION_NEXT:
                 buildCodeFile(context);
         }
 
@@ -106,8 +98,8 @@ public class TmpInitializer extends AbstractInitializer {
     }
 
     @Override
-    public Integer getStepType() {
-        return StepEnum.STEP_TMP.getType();
+    public StepEnum step() {
+        return StepEnum.STEP_TMP;
     }
 
     @Override
@@ -117,9 +109,7 @@ public class TmpInitializer extends AbstractInitializer {
 
     @Override
     public void finalize(SessionGenerateContext context) {
-        String tmpTreeName = ContextContainer.getContext().getGenerateInfo().getSelectedTmpTreeName();
-        String key = String.format(TMP_OP_KEY, tmpTreeName);
-        LockUtils.unLock(key);
+        unWriteLock(context);
     }
 
     private String parseModuleDir(String tmpModulePath, CodeConfigInfo codeConfigInfo, String templateFileName) {
@@ -213,6 +203,11 @@ public class TmpInitializer extends AbstractInitializer {
         GenerateInfo generateInfo = context.getGenerateInfo();
         CodeConfigInfo codeConfigInfo = generateInfo.getCodeConfigInfo();
         TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
+
+        //清理
+        generateInfo.setCommonValueStack(new CommonValueStack());
+        generateInfo.setTableCodeTemplateInfoList(new ArrayList<>());
+        FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);//清除生成的代码文件
 
         //遍历选中的模板
         config.getTmps().stream().forEach(l -> {
@@ -432,5 +427,46 @@ public class TmpInitializer extends AbstractInitializer {
 
     private String getActualPath(String tmpTreeName, String modulePath) {
         return FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, tmpTreeName, modulePath);
+    }
+
+    /**
+     * 离开解所有锁、进入和下一步时是读锁、其他都是写锁
+     *
+     * @param context
+     * @return
+     */
+    private boolean tryLock(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        //模板操作
+        String tmpTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
+        String key = String.format(TMP_OP_KEY, tmpTreeName);
+
+        if (OPERATION_LEAVE.equals(config.getOperation())) {
+            LockUtils.unAllLock(key, context.getSessionId());
+            return true;
+        }
+        if (OPERATION_INTO.equals(config.getOperation())
+                || OPERATION_NEXT.equals(config.getOperation())
+                || OPERATION_REFRESH.equals(config.getOperation())
+                || OPERATION_LOAD_TREE.equals(config.getOperation())
+                || OPERATION_LOAD_FILE.equals(config.getOperation())) {
+            if (!LockUtils.tryReadLock(key, context.getSessionId())) {
+                context.error("该同名模板树正在被其他人写操作中");
+                return false;
+            }
+        } else {
+            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+                context.error("该同名模板树正在被其他人写操作中");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void unWriteLock(SessionGenerateContext context) {
+        //模板操作
+        String tmpTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
+        String key = String.format(TMP_OP_KEY, tmpTreeName);
+        LockUtils.unWriteLock(key, context.getSessionId());
     }
 }

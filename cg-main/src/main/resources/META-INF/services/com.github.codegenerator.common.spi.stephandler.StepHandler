@@ -1,0 +1,3 @@
+com.github.codegenerator.main.spi.stephandler.TmpStepHandler
+com.github.codegenerator.main.spi.stephandler.CodeStepHandler
+com.github.codegenerator.main.spi.stephandler.PreviewStepHandler

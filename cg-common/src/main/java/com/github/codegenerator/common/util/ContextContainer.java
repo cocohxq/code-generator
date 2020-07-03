@@ -1,7 +1,7 @@
 package com.github.codegenerator.common.util;
 
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
-import com.github.codegenerator.common.spi.initializer.Initializer;
+import com.github.codegenerator.common.spi.stephandler.StepHandler;
 import com.github.codegenerator.common.spi.viewer.ViewerInfo;
 import org.springframework.boot.system.ApplicationHome;
 
@@ -22,7 +22,7 @@ public class ContextContainer {
     /**
      * 构建步骤初始化处理器
      */
-    private static Map<Integer, List<Initializer>> initializerMap = new HashMap<>();
+    private static Map<String, List<StepHandler>> initializerMap = new HashMap<>();
     /**
      * 页面展示信息
      */
@@ -58,20 +58,20 @@ public class ContextContainer {
 
 
 
-    public static void registryInitializer(Initializer initializer){
-        if(null == initializer){
+    public static void registryInitializer(StepHandler stepHandler){
+        if(null == stepHandler){
             return;
         }
-        List<Initializer> list = initializerMap.get(initializer.getStepType());
+        List<StepHandler> list = initializerMap.get(stepHandler.step());
         if(null == list){
             list = new ArrayList<>();
-            initializerMap.put(initializer.getStepType(),list);
+            initializerMap.put(stepHandler.step().getCode(),list);
         }
-        list.add(initializer);
+        list.add(stepHandler);
     }
 
-    public static List<Initializer> getStepInitializer(Integer stepType){
-        return initializerMap.get(stepType);
+    public static List<StepHandler> getStepInitializer(String step){
+        return initializerMap.get(step);
     }
 
     public static SessionGenerateContext getContext() {

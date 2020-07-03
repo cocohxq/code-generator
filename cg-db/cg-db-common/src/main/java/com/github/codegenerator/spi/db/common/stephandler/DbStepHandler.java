@@ -1,8 +1,9 @@
-package com.github.codegenerator.spi.db.common.initializer;
+package com.github.codegenerator.spi.db.common.stephandler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.DbEnum;
 import com.github.codegenerator.common.em.StepEnum;
+import com.github.codegenerator.common.in.model.CommonValueStack;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.db.Column;
@@ -10,9 +11,10 @@ import com.github.codegenerator.common.in.model.db.Database;
 import com.github.codegenerator.common.in.model.db.FieldMeta;
 import com.github.codegenerator.common.in.model.db.Table;
 import com.github.codegenerator.common.in.model.db.TableMeta;
-import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
+import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.DataUtil;
+import com.github.codegenerator.common.util.FileUtils;
 import com.github.codegenerator.common.util.LockUtils;
 import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
@@ -21,7 +23,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DbInitializer extends AbstractInitializer {
+public abstract class DbStepHandler extends AbstractStepHandler {
 
 
     private static final String OPERATION_COPY = "copy";
@@ -33,46 +35,11 @@ public abstract class DbInitializer extends AbstractInitializer {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        //构建信息重建
-        context.getGenerateInfo().setDatabase(null);
-        //保存配置或更新
-        String key = String.format(DB_OP_KEY, config.getConfigName());
-
-        //可以并发读，不能并发写和读写
-        if (OPERATION_NEXT.equals(config.getOperation())) {
-            if (!LockUtils.tryReadLock(key)) {
-                context.error("该同名配置正在被其他人写操作中");
-                return false;
-            }
-            //加载class
-            config = DataUtil.getData("cb", config.getConfigName(), Config.class);
-            context.setConfig(config);
-        } else if (OPERATION_DEL.equals(config.getOperation())) {
-            if (!LockUtils.tryWriteLock(key)) {
-                context.error("该同名配置正在被其他人写操作中");
-                return false;
-            }
-            return true;
-        } else {
-            if (!LockUtils.tryWriteLock(key)) {
-                context.error("该同名配置正在被其他人写操作中");
-                return false;
-            }
-        }
-        //非del操作，需要校验这些信息
-        if (null == config.getDbType() || !config.getDbType().equals(getDbType())) {
-            return false;
-        }
-        if (null == config.getIp() || null == config.getPort() || null == config.getDbName()) {
-            context.error("ip、port、dbName名称存在空值");
-            return false;
-        }
-        return true;
+        return tryLock(context);
     }
 
     @Override
-    public void doInitialize(SessionGenerateContext context) {
+    public void doHandle(SessionGenerateContext context) {
         Config config = context.getConfig();
 
         switch (config.getOperation()) {
@@ -89,7 +56,7 @@ public abstract class DbInitializer extends AbstractInitializer {
                 DataUtil.deleteData("cb", config.getConfigName());
                 context.setStepInitResult(1);
                 break;
-            default:
+            case OPERATION_NEXT:
                 dbInit(context);
         }
     }
@@ -102,9 +69,7 @@ public abstract class DbInitializer extends AbstractInitializer {
 
     @Override
     public void finalize(SessionGenerateContext context) {
-        String tmpTreeName = ContextContainer.getContext().getConfig().getConfigName();
-        String key = String.format(DB_OP_KEY, tmpTreeName);
-        LockUtils.unLock(key);
+        unWriteLock(context);
     }
 
     /**
@@ -133,8 +98,8 @@ public abstract class DbInitializer extends AbstractInitializer {
     public abstract String convertType(String columnType) throws Exception;
 
     @Override
-    public Integer getStepType() {
-        return StepEnum.STEP_DB.getType();
+    public StepEnum step() {
+        return StepEnum.STEP_DB;
     }
 
     public abstract List<Table> getTables(Connection cn, String dbName) throws Exception;
@@ -225,5 +190,42 @@ public abstract class DbInitializer extends AbstractInitializer {
             } catch (Exception e1) {
             }
         }
+    }
+
+
+    /**
+     * 离开解所有锁、进入和下一步时是读锁、其他都是写锁
+     *
+     * @param context
+     * @return
+     */
+    private boolean tryLock(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        String key = String.format(DB_OP_KEY, config.getConfigName());
+
+        if (OPERATION_LEAVE.equals(config.getOperation())) {
+            LockUtils.unAllLock(key, context.getSessionId());
+            return true;
+        }
+        if (OPERATION_INTO.equals(config.getOperation())
+                || OPERATION_NEXT.equals(config.getOperation())) {
+            if (!LockUtils.tryReadLock(key, context.getSessionId())) {
+                context.error("该同名配置正在被其他人写操作中");
+                return false;
+            }
+        } else {
+            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+                context.error("该同名配置正在被其他人写操作中");
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    private void unWriteLock(SessionGenerateContext context) {
+        //模板操作
+        String key = String.format(DB_OP_KEY, context.getConfig().getConfigName());
+        LockUtils.unWriteLock(key, context.getSessionId());
     }
 }

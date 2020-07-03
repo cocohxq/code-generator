@@ -1,7 +1,7 @@
 package com.github.codegenerator.main.in;
 
 import com.github.codegenerator.common.in.model.Config;
-import com.github.codegenerator.common.spi.initializer.Initializer;
+import com.github.codegenerator.common.spi.stephandler.StepHandler;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.DataUtil;
 import com.github.codegenerator.common.util.FileUtils;
@@ -73,8 +73,8 @@ public class ConfigController {
 //        ContextContainer.getContext().getConfig().setOperation(null);
 //        BeanUtils.copyProperties(config,ContextContainer.getContext().getConfig(),getNullPropertyNames(config));
         ContextContainer.getContext().setConfig(config);
-        for (Initializer initializer : ContextContainer.getStepInitializer(config.getStepType())) {
-            initializer.initialize(ContextContainer.getContext());
+        for (StepHandler stepHandler : ContextContainer.getStepInitializer(config.getStep())) {
+            stepHandler.handle(ContextContainer.getContext());
         }
         Map<String, Object> result = new HashMap<>();
         result.put("error", ContextContainer.getContext().getErrorMsgs());

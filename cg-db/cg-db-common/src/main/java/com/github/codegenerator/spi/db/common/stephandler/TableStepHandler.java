@@ -1,4 +1,4 @@
-package com.github.codegenerator.spi.db.common.initializer;
+package com.github.codegenerator.spi.db.common.stephandler;
 
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
@@ -6,12 +6,12 @@ import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.TableConfigInfo;
 import com.github.codegenerator.common.in.model.db.TableMeta;
-import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
+import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 
 /**
  * 表字段相关配置
  */
-public abstract class TableInitializer extends AbstractInitializer {
+public abstract class TableStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
@@ -25,7 +25,7 @@ public abstract class TableInitializer extends AbstractInitializer {
     }
 
     @Override
-    public void doInitialize(SessionGenerateContext context) {
+    public void doHandle(SessionGenerateContext context) {
         Config config = context.getConfig();
         GenerateInfo generateInfo = context.getGenerateInfo();
         //选中的表
@@ -45,8 +45,8 @@ public abstract class TableInitializer extends AbstractInitializer {
     }
 
     @Override
-    public Integer getStepType() {
-        return StepEnum.STEP_TABLE.getType();
+    public StepEnum step() {
+        return StepEnum.STEP_TABLE;
     }
 
     @Override

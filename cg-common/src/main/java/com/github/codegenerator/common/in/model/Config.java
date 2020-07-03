@@ -6,7 +6,7 @@ import java.util.Map;
 public class Config {
 
     //当前提交step
-    private transient Integer stepType;
+    private transient String step;
 
     //db配置
     private String configName;
@@ -74,12 +74,12 @@ public class Config {
         this.dbType = dbType;
     }
 
-    public Integer getStepType() {
-        return stepType;
+    public String getStep() {
+        return step;
     }
 
-    public void setStepType(Integer stepType) {
-        this.stepType = stepType;
+    public void setStep(String step) {
+        this.step = step;
     }
 
     public String getTableName() {

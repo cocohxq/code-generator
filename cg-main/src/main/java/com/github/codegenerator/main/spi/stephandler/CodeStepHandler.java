@@ -1,4 +1,4 @@
-package com.github.codegenerator.main.spi.initializer;
+package com.github.codegenerator.main.spi.stephandler;
 
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
@@ -6,7 +6,7 @@ import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.CodeConfigInfo;
 import com.github.codegenerator.common.in.model.TableConfigInfo;
-import com.github.codegenerator.common.spi.initializer.AbstractInitializer;
+import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 代码生成的配置
  */
-public class CodeInitializer extends AbstractInitializer {
+public class CodeStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
@@ -28,7 +28,7 @@ public class CodeInitializer extends AbstractInitializer {
     }
 
     @Override
-    public void doInitialize(SessionGenerateContext context) {
+    public void doHandle(SessionGenerateContext context) {
         //解析table的java模板变量
         Config config = context.getConfig();
         GenerateInfo generateInfo = context.getGenerateInfo();
@@ -67,8 +67,8 @@ public class CodeInitializer extends AbstractInitializer {
     }
 
     @Override
-    public Integer getStepType() {
-        return StepEnum.STEP_CODE.getType();
+    public StepEnum step() {
+        return StepEnum.STEP_CODE;
     }
 
     @Override

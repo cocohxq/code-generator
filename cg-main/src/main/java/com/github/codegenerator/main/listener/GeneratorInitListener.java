@@ -2,7 +2,7 @@ package com.github.codegenerator.main.listener;
 
 
 import com.github.codegenerator.common.em.StepEnum;
-import com.github.codegenerator.common.spi.initializer.Initializer;
+import com.github.codegenerator.common.spi.stephandler.StepHandler;
 import com.github.codegenerator.common.spi.viewer.Viewer;
 import com.github.codegenerator.common.spi.viewer.ViewerInfo;
 import com.github.codegenerator.common.util.ContextContainer;
@@ -34,8 +34,8 @@ public class GeneratorInitListener implements ServletContextListener {
     }
 
     private void initInitializers() {
-        ServiceLoader<Initializer> serviceLoader = ServiceLoader.load(Initializer.class);
-        for (Initializer service : serviceLoader) {
+        ServiceLoader<StepHandler> serviceLoader = ServiceLoader.load(StepHandler.class);
+        for (StepHandler service : serviceLoader) {
             ContextContainer.registryInitializer(service);
         }
 

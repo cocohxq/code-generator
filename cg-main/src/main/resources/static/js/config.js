@@ -7,8 +7,10 @@ $(document).ready(function () {
     // refreshuserTmpTreeList();
     initCodeArea();//模板编辑区域
 
+    chooseBar("step_db", "cur");
+
     //更换配置重新加载
-    $("#step_0 #addConfig").click(function () {
+    $("#step_db #addConfig").click(function () {
         let href = location.href;
         if (href.indexOf("?") != -1) {
             href = href.substring(0, href.indexOf("?"))
@@ -17,7 +19,7 @@ $(document).ready(function () {
     });
 
     //更换配置重新加载
-    $("#step_0 #copyAddConfig").click(function () {
+    $("#step_db #copyAddConfig").click(function () {
         let href = location.href;
         if (href.indexOf("?") != -1) {
             href = href.substring(0, href.indexOf("?"))
@@ -31,7 +33,7 @@ $(document).ready(function () {
     });
 
     //更换配置重新加载
-    $("#step_0 #editConfig").click(function () {
+    $("#step_db #editConfig").click(function () {
         let href = location.href;
         if (href.indexOf("?") != -1) {
             href = href.substring(0, href.indexOf("?"))
@@ -45,7 +47,7 @@ $(document).ready(function () {
     });
 
     //更换配置重新加载
-    $("#step_0 #delConfig").click(function () {
+    $("#step_db #delConfig").click(function () {
         let selectedConfig = $("#selectedConfig").val();
         if (selectedConfig == "请选择") {
             $.messager.alert('error', '请选择配置');
@@ -56,7 +58,7 @@ $(document).ready(function () {
         param.operation = "delete";
 
         //删除配置
-        initData(0, true, param, function () {
+        initData("step_db", "next", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -67,9 +69,9 @@ $(document).ready(function () {
     });
 
     //更换配置重新加载
-    $("#step_0 #saveConfig").click(function () {
+    $("#step_db #saveConfig").click(function () {
         let param = {};
-        if (!fillInputParam("#step_0", param)) {
+        if (!fillInputParam("#step_db", param)) {
             return;
         }
         param.dbType = $("#dbType").val();
@@ -85,7 +87,7 @@ $(document).ready(function () {
         }
 
         //初始化库表信息
-        initData(0, true, param, function () {
+        initData("step_db", "next", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -96,7 +98,7 @@ $(document).ready(function () {
     });
 
     //选择数据源-下一步
-    $("#step_0 .next").click(function () {
+    $("#step_db .next").click(function () {
         let param = {};
         param.add = false;
         let selectedConfig = $("#selectedConfig").val();
@@ -106,14 +108,14 @@ $(document).ready(function () {
         }
         param.configName = selectedConfig;
         param.operation = "next";
-        initData(0, true, param, step0Callback);
+        initData("step_db", "next", param, step0Callback);
     });
 
 
     //选择表-下一步
-    $("#step_5 .next").click(function () {
+    $("#step_table .next").click(function () {
         let param = {};
-        if (!fillInputParam("#step_5", param)) {
+        if (!fillInputParam("#step_table", param)) {
             return;
         }
         let tableNames = new Array();
@@ -121,25 +123,25 @@ $(document).ready(function () {
             tableNames.push($(this).val());
         });
         if (tableNames.length == 0) {
-            $("#step_5 .errMsg").text("请选择需要的生成代码的表");
+            $("#step_table .errMsg").text("请选择需要的生成代码的表");
             return;
         }
         if (tableNames.length > 1) {
-            $("#step_5 .errMsg").text("只支持按单表生成代码");
+            $("#step_table .errMsg").text("只支持按单表生成代码");
             return;
         }
 
         param.tableName = tableNames[0];
-        initData(5, true, param, function (data) {
+        initData("step_table", "next", param, function (data) {
             return true;
         });
     });
 
-    $("#step_5 .pre").click(function () {
-        chooseBar(5, false);
+    $("#step_table .pre").click(function () {
+        chooseBar("step_table", "back");
     });
 
-    $("#step_5 .field").click(function () {
+    $("#step_table .field").click(function () {
         if ($("#columns option:selected").length == 0) {
             $.messager.alert('error', "请先选择字段");
             return false;
@@ -161,7 +163,7 @@ $(document).ready(function () {
                     existedVal += ",";
                 }
                 existedVal += $(this).val();
-                $(this).attr("selected", false);
+                $(this).attr("selected", "back");
             }
         });
         $("#" + $(this).attr("at")).val(existedVal);
@@ -169,9 +171,9 @@ $(document).ready(function () {
 
 
     //编辑代码配置-下一步
-    $("#step_8 .next").click(function () {
+    $("#step_code .next").click(function () {
         let param = {};
-        if (!fillInputParam("#step_8", param)) {
+        if (!fillInputParam("#step_code", param)) {
             return;
         }
         //代码位置
@@ -188,25 +190,25 @@ $(document).ready(function () {
             }
         }
         //初始化库表信息
-        initData(8, true, param, function () {
+        initData("step_code", "next", param, function () {
             refreshuserTmpTreeList();
             return true;
         });
 
     });
 
-    $("#step_8 .pre").click(function () {
-        chooseBar(8, false);
+    $("#step_code .pre").click(function () {
+        chooseBar("step_code", "back");
     });
 
 
     //选择模板-下一步
-    $("#step_10 .next").click(function () {
+    $("#step_tmp .next").click(function () {
         let param = {};
         param.tmps = getSelectedTreeNode();
         if (param.tmps) {
             param.operation = "next";
-            initData(10, true, param, function (data) {
+            initData("step_tmp", "next", param, function (data) {
                 return initFileTree(data);
             });
         } else {
@@ -215,21 +217,21 @@ $(document).ready(function () {
         }
     });
 
-    $("#step_10 .pre").click(function () {
-        chooseBar(10, false);
+    $("#step_tmp .pre").click(function () {
+        chooseBar("step_tmp", "back");
     });
 
 
     //预览导出
-    $("#step_15 .next").click(function () {
+    $("#step_preview .next").click(function () {
         let param = {};
-        initData(15, true, param, function (data) {
+        initData("step_preview", "next", param, function (data) {
             return downloadZip(data);
         });
     });
 
-    $("#step_15 .pre").click(function () {
-        chooseBar(15, false);
+    $("#step_preview .pre").click(function () {
+        chooseBar("step_preview", "back");
     });
 
 });
@@ -292,7 +294,7 @@ function initTmps(treeNode) {
                 return;
             }
             param.operation = "editTemplateName";
-            initData(10, false, param, function (data) {
+            initData("step_tmp", "none", param, function (data) {
                 if (data == 1) {
                     loadTmpTree();
                     originEditNode = null;
@@ -333,7 +335,7 @@ function initTmps(treeNode) {
                 }
                 param.extParams.fileType = 0;
                 param.operation = "loadFile";
-                initData(10, false, param, function (data) {
+                initData("step_tmp", "none", param, function (data) {
                     editor.setValue(data);
                 });
             } else {
@@ -361,7 +363,7 @@ function initFileTree(treeNode) {
                 param.extParams.modulePath = node.attributes.modulePath;
                 param.extParams.fileType = 1;
                 param.operation = "loadFile";
-                initData(15, false, param, function (data) {
+                initData("step_preview", "none", param, function (data) {
                     fileEditor.setValue(data);
                 });
             }
@@ -453,7 +455,7 @@ function append(type) {
     param.extParams.fileType = type;
 
     param.operation = "addPath";
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -551,10 +553,10 @@ function step0Callback(data) {
  * @param param
  * @param succ_callback
  */
-function initData(curStep, next, param, succ_callback) {
+function initData(stepId, route, param, succ_callback) {
     let result = true;
-    let stepId = "#step_" + curStep;
-    param.stepType = $(stepId).attr("type");//根据step找到stepType
+    let stepIdSector = "#" + stepId;
+    param.step = $(stepIdSector).attr("code");
     $.ajax({
         type: 'POST',
         url: '/initData',
@@ -572,8 +574,8 @@ function initData(curStep, next, param, succ_callback) {
                 return;
             }
             result = succ_callback(data.stepResult);
-            if (result && next) {
-                chooseBar(curStep, next);
+            if (result) {
+                chooseBar(stepId, route);
             }
         },
         error: function (e) {
@@ -588,19 +590,53 @@ function initData(curStep, next, param, succ_callback) {
  *
  * 导航条切换
  */
-function chooseBar(curStep, next) {
+function chooseBar(stepId, route) {
     $("#bars .bar").removeClass("cur");
-    let stepId = "#step_" + curStep;
-    $(stepId).hide();
-    let barId = "#bar_" + $(stepId).attr("type");
+    let stepIdSector = "#" + stepId;
+    let barId = "#bar_" + $(stepIdSector).attr("code");
     let barIndex = $("#bars .bar").index($(barId));
-    if (next) {
-        $(stepId).next().show();//内容切换
-        $("#bars .bar").eq(barIndex + 1).addClass("cur");//导航条切换
+    let switchBar = null;
+
+    if (!route || route == "cur") {
+        $(stepIdSector).show();//内容切换
+        switchBar = $(barId);
     } else {
-        $(stepId).prev().show();
-        $("#bars .bar").eq(barIndex - 1).addClass("cur");
+        if (route == "none") {
+            // do nothing
+        } else if (route == "next") {
+            $(stepIdSector).hide();
+            $(stepIdSector).next().show();//内容切换
+            switchBar = $("#bars .bar").eq(barIndex + 1);
+            if (switchBar) {
+                switchBar.addClass("cur");//导航条切换
+            }
+        } else {
+            $(stepIdSector).hide();
+            $(stepIdSector).prev().show();
+            switchBar = $("#bars .bar").eq(barIndex - 1);
+            if (switchBar) {
+                switchBar.addClass("cur");
+            }
+        }
+
+        //旧的步骤通知离开
+        let param = {}
+        param.operation = "leave";
+        initData(stepId, "none", param, function (data) {
+        });
+
     }
+
+    //新的步骤通知进度
+    if (switchBar) {
+        let param = {};
+        param.operation = "into";
+        let code = switchBar.attr("code");
+        stepId = "step_" + code;
+        initData(stepId, "none", param, function (data) {
+        });
+    }
+
 }
 
 /**
@@ -610,7 +646,7 @@ function refreshuserTmpTreeList() {
 
     let param = {};
     param.operation = "refreshUserTmpTreeList";
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data) {
             $("#userTmpTreeList option").remove();
             for (let i = 0; i < data.length; i++) {
@@ -638,7 +674,7 @@ function loadTmpTree() {
     param.operation = "loadTmpTree";
     param.extParams.tmpTreeName = tmpTreeName;
 
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data) {
             initTmps(data);
         } else {
@@ -694,8 +730,8 @@ function saveUserTmpTree() {
                     return;
                 }
 
-                param.operation="saveUserTmpTree";
-                initData(10, false, param, function (data) {
+                param.operation = "saveUserTmpTree";
+                initData("step_tmp", "none", param, function (data) {
                     $('#dd').dialog('close');
                     if (data.msg == "提交成功") {
                         refreshuserTmpTreeList();
@@ -732,7 +768,7 @@ function del(node) {
     param.extParams.modulePath = node.attributes.modulePath;
 
     param.operation = "deleteTmp";
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data.msg == "删除成功") {
             loadTmpTree();
         } else {
@@ -791,7 +827,7 @@ function doCopy(node) {
     param.extParams.targetTmpModulePath = targetNode.attributes.modulePath;
 
     param.operation = "copyPath";
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -822,7 +858,7 @@ function doMove(node) {
     param.extParams.targetTmpModulePath = targetNode.attributes.modulePath;
 
     param.operation = "movePath";
-    initData(10, false, param, function (data) {
+    initData("step_tmp", "none", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -858,7 +894,7 @@ function commitCode() {
         param.extParams.tmpModulePath = node.attributes.modulePath;
 
         param.operation = "commit";
-        initData(10, false, param, function (data) {
+        initData("step_tmp", "none", param, function (data) {
             if (data == 0) {
                 $.messager.alert('info', "提交失败");
             }

@@ -1,9 +1,9 @@
-package com.github.codegenerator.spi.db.mysql.initializer;
+package com.github.codegenerator.spi.db.mysql.stephandler;
 
 import com.github.codegenerator.common.em.DbEnum;
 import com.github.codegenerator.common.in.model.db.Column;
 import com.github.codegenerator.common.in.model.db.Table;
-import com.github.codegenerator.spi.db.common.initializer.DbInitializer;
+import com.github.codegenerator.spi.db.common.stephandler.DbStepHandler;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MysqlInitializer extends DbInitializer {
+public class MysqlStepHandler extends DbStepHandler {
 
 
     private final static String TABLE_NAME = "TABLE_NAME";

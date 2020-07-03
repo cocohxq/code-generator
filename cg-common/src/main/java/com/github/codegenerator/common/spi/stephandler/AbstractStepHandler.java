@@ -1,22 +1,24 @@
-package com.github.codegenerator.common.spi.initializer;
+package com.github.codegenerator.common.spi.stephandler;
 
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractInitializer implements Initializer {
+public abstract class AbstractStepHandler implements StepHandler {
 
     protected static final String OPERATION_NEXT = "next";
+    protected static final String OPERATION_INTO = "into";
+    protected static final String OPERATION_LEAVE = "leave";
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void initialize(SessionGenerateContext context) {
+    public void handle(SessionGenerateContext context) {
         try {
             if (!before(context)) {
                 return;
             }
             //下一步
-            doInitialize(context);
+            doHandle(context);
             after(context);
         } catch (Exception e) {
             logger.error("处理异常", e);
@@ -28,7 +30,7 @@ public abstract class AbstractInitializer implements Initializer {
 
     public abstract boolean before(SessionGenerateContext context);
 
-    public abstract void doInitialize(SessionGenerateContext context);
+    public abstract void doHandle(SessionGenerateContext context);
 
     public abstract void after(SessionGenerateContext context);
 

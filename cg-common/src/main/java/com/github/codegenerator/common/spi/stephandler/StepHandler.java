@@ -1,11 +1,12 @@
-package com.github.codegenerator.common.spi.initializer;
+package com.github.codegenerator.common.spi.stephandler;
 
+import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 
 /**
  * 初始化
  */
-public interface Initializer {
+public interface StepHandler {
 
 
     /**
@@ -14,11 +15,11 @@ public interface Initializer {
      * @param
      * @return
      */
-    void initialize(SessionGenerateContext context);
+    void handle(SessionGenerateContext context);
 
     /**
      * 步骤类型
      * @return
      */
-    Integer getStepType();
+    StepEnum step();
 }

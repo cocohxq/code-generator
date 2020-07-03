@@ -72,24 +72,24 @@
         .step{
             display: none;
         }
-        #step_0{
+        #step_db{
             padding-left:450px;
-            display: block;
+            /*display: block;*/
         }
 
-        #step_5{
+        #step_table{
             padding-left:50px;
         }
-        #step_5 select{
+        #step_table select{
             height:400px;
             widht:200px;
         }
 
-        #step_8{
+        #step_code{
             padding-left:450px;
         }
 
-        #step_15{
+        #step_preview{
             padding-left:50px;
         }
 
@@ -127,9 +127,9 @@
                 <#list view.steps as step>
                     <span id="bars">>>
                     <#if step_index == 0>
-                        <span class="bar cur" id="bar_${step.type}">
+                        <span class="bar cur" id="bar_${step.code}" code="${step.code}">
                     <#else >
-                        <span class="bar" id="bar_${step.type}">
+                        <span class="bar" id="bar_${step.code}" code="${step.code}">
                     </#if>
                         ${step.name}</span>
                 </#list>
@@ -138,7 +138,7 @@
             </legend>
         </div>
         <!--选择数据源-->
-        <div id="step_${view.steps[0].type}" type="${view.steps[0].type}" class="step">
+        <div id="step_${view.steps[0].code}" code="${view.steps[0].code}" class="step">
 
                 <#if !op??>
                     <div class="control-group" style="height: 350px">
@@ -235,7 +235,7 @@
         </div>
 
         <!-- 选择表-->
-        <div id="step_${view.steps[1].type}" type="${view.steps[1].type}" class="step">
+        <div id="step_${view.steps[1].code}" code="${view.steps[1].code}" class="step">
             <div class="control-group">
 
                 <!-- Select Multiple -->
@@ -315,7 +315,7 @@
 
 
         <!-- 编辑代码配置 -->
-        <div id="step_${view.steps[2].type}" type="${view.steps[2].type}" class="step">
+        <div id="step_${view.steps[2].code}" code="${view.steps[2].code}" class="step">
             <div class="control-group">
                 <label class="control-label" for="input01"><span class="highlight">*</span>groupId</label>
                 <div class="controls">
@@ -363,7 +363,7 @@
         </div>
 
         <!-- 选择/编辑模板 -->
-        <div id="step_${view.steps[3].type}" type="${view.steps[3].type}" class="step">
+        <div id="step_${view.steps[3].code}" code="${view.steps[3].code}" class="step">
 
             <div class="control-group">
 
@@ -429,7 +429,7 @@
 
 
         <!-- 预览/导出文件 -->
-        <div id="step_${view.steps[4].type}" type="${view.steps[4].type}" class="step">
+        <div id="step_${view.steps[4].code}" code="${view.steps[4].code}" class="step">
 
             <div class="control-group">
 
