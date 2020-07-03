@@ -19,5 +19,7 @@ public class MainApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);
+        //支持url中有特殊符号
+        System.setProperty("tomcat.util.http.parser.HttpParser.requestTargetAllow","|{}");
     }
 }

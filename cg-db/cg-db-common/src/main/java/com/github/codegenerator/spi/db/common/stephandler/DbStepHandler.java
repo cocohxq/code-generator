@@ -3,7 +3,6 @@ package com.github.codegenerator.spi.db.common.stephandler;
 import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.DbEnum;
 import com.github.codegenerator.common.em.StepEnum;
-import com.github.codegenerator.common.in.model.CommonValueStack;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.db.Column;
@@ -12,16 +11,17 @@ import com.github.codegenerator.common.in.model.db.FieldMeta;
 import com.github.codegenerator.common.in.model.db.Table;
 import com.github.codegenerator.common.in.model.db.TableMeta;
 import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
-import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.DataUtil;
-import com.github.codegenerator.common.util.FileUtils;
 import com.github.codegenerator.common.util.LockUtils;
 import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
+import org.springframework.util.StringUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class DbStepHandler extends AbstractStepHandler {
 
@@ -43,21 +43,27 @@ public abstract class DbStepHandler extends AbstractStepHandler {
         Config config = context.getConfig();
 
         switch (config.getOperation()) {
+            case OPERATION_INTO:
+                into(context);
+                break;
             case OPERATION_COPY:
             case OPERATION_ADD:
-                DataUtil.saveData("cb", config.getConfigName(), JSONObject.toJSONString(config));
+                DataUtil.saveData(config.getConfigName(), JSONObject.toJSONString(config));
                 context.setStepInitResult(1);
                 break;
             case OPERATION_EDIT:
-                DataUtil.updateData("cb", config.getConfigName(), JSONObject.toJSONString(config), true);
+                DataUtil.updateData(config.getConfigName(), JSONObject.toJSONString(config), true);
                 context.setStepInitResult(1);
                 break;
             case OPERATION_DEL:
-                DataUtil.deleteData("cb", config.getConfigName());
+                DataUtil.deleteData(config.getConfigName());
                 context.setStepInitResult(1);
                 break;
             case OPERATION_NEXT:
                 dbInit(context);
+                break;
+            case OPERATION_PREPARE_WRITE:
+                prepareWrite(context);
         }
     }
 
@@ -108,6 +114,9 @@ public abstract class DbStepHandler extends AbstractStepHandler {
         Connection cn = null;
         try {
             Config cfg = context.getConfig();
+            //加载class
+            cfg = DataUtil.getData(cfg.getConfigName(), Config.class);
+            context.setConfig(cfg);
             Database db = new Database(DbEnum.getDbByType(getDbType()).getDriver(), cfg.getUsername(), cfg.getPwd(), getJdbcUrl(cfg.getIp(), cfg.getPort(), cfg.getDbName()), cfg.getDbName());
             try {
                 cn = DbUtils.getConnection(db);
@@ -201,14 +210,16 @@ public abstract class DbStepHandler extends AbstractStepHandler {
      */
     private boolean tryLock(SessionGenerateContext context) {
         Config config = context.getConfig();
+        if (StringUtils.isEmpty(config.getConfigName())) {
+            return true;
+        }
         String key = String.format(DB_OP_KEY, config.getConfigName());
 
         if (OPERATION_LEAVE.equals(config.getOperation())) {
             LockUtils.unAllLock(key, context.getSessionId());
             return true;
         }
-        if (OPERATION_INTO.equals(config.getOperation())
-                || OPERATION_NEXT.equals(config.getOperation())) {
+        if (OPERATION_INTO.equals(config.getOperation()) || OPERATION_NEXT.equals(config.getOperation())) {
             if (!LockUtils.tryReadLock(key, context.getSessionId())) {
                 context.error("该同名配置正在被其他人写操作中");
                 return false;
@@ -224,8 +235,42 @@ public abstract class DbStepHandler extends AbstractStepHandler {
     }
 
     private void unWriteLock(SessionGenerateContext context) {
+        if (StringUtils.isEmpty(context.getConfig().getConfigName())) {
+            return;
+        }
         //模板操作
         String key = String.format(DB_OP_KEY, context.getConfig().getConfigName());
         LockUtils.unWriteLock(key, context.getSessionId());
+    }
+
+    private void into(SessionGenerateContext context) {
+        List<String> configList = DataUtil.getDataNameList();
+        configList.add(0, "请选择");
+        Map<String, Object> map = new HashMap<>();
+        map.put("dbConfigList", configList);
+        context.setStepInitResult(map);
+    }
+
+    /**
+     * 复制、编辑、新增都会进入写的页面
+     *
+     * @param context
+     */
+    private void prepareWrite(SessionGenerateContext context) {
+        Map<String, Object> param = context.getConfig().getExtParams();
+        String selectedConfig = (String) param.get("selectedConfig");
+        Boolean isCopy = (Boolean) param.get("isCopy");
+        Config config = new Config();
+        if (!StringUtils.isEmpty(selectedConfig)) {
+            config = DataUtil.getData(selectedConfig, Config.class);
+            //如果是复制新增，这里把config名称剔除,让页面重新输入
+            if (isCopy) {
+                config.setConfigName("");
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("config", config);
+        map.put("operation", context.getConfig().getOperation());
+        context.setStepInitResult(config);
     }
 }

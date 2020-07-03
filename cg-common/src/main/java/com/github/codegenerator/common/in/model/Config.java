@@ -37,7 +37,7 @@ public class Config {
     private transient List<String> tmps;
 
     //操作
-    private transient String operation = "next";
+    private transient String operation;
 
     //参数
     private transient Map<String, Object> extParams;

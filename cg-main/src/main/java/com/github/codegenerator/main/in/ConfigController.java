@@ -1,9 +1,10 @@
 package com.github.codegenerator.main.in;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.spi.stephandler.StepHandler;
 import com.github.codegenerator.common.util.ContextContainer;
-import com.github.codegenerator.common.util.DataUtil;
 import com.github.codegenerator.common.util.FileUtils;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 配置入口
@@ -31,32 +32,14 @@ public class ConfigController {
 
     //step1 进入选择页
     @GetMapping(value = {"/init", "/"})
-    public String init(Model model, HttpServletRequest request) {
-        //存在操作
-        String operation = request.getParameter("op");
-        if (!StringUtils.isEmpty(operation)) {
-            model.addAttribute("op", operation);
-            //加载相应数据
-            String selectedConfig = request.getParameter("sc");
-            if (!StringUtils.isEmpty(selectedConfig)) {
-                request.setAttribute("selectedConfig", selectedConfig);
-                Config config = DataUtil.getData("cb", selectedConfig, Config.class);
-                //如果是复制新增，这里把config名称剔除,让页面重新输入
-                if (!StringUtils.isEmpty(request.getParameter("cp"))) {
-                    config.setConfigName("");
-                }
-                model.addAttribute("dbConfig", config);
-            } else {
-                model.addAttribute("dbConfig", new Config());
-            }
-        } else {
-            List<String> configList = DataUtil.getDataNameList();
-            configList.add(0, "请选择");
-            if (null != configList) {
-                model.addAttribute("dbConfigList", configList);
-            }
-        }
+    public String init(Model model,HttpServletRequest request) {
+        Config config = Optional.ofNullable(request.getParameter("config")).map(str-> JSONObject.parseObject(str,Config.class)).orElse(new Config());
 
+        if(StringUtils.isEmpty(config.getStep())){
+            config.setStep(StepEnum.STEP_DB.getCode());
+            config.setOperation("into");
+        }
+        model.addAttribute("data", initData(config).get("stepResult"));
         model.addAttribute("view", ContextContainer.getViewerInfo());
         return "config";
     }
@@ -70,11 +53,11 @@ public class ConfigController {
     @PostMapping("/initData")
     @ResponseBody
     public Map<String, Object> initData(@RequestBody Config config) {
-//        ContextContainer.getContext().getConfig().setOperation(null);
-//        BeanUtils.copyProperties(config,ContextContainer.getContext().getConfig(),getNullPropertyNames(config));
         ContextContainer.getContext().setConfig(config);
-        for (StepHandler stepHandler : ContextContainer.getStepInitializer(config.getStep())) {
-            stepHandler.handle(ContextContainer.getContext());
+        if (!StringUtils.isEmpty(config.getStep())) {
+            for (StepHandler stepHandler : ContextContainer.getStepInitializer(config.getStep())) {
+                stepHandler.handle(ContextContainer.getContext());
+            }
         }
         Map<String, Object> result = new HashMap<>();
         result.put("error", ContextContainer.getContext().getErrorMsgs());

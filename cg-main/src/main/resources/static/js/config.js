@@ -9,13 +9,14 @@ $(document).ready(function () {
 
     chooseBar("step_db", "cur");
 
+
     //更换配置重新加载
     $("#step_db #addConfig").click(function () {
         let href = location.href;
         if (href.indexOf("?") != -1) {
             href = href.substring(0, href.indexOf("?"))
         }
-        location.href = href + "?op=e";
+        location.href = href + '?config={"step":"step_db","operation":"prepareWrite"}';
     });
 
     //更换配置重新加载
@@ -29,7 +30,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + "?op=e&cp=1&sc=" + selectedConfig;
+        location.href = href + '?config={"step":"step_db","operation":"prepareWrite","extParams":{"isCopy":true,"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -43,7 +44,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + "?op=e&sc=" + selectedConfig;
+        location.href = href + '?config={"step":"step_db","operation":"prepareWrite","extParams":{"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -78,9 +79,9 @@ $(document).ready(function () {
 
         //判断操作
         let href = location.href;
-        if (href.indexOf("cp=1") != -1) {
+        if (href.indexOf("isCopy") != -1) {
             param.operation = "copy";
-        } else if (href.indexOf("sc=") != -1) {
+        } else if (href.indexOf("selectedConfig") != -1) {
             param.operation = "edit";
         } else {
             param.operation = "add";

@@ -41,18 +41,22 @@
             padding-top: 10px; /* 60px to make the container go all the way to the bottom of the topbar */
             padding-bottom: 10px;
         }
-        #components{
+
+        #components {
             min-height: 600px;
         }
-        #target{
+
+        #target {
             min-height: 200px;
             border: 1px solid #ccc;
             padding: 5px;
         }
-        #target .component{
+
+        #target .component {
             border: 1px solid #fff;
         }
-        #temp{
+
+        #temp {
             width: 500px;
             background: white;
             border: 1px dotted #ccc;
@@ -63,42 +67,50 @@
             margin: 0 auto;
             width: 213px;
         }
-        .popover-content form .btn{
+
+        .popover-content form .btn {
             margin-right: 10px
         }
-        #bars{
-            font-size:small;
+
+        #bars {
+            font-size: small;
         }
-        .step{
+
+        .step {
             display: none;
         }
-        #step_db{
-            padding-left:450px;
+
+        #step_db {
+            padding-left: 450px;
             /*display: block;*/
         }
 
-        #step_table{
-            padding-left:50px;
-        }
-        #step_table select{
-            height:400px;
-            widht:200px;
+        #step_table {
+            padding-left: 50px;
         }
 
-        #step_code{
-            padding-left:450px;
+        #step_table select {
+            height: 400px;
+            widht: 200px;
         }
 
-        #step_preview{
-            padding-left:50px;
+        #step_code {
+            padding-left: 450px;
+        }
+
+        #step_preview {
+            padding-left: 50px;
         }
 
 
-        .bar.cur{
+        .bar.cur {
             color: red;
         }
 
-        .select {width:400px; float:left;}
+        .select {
+            width: 400px;
+            float: left;
+        }
 
         .clear:after {
             clear: both;
@@ -109,12 +121,12 @@
             visibility: hidden;
         }
 
-        .highlight{
-            color:red;
+        .highlight {
+            color: red;
         }
 
-        .checkbox{
-            border:none
+        .checkbox {
+            border: none
         }
 
     </style>
@@ -122,51 +134,52 @@
 <body>
 <div class="form-horizontal">
     <fieldset>
-        <div id="legend" >
+        <div id="legend">
             <legend class="">构建配置
                 <#list view.steps as step>
-                    <span id="bars">>>
+                <span id="bars">>>
                     <#if step_index == 0>
                         <span class="bar cur" id="bar_${step.code}" code="${step.code}">
                     <#else >
                         <span class="bar" id="bar_${step.code}" code="${step.code}">
                     </#if>
-                        ${step.name}</span>
+                            ${step.name}</span>
                 </#list>
             </span>
-                <span style="float: right"><img src="/static/img/help.png" style="width: 16px; height: 16px; "><a href="/tip" target="_blank">模板属性值说明</a></span>
+                <span style="float: right"><img src="/static/img/help.png" style="width: 16px; height: 16px; "><a
+                            href="/tip" target="_blank">模板属性值说明</a></span>
             </legend>
         </div>
         <!--选择数据源-->
         <div id="step_${view.steps[0].code}" code="${view.steps[0].code}" class="step">
-
-                <#if !op??>
-                    <div class="control-group" style="height: 350px">
-                        <label class="control-label"><span class="highlight">*</span>数据库配置</label>
-                        <div class="controls">
-                            <select class="input-large" id="selectedConfig" >
-                                <#list dbConfigList as dbConfig>
-                                    <option class="input-large" value="${dbConfig}" <#if selectedConfig?? && selectedConfig == dbConfig>selected</#if>>${dbConfig}</option>
-                                </#list>
-                            </select>
-                            <button class="btn add" id="addConfig">新增</button>
-                            <button class="btn add" id="copyAddConfig">复制新增</button>
-                            <button class="btn edit" id="editConfig">编辑</button>
-                            <button class="btn edit" id="delConfig">删除</button>
-                        </div>
+            <#if !operation??>
+                <div class="control-group" style="height: 350px">
+                    <label class="control-label"><span class="highlight">*</span>数据库配置</label>
+                    <div class="controls">
+                        <select class="input-large" id="selectedConfig">
+                            <#list data.dbConfigList as dbConfig>
+                                <option class="input-large" value="${dbConfig}">${dbConfig}</option>
+                            </#list>
+                        </select>
+                        <button class="btn add" id="addConfig">新增</button>
+                        <button class="btn add" id="copyAddConfig">复制新增</button>
+                        <button class="btn edit" id="editConfig">编辑</button>
+                        <button class="btn edit" id="delConfig">删除</button>
                     </div>
-                    <div class="control-group">
-                        <div class="controls">
-                            <button class="btn btn-success input-large next">下一步</button>
-                            <span class="errMsg" style="color: red"></span>
-                        </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-success input-large next">下一步</button>
+                        <span class="errMsg" style="color: red"></span>
                     </div>
-                </#if>
-            <#if op?? && op=="e">
+                </div>
+            </#if>
+            <#if operation??>
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>配置名称</label>
                     <div class="controls">
-                        <input id="configName" type="text" placeholder="配置名称" class="input-large" value="${dbConfig.configName!""}" notNull="true">
+                        <input id="configName" type="text" placeholder="配置名称" class="input-large"
+                               value="${data.dbConfig.configName!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -176,7 +189,8 @@
                     <div class="controls">
                         <select class="input-large" id="dbType">
                             <#list view.effectiveDbs as dbType>
-                                <option class="input-large" value="${dbType.type}" <#if dbConfig.dbType?? && dbConfig.dbType == dbType.type>selected</#if>>${dbType.name}</option>
+                                <option class="input-large" value="${dbType.type}"
+                                        <#if data.dbConfig.dbType?? && data.dbConfig.dbType == dbType.type>selected</#if>>${dbType.name}</option>
                             </#list>
                         </select>
                     </div>
@@ -185,7 +199,8 @@
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>ip(host)</label>
                     <div class="controls">
-                        <input id="ip" type="text" placeholder="数据库ip" class="input-large" value="${dbConfig.ip!""}" notNull="true">
+                        <input id="ip" type="text" placeholder="数据库ip" class="input-large"
+                               value="${data.dbConfig.ip!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -193,7 +208,8 @@
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>port</label>
                     <div class="controls">
-                        <input id="port" type="text" placeholder="端口" class="input-large" value="${dbConfig.port!""}" notNull="true">
+                        <input id="port" type="text" placeholder="端口" class="input-large"
+                               value="${data.dbConfig.port!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -201,7 +217,8 @@
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>数据库名</label>
                     <div class="controls">
-                        <input id="dbName" type="text" placeholder="需连接的数据库" class="input-large" value="${dbConfig.dbName!""}" notNull="true">
+                        <input id="dbName" type="text" placeholder="需连接的数据库" class="input-large"
+                               value="${data.dbConfig.dbName!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -210,7 +227,8 @@
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>用户名</label>
                     <div class="controls">
-                        <input id="username" type="text" placeholder="数据库用户名" class="input-large" value="${dbConfig.username!""}" notNull="true">
+                        <input id="username" type="text" placeholder="数据库用户名" class="input-large"
+                               value="${data.dbConfig.username!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -218,7 +236,8 @@
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>密码</label>
                     <div class="controls">
-                        <input id="pwd" type="text" placeholder="数据库密码" class="input-large" value="${dbConfig.pwd!""}" notNull="true">
+                        <input id="pwd" type="text" placeholder="数据库密码" class="input-large"
+                               value="${data.dbConfig.pwd!""}" notNull="true">
                         <p class="help-block"></p>
                     </div>
                 </div>
@@ -230,8 +249,6 @@
                     </div>
                 </div>
             </#if>
-
-
         </div>
 
         <!-- 选择表-->
@@ -256,18 +273,24 @@
                 </div>
 
                 <div class="controls" style="margin-left:850px;">
-                    <button class="btn btn-success field" at="createTimeStr">选为新增时间</button><br>
-                    <button class="btn btn-success field" at="updateTimeStr">选为更新时间</button><br>
-                    <button class="btn btn-success field" at="deleteStr">选为删除标识</button><br>
-                    <button class="btn btn-success field" at="extendStr">选为extend字段</button><br>
-                    <button class="btn btn-success field" at="inStr">选为in字段</button><br>
+                    <button class="btn btn-success field" at="createTimeStr">选为新增时间</button>
+                    <br>
+                    <button class="btn btn-success field" at="updateTimeStr">选为更新时间</button>
+                    <br>
+                    <button class="btn btn-success field" at="deleteStr">选为删除标识</button>
+                    <br>
+                    <button class="btn btn-success field" at="extendStr">选为extend字段</button>
+                    <br>
+                    <button class="btn btn-success field" at="inStr">选为in字段</button>
+                    <br>
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" for="input01">时间戳-新增</label>
                 <div class="controls">
-                    <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large" value="">(用于创建sql生成识别，表字段不同用","分隔)
+                    <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large"
+                           value="">(用于创建sql生成识别，表字段不同用","分隔)
                     <p class="help-block"></p>
                 </div>
             </div>
@@ -275,7 +298,8 @@
             <div class="control-group">
                 <label class="control-label" for="input01">时间戳-更新</label>
                 <div class="controls">
-                    <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time" class="input-large" value="">(用于更新sql生成识别,表字段不同用","分隔)
+                    <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time"
+                           class="input-large" value="">(用于更新sql生成识别,表字段不同用","分隔)
                     <p class="help-block"></p>
                 </div>
             </div>
@@ -291,7 +315,8 @@
             <div class="control-group">
                 <label class="control-label" for="input01">pojo类extend字段</label>
                 <div class="controls">
-                    <input id="extendStr" type="text" placeholder="id,created_time,last_modified_time" class="input-large" value="">(pojo类[model,DO,DTO,query,Entity]的某些字段可能在继承的model基类中已经定义，生成pojo时进行排除)
+                    <input id="extendStr" type="text" placeholder="id,created_time,last_modified_time"
+                           class="input-large" value="">(pojo类[model,DO,DTO,query,Entity]的某些字段可能在继承的model基类中已经定义，生成pojo时进行排除)
                     <p class="help-block"></p>
                 </div>
             </div>
@@ -319,7 +344,8 @@
             <div class="control-group">
                 <label class="control-label" for="input01"><span class="highlight">*</span>groupId</label>
                 <div class="controls">
-                    <input id="groupId" type="text" placeholder="com.xxx.xxx" class="input-large" value="" notNull="true">
+                    <input id="groupId" type="text" placeholder="com.xxx.xxx" class="input-large" value=""
+                           notNull="true">
                     <p class="help-block"></p>
                 </div>
             </div>
@@ -368,7 +394,7 @@
             <div class="control-group">
 
                 <div style="float: left;width: 30%">
-                    <select class="input-large" id="userTmpTreeList" onchange="loadTmpTree()" >
+                    <select class="input-large" id="userTmpTreeList" onchange="loadTmpTree()">
                     </select>
                     <br><span style="color:red">
                     <table style="border: none">
@@ -408,7 +434,6 @@
                     <div onclick="copy()" data-options="iconCls:'icon-add'">复制</div>
                     <div onclick="cut()" data-options="iconCls:'icon-add'">剪切</div>
                 </div>
-
 
 
                 <div style="width: 65%;float:left">
@@ -458,15 +483,15 @@
 
 <div id="dd" style="display: none">
     <div style="padding-top: 50px;padding-left: 20px">
-    <span style="color:red;">*将勾选的模板提交到以下模板树：</span><br>
-     模板树名称：<input class="input-large" id="userTmpTreeName">
+        <span style="color:red;">*将勾选的模板提交到以下模板树：</span><br>
+        模板树名称：<input class="input-large" id="userTmpTreeName">
     </div>
 </div>
 
 <div style="border-top: 1px solid #e5e5e5;padding-left:600px;margin-top:150px">
         <span>
                 Copyright &copy; 2018-${.now?string('yyyy')} &nbsp;by hanxianqiang&nbsp;
-                <a href="https://github.com/cocohxq/code-generator" target="_blank" >github</a>
+                <a href="https://github.com/cocohxq/code-generator" target="_blank">github</a>
         </span>
 </div>
 

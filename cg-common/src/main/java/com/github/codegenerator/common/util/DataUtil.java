@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 public class DataUtil {
 
 
-    public static boolean updateData(String group,String key, String data,boolean insertIfAbsent) {
+    public static boolean updateData(String key, String data, boolean insertIfAbsent) {
         try {
-            FileUtils.update(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key),data,insertIfAbsent);
+            FileUtils.update(FileUtils.concatPath(ContextContainer.CONFIG_PATH,key),data,insertIfAbsent);
             return true;
         } catch (Exception e) {
             ContextContainer.getContext().error("保存config数据异常:"+e.getMessage());
@@ -21,9 +21,9 @@ public class DataUtil {
         }
     }
 
-    public static boolean saveData(String group,String key, String data) {
+    public static boolean saveData(String key, String data) {
         try {
-            FileUtils.write(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key),data);
+            FileUtils.write(FileUtils.concatPath(ContextContainer.CONFIG_PATH,key),data);
             return true;
         } catch (Exception e) {
             ContextContainer.getContext().error("保存config数据异常："+e.getMessage());
@@ -31,9 +31,9 @@ public class DataUtil {
         }
     }
 
-    public static boolean deleteData(String group,String key) {
+    public static boolean deleteData(String key) {
         try {
-            FileUtils.delete(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key));
+            FileUtils.delete(FileUtils.concatPath(ContextContainer.CONFIG_PATH,key));
             return true;
         } catch (Exception e) {
             ContextContainer.getContext().error("删除config数据异常："+e.getMessage());
@@ -42,9 +42,9 @@ public class DataUtil {
     }
 
 
-    public static <T> T getData(String group,String key, Class<T> clazz) {
+    public static <T> T getData(String key, Class<T> clazz) {
         try {
-            String info = FileUtils.read(FileUtils.concatPath(ContextContainer.CONFIG_PATH,group+"_"+key));
+            String info = FileUtils.read(FileUtils.concatPath(ContextContainer.CONFIG_PATH,key));
             if(null == info){
                 return null;
             }
