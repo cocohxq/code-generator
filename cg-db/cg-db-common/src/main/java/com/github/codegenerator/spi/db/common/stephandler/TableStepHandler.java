@@ -15,18 +15,26 @@ public abstract class TableStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        if (null == config.getTableName()) {
-            context.error("请选择需要生成代码的表");
-            return false;
-        }
-        context.getGenerateInfo().setTableConfigInfo(null);
         return true;
     }
 
     @Override
     public void doHandle(SessionGenerateContext context) {
         Config config = context.getConfig();
+        if (OPERATION_NEXT.equals(config.getOperation())) {
+            handlerNext(context);
+        }
+    }
+
+    private void handlerNext(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        if (null == config.getTableName()) {
+            context.error("请选择需要生成代码的表");
+            return;
+        }
+        context.getGenerateInfo().setTableConfigInfo(null);
+
+
         GenerateInfo generateInfo = context.getGenerateInfo();
         //选中的表
         TableMeta selectTable = generateInfo.getDatabase().getTableList().stream().filter(l -> config.getTableName().equals(l.getTable().getTableName())).findFirst().get();

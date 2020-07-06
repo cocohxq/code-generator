@@ -16,7 +16,7 @@ $(document).ready(function () {
         if (href.indexOf("?") != -1) {
             href = href.substring(0, href.indexOf("?"))
         }
-        location.href = href + '?config={"step":"step_db","operation":"prepareWrite"}';
+        location.href = href + '?config={"step":"db","operation":"prepareWrite"}';
     });
 
     //更换配置重新加载
@@ -30,7 +30,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + '?config={"step":"step_db","operation":"prepareWrite","extParams":{"isCopy":true,"selectedConfig":"' + selectedConfig + '"}}';
+        location.href = href + '?config={"step":"db","operation":"prepareWrite","extParams":{"isCopy":true,"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -44,7 +44,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + '?config={"step":"step_db","operation":"prepareWrite","extParams":{"selectedConfig":"' + selectedConfig + '"}}';
+        location.href = href + '?config={"step":"db","operation":"prepareWrite","extParams":{"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -133,6 +133,7 @@ $(document).ready(function () {
         }
 
         param.tableName = tableNames[0];
+        param.operation = "next";
         initData("step_table", "next", param, function (data) {
             return true;
         });
@@ -191,6 +192,7 @@ $(document).ready(function () {
             }
         }
         //初始化库表信息
+        param.operation = "next";
         initData("step_code", "next", param, function () {
             refreshuserTmpTreeList();
             return true;
@@ -207,6 +209,7 @@ $(document).ready(function () {
     $("#step_tmp .next").click(function () {
         let param = {};
         param.tmps = getSelectedTreeNode();
+        param.operation = "next";
         if (param.tmps) {
             param.operation = "next";
             initData("step_tmp", "next", param, function (data) {
@@ -226,6 +229,7 @@ $(document).ready(function () {
     //预览导出
     $("#step_preview .next").click(function () {
         let param = {};
+        param.operation = "next";
         initData("step_preview", "next", param, function (data) {
             return downloadZip(data);
         });

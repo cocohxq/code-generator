@@ -61,7 +61,7 @@ public class DataUtil {
             if(!configDir.exists()){
                 return new ArrayList<>();
             }
-            return Arrays.asList(configDir.listFiles()).stream().filter(f -> !f.isHidden() && f.isFile()).map(f ->f.getName().substring(f.getName().indexOf("_")+1)).collect(Collectors.toList());
+            return Arrays.asList(configDir.listFiles()).stream().filter(f -> !f.isHidden() && f.isFile()).map(f ->f.getName()).collect(Collectors.toList());
         } catch (Exception e) {
             ContextContainer.getContext().error("获取config数据列表异常:"+e.getMessage());
             return null;

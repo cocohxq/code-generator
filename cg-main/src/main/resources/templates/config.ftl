@@ -135,7 +135,7 @@
 <div class="form-horizontal">
     <fieldset>
         <div id="legend">
-            <legend class="">构建配置
+            <legend class=""><a href="/" style="text-decoration: #0a001f">构建配置</a>
                 <#list view.steps as step>
                 <span id="bars">>>
                     <#if step_index == 0>
@@ -152,7 +152,7 @@
         </div>
         <!--选择数据源-->
         <div id="step_${view.steps[0].code}" code="${view.steps[0].code}" class="step">
-            <#if !operation??>
+            <#if !data.operation??>
                 <div class="control-group" style="height: 350px">
                     <label class="control-label"><span class="highlight">*</span>数据库配置</label>
                     <div class="controls">
@@ -174,7 +174,7 @@
                     </div>
                 </div>
             </#if>
-            <#if operation??>
+            <#if data.operation??>
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>配置名称</label>
                     <div class="controls">

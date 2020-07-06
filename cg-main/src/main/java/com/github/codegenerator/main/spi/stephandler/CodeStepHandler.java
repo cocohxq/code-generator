@@ -1,10 +1,10 @@
 package com.github.codegenerator.main.spi.stephandler;
 
 import com.github.codegenerator.common.em.StepEnum;
+import com.github.codegenerator.common.in.model.CodeConfigInfo;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
-import com.github.codegenerator.common.in.model.CodeConfigInfo;
 import com.github.codegenerator.common.in.model.TableConfigInfo;
 import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 
@@ -18,19 +18,26 @@ public class CodeStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        if (null == config.getGroupId()) {
-            context.error("请填入groupId");
-            return false;
-        }
-        context.getGenerateInfo().setCodeConfigInfo(null);
         return true;
     }
 
     @Override
     public void doHandle(SessionGenerateContext context) {
-        //解析table的java模板变量
         Config config = context.getConfig();
+        if (OPERATION_NEXT.equals(config.getOperation())) {
+            handlerNext(context);
+        }
+    }
+
+    private void handlerNext(SessionGenerateContext context) {
+        Config config = context.getConfig();
+        if (null == config.getGroupId()) {
+            context.error("请填入groupId");
+            return;
+        }
+        context.getGenerateInfo().setCodeConfigInfo(null);
+
+        //解析table的java模板变量
         GenerateInfo generateInfo = context.getGenerateInfo();
         TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
 

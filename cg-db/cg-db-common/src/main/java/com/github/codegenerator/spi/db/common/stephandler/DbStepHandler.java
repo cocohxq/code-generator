@@ -52,7 +52,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
                 context.setStepInitResult(1);
                 break;
             case OPERATION_EDIT:
-                DataUtil.updateData(config.getConfigName(), JSONObject.toJSONString(config), true);
+                DataUtil.updateData(config.getConfigName(), JSONObject.toJSONString(config), false);
                 context.setStepInitResult(1);
                 break;
             case OPERATION_DEL:
@@ -60,7 +60,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
                 context.setStepInitResult(1);
                 break;
             case OPERATION_NEXT:
-                dbInit(context);
+                handlerNext(context);
                 break;
             case OPERATION_PREPARE_WRITE:
                 prepareWrite(context);
@@ -110,7 +110,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
 
     public abstract List<Table> getTables(Connection cn, String dbName) throws Exception;
 
-    private void dbInit(SessionGenerateContext context) {
+    private void handlerNext(SessionGenerateContext context) {
         Connection cn = null;
         try {
             Config cfg = context.getConfig();
@@ -257,20 +257,25 @@ public abstract class DbStepHandler extends AbstractStepHandler {
      * @param context
      */
     private void prepareWrite(SessionGenerateContext context) {
+
         Map<String, Object> param = context.getConfig().getExtParams();
-        String selectedConfig = (String) param.get("selectedConfig");
-        Boolean isCopy = (Boolean) param.get("isCopy");
+        String selectedConfig = null;
+        Boolean isCopy = null;
+        if (null != param && !param.isEmpty()) {
+            selectedConfig = (String) param.get("selectedConfig");
+            isCopy = (Boolean) param.get("isCopy");
+        }
         Config config = new Config();
         if (!StringUtils.isEmpty(selectedConfig)) {
             config = DataUtil.getData(selectedConfig, Config.class);
             //如果是复制新增，这里把config名称剔除,让页面重新输入
-            if (isCopy) {
+            if (null != isCopy && isCopy) {
                 config.setConfigName("");
             }
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("config", config);
+        map.put("dbConfig", config);
         map.put("operation", context.getConfig().getOperation());
-        context.setStepInitResult(config);
+        context.setStepInitResult(map);
     }
 }

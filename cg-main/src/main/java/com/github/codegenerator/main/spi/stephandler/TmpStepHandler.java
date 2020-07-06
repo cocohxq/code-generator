@@ -92,6 +92,7 @@ public class TmpStepHandler extends AbstractStepHandler {
                 break;
             case OPERATION_NEXT:
                 buildCodeFile(context);
+                break;
         }
 
 
@@ -469,4 +470,5 @@ public class TmpStepHandler extends AbstractStepHandler {
         String key = String.format(TMP_OP_KEY, tmpTreeName);
         LockUtils.unWriteLock(key, context.getSessionId());
     }
+
 }

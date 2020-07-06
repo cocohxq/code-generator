@@ -29,7 +29,7 @@ public class PreviewStepHandler extends AbstractStepHandler {
             case OPERATION_LOAD_FILE:
                 loadFile(context);
                 break;
-            default:
+            case OPERATION_NEXT:
                 buildZip(context);
         }
     }
@@ -44,10 +44,10 @@ public class PreviewStepHandler extends AbstractStepHandler {
 
     }
 
-    private void buildZip(SessionGenerateContext context){
+    private void buildZip(SessionGenerateContext context) {
         GenerateInfo generateInfo = context.getGenerateInfo();
         DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        String zipName = String.format("%s_%s_%s",generateInfo.getTableConfigInfo().getTableMeta().getTable().getTableName(),df.format(new Date()),"code.zip");
+        String zipName = String.format("%s_%s_%s", generateInfo.getTableConfigInfo().getTableMeta().getTable().getTableName(), df.format(new Date()), "code.zip");
         FileUtils.generateZip(FileUtils.loadDirAllFilePathList(generateInfo.getCodepath()), generateInfo.getCodepath(), zipName);
         //返回zip的路径
         context.setStepInitResult(zipName);
