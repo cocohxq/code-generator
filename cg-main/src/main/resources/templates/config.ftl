@@ -152,7 +152,7 @@
         </div>
         <!--选择数据源-->
         <div id="step_${view.steps[0].code}" code="${view.steps[0].code}" class="step">
-            <#if !data.operation??>
+            <#if data ?? && !data.operation??>
                 <div class="control-group" style="height: 350px">
                     <label class="control-label"><span class="highlight">*</span>数据库配置</label>
                     <div class="controls">
@@ -174,7 +174,7 @@
                     </div>
                 </div>
             </#if>
-            <#if data.operation??>
+            <#if data ?? && data.operation??>
                 <div class="control-group">
                     <label class="control-label" for="input01"><span class="highlight">*</span>配置名称</label>
                     <div class="controls">
@@ -496,4 +496,8 @@
 </div>
 
 </body>
+
+<script type="application/javascript" >
+    let error = "${error!''}";
+</script>
 </html>

@@ -235,7 +235,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
     }
 
     private void unWriteLock(SessionGenerateContext context) {
-        if (StringUtils.isEmpty(context.getConfig().getConfigName())) {
+        if (StringUtils.isEmpty(context.getConfig().getConfigName()) || OPERATION_PREPARE_WRITE.equals(context.getConfig().getOperation())) {
             return;
         }
         //模板操作

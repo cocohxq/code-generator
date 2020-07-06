@@ -6,6 +6,7 @@ $(document).ready(function () {
     fileEditor = null;
     // refreshuserTmpTreeList();
     initCodeArea();//模板编辑区域
+    showError();
 
     chooseBar("step_db", "cur");
 
@@ -30,7 +31,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + '?config={"step":"db","operation":"prepareWrite","extParams":{"isCopy":true,"selectedConfig":"' + selectedConfig + '"}}';
+        location.href = href + '?config={"step":"db","operation":"prepareWrite","configName":"' + selectedConfig + '","extParams":{"isCopy":true,"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -44,7 +45,7 @@ $(document).ready(function () {
             $.messager.alert('error', '请选择配置');
             return;
         }
-        location.href = href + '?config={"step":"db","operation":"prepareWrite","extParams":{"selectedConfig":"' + selectedConfig + '"}}';
+        location.href = href + '?config={"step":"db","operation":"prepareWrite","configName":"' + selectedConfig + '","extParams":{"selectedConfig":"' + selectedConfig + '"}}';
     });
 
     //更换配置重新加载
@@ -59,7 +60,7 @@ $(document).ready(function () {
         param.operation = "delete";
 
         //删除配置
-        initData("step_db", "next", param, function () {
+        initData("step_db", "cur", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -88,7 +89,7 @@ $(document).ready(function () {
         }
 
         //初始化库表信息
-        initData("step_db", "next", param, function () {
+        initData("step_db", "cur", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -241,6 +242,15 @@ $(document).ready(function () {
 
 });
 
+
+function showError() {
+    console.log(error);
+    if (error) {
+        $.messager.confirm('提示', error, function (r) {
+            history.go(-1);
+        });
+    }
+}
 
 function getSelectedTreeNode() {
     let nodes = $('#tmps').tree("getChecked", ['checked', 'indeterminate']);

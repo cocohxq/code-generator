@@ -4,16 +4,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class LockUtils {
 
+    public final static int EXPIRE_TIME = 3 * 60 * 1000;
     //没有使用ReentrantReadWriteLock是因为这个不是基于线程的，一个操作是很多次请求进来，是一个阶段性的操作
     private final static Map<String, LockInfo> dbLockMap = new ConcurrentHashMap<>();
-    private final static int TIMEOUT = 3 * 60 * 1000;
     private static Logger logger = LoggerFactory.getLogger(LockUtils.class);
+
+    {
+        //每5秒检查下是否过期
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                List<String> expireKeys = dbLockMap.values().stream().filter(l -> System.currentTimeMillis() - l.startTime >= l.expireTime).map(l -> l.key).collect(Collectors.toList());
+                Optional.ofNullable(expireKeys).ifPresent(keys -> keys.stream().forEach(key -> dbLockMap.remove(key)));
+            }
+        }, 60 * 1000, 5000);
+    }
 
     /**
      * 尝试锁定，根据key找到锁，尝试加锁，能加锁成功就可以继续执行
@@ -24,7 +40,7 @@ public class LockUtils {
     public static boolean tryWriteLock(String key, String user) {
         try {
             if (!dbLockMap.containsKey(key)) {
-                dbLockMap.putIfAbsent(key, new LockInfo(key));
+                dbLockMap.putIfAbsent(key, new LockInfo(key, EXPIRE_TIME));
             }
             return dbLockMap.get(key).tryWriteLock(user);
         } catch (Exception e) {
@@ -36,7 +52,7 @@ public class LockUtils {
     public static boolean tryReadLock(String key, String user) {
         try {
             if (!dbLockMap.containsKey(key)) {
-                dbLockMap.putIfAbsent(key, new LockInfo(key));
+                dbLockMap.putIfAbsent(key, new LockInfo(key, EXPIRE_TIME));
             }
             return dbLockMap.get(key).tryReadLock(user);
         } catch (Exception e) {
@@ -89,8 +105,14 @@ public class LockUtils {
 
         public String key;
 
-        public LockInfo(String key) {
+        public long startTime;
+
+        public long expireTime;
+
+        public LockInfo(String key, long expireTime) {
             this.key = key;
+            this.expireTime = expireTime;
+            this.startTime = System.currentTimeMillis();
         }
 
         public boolean tryWriteLock(String user) {

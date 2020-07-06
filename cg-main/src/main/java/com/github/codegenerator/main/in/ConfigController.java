@@ -20,9 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 配置入口
@@ -39,7 +42,9 @@ public class ConfigController {
             config.setStep(StepEnum.STEP_DB.getCode());
             config.setOperation("into");
         }
-        model.addAttribute("data", initData(config).get("stepResult"));
+        Map<String, Object> result = initData(config);
+        model.addAttribute("data", result.get("stepResult"));
+        model.addAttribute("error", StringUtils.isEmpty(result.get("error"))? null : ((List)result.get("error")).stream().collect(Collectors.joining("")));
         model.addAttribute("view", ContextContainer.getViewerInfo());
         return "config";
     }
