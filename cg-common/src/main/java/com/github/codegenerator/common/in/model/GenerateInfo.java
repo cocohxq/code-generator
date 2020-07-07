@@ -11,6 +11,11 @@ public class GenerateInfo {
     private String codepath;
 
     /**
+     * 选中的模板树名称
+     */
+    private String selectedDbConfigName;
+
+    /**
      * 表映射成的java对象信息
      */
     private Database database;
@@ -95,5 +100,13 @@ public class GenerateInfo {
 
     public void setCodeConfigInfo(CodeConfigInfo codeConfigInfo) {
         this.codeConfigInfo = codeConfigInfo;
+    }
+
+    public String getSelectedDbConfigName() {
+        return selectedDbConfigName;
+    }
+
+    public void setSelectedDbConfigName(String selectedDbConfigName) {
+        this.selectedDbConfigName = selectedDbConfigName;
     }
 }

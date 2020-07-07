@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractStepHandler implements StepHandler {
 
     protected static final String OPERATION_PREPARE_WRITE = "prepareWrite";
-    protected static final String OPERATION_NEXT = "next";
+    protected static final String OPERATION_FINISH_WRITE = "finishWrite";
+    protected static final String OPERATION_HANDLE = "handle";
     protected static final String OPERATION_INTO = "into";
     protected static final String OPERATION_LEAVE = "leave";
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

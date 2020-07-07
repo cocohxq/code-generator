@@ -29,7 +29,7 @@ public class PreviewStepHandler extends AbstractStepHandler {
             case OPERATION_LOAD_FILE:
                 loadFile(context);
                 break;
-            case OPERATION_NEXT:
+            case OPERATION_HANDLE:
                 buildZip(context);
         }
     }

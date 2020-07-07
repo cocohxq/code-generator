@@ -82,7 +82,7 @@
 
         #step_db {
             padding-left: 450px;
-            /*display: block;*/
+            display: block;
         }
 
         #step_table {
@@ -129,6 +129,7 @@
             border: none
         }
 
+
     </style>
 </head>
 <body>
@@ -169,7 +170,7 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button class="btn btn-success input-large next">下一步</button>
+                        <button class="btn btn-success input-large handle">下一步</button>
                         <span class="errMsg" style="color: red"></span>
                     </div>
                 </div>
@@ -331,8 +332,8 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <button class="btn btn-success pre">上一步</button>
-                    <button class="btn btn-success next">下一步</button>
+                    <button class="btn btn-success cancel">上一步</button>
+                    <button class="btn btn-success handle">下一步</button>
                     <span class="errMsg" style="color: red"></span>
                 </div>
             </div>
@@ -380,8 +381,8 @@
 
             <div class="control-group">
                 <div class="controls">
-                    <button class="btn btn-success pre">上一步</button>
-                    <button class="btn btn-success next">下一步</button>
+                    <button class="btn btn-success cancel">上一步</button>
+                    <button class="btn btn-success handle">下一步</button>
                     <span class="errMsg" style="color: red"></span>
                 </div>
             </div>
@@ -445,8 +446,8 @@
 
             <div class="control-group" style="margin-left: 450px">
                 <div class="controls">
-                    <button class="btn btn-success pre">上一步</button>
-                    <button class="btn btn-success next">下一步</button>
+                    <button class="btn btn-success cancel">上一步</button>
+                    <button class="btn btn-success handle">下一步</button>
                     <span class="errMsg" style="color: red"></span>
                 </div>
             </div>
@@ -468,8 +469,8 @@
 
             <div class="control-group" style="margin-left: 450px">
                 <div class="controls">
-                    <button class="btn btn-success pre">上一步</button>
-                    <button class="btn btn-success next">导出</button>
+                    <button class="btn btn-success cancel">上一步</button>
+                    <button class="btn btn-success handle">导出</button>
                     <span class="errMsg" style="color: red"></span>
                 </div>
             </div>
@@ -497,7 +498,7 @@
 
 </body>
 
-<script type="application/javascript" >
+<script type="application/javascript">
     let error = "${error!''}";
 </script>
 </html>

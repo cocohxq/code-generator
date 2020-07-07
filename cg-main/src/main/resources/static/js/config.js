@@ -8,7 +8,7 @@ $(document).ready(function () {
     initCodeArea();//模板编辑区域
     showError();
 
-    chooseBar("step_db", "cur");
+    // chooseBar("step_db", "cur");
 
 
     //更换配置重新加载
@@ -60,7 +60,7 @@ $(document).ready(function () {
         param.operation = "delete";
 
         //删除配置
-        initData("step_db", "cur", param, function () {
+        execute("step_db", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -89,7 +89,7 @@ $(document).ready(function () {
         }
 
         //初始化库表信息
-        initData("step_db", "cur", param, function () {
+        execute("step_db", param, function () {
             //重新加载页面
             let href = location.href;
             if (href.indexOf("?") != -1) {
@@ -100,7 +100,7 @@ $(document).ready(function () {
     });
 
     //选择数据源-下一步
-    $("#step_db .next").click(function () {
+    $("#step_db .handle").click(function () {
         let param = {};
         param.add = false;
         let selectedConfig = $("#selectedConfig").val();
@@ -109,13 +109,17 @@ $(document).ready(function () {
             return;
         }
         param.configName = selectedConfig;
-        param.operation = "next";
-        initData("step_db", "next", param, step0Callback);
+        param.operation = "handle";
+
+
+        chooseBar("step_db", "handle", function (stepId) {
+            execute(stepId, param, step0Callback);
+        });
     });
 
 
     //选择表-下一步
-    $("#step_table .next").click(function () {
+    $("#step_table .handle").click(function () {
         let param = {};
         if (!fillInputParam("#step_table", param)) {
             return;
@@ -134,13 +138,15 @@ $(document).ready(function () {
         }
 
         param.tableName = tableNames[0];
-        param.operation = "next";
-        initData("step_table", "next", param, function (data) {
-            return true;
+        param.operation = "handle";
+
+        chooseBar("step_table", "handle", function (stepId) {
+            execute(stepId, param, function (data) {
+            });
         });
     });
 
-    $("#step_table .pre").click(function () {
+    $("#step_table .cancel").click(function () {
         chooseBar("step_table", "back");
     });
 
@@ -174,7 +180,7 @@ $(document).ready(function () {
 
 
     //编辑代码配置-下一步
-    $("#step_code .next").click(function () {
+    $("#step_code .handle").click(function () {
         let param = {};
         if (!fillInputParam("#step_code", param)) {
             return;
@@ -193,50 +199,60 @@ $(document).ready(function () {
             }
         }
         //初始化库表信息
-        param.operation = "next";
-        initData("step_code", "next", param, function () {
+        param.operation = "handle";
+
+        chooseBar("step_code", "handle", function (stepId) {
+            execute(stepId, param, function () {
+                return true
+            });
+        }, function (stepId) {
             refreshuserTmpTreeList();
             return true;
         });
 
     });
 
-    $("#step_code .pre").click(function () {
+    $("#step_code .cancel").click(function () {
         chooseBar("step_code", "back");
     });
 
 
     //选择模板-下一步
-    $("#step_tmp .next").click(function () {
+    $("#step_tmp .handle").click(function () {
         let param = {};
         param.tmps = getSelectedTreeNode();
-        param.operation = "next";
         if (param.tmps) {
-            param.operation = "next";
-            initData("step_tmp", "next", param, function (data) {
-                return initFileTree(data);
+            param.operation = "handle";
+
+            chooseBar("step_tmp", "handle", function (stepId) {
+                execute(stepId, param, function (data) {
+                    return initFileTree(data);
+                });
             });
+
         } else {
             $.messager.alert('error', '请选择模板');
             return;
         }
     });
 
-    $("#step_tmp .pre").click(function () {
+    $("#step_tmp .cancel").click(function () {
         chooseBar("step_tmp", "back");
     });
 
 
     //预览导出
-    $("#step_preview .next").click(function () {
+    $("#step_preview .handle").click(function () {
         let param = {};
-        param.operation = "next";
-        initData("step_preview", "next", param, function (data) {
-            return downloadZip(data);
+        param.operation = "handle";
+        chooseBar("step_preview", "handle", function (stepId) {
+            execute(stepId, param, function (data) {
+                return downloadZip(data);
+            });
         });
     });
 
-    $("#step_preview .pre").click(function () {
+    $("#step_preview .cancel").click(function () {
         chooseBar("step_preview", "back");
     });
 
@@ -244,7 +260,6 @@ $(document).ready(function () {
 
 
 function showError() {
-    console.log(error);
     if (error) {
         $.messager.confirm('提示', error, function (r) {
             history.go(-1);
@@ -309,7 +324,7 @@ function initTmps(treeNode) {
                 return;
             }
             param.operation = "editTemplateName";
-            initData("step_tmp", "none", param, function (data) {
+            execute("step_tmp", param, function (data) {
                 if (data == 1) {
                     loadTmpTree();
                     originEditNode = null;
@@ -350,7 +365,7 @@ function initTmps(treeNode) {
                 }
                 param.extParams.fileType = 0;
                 param.operation = "loadFile";
-                initData("step_tmp", "none", param, function (data) {
+                execute("step_tmp", param, function (data) {
                     editor.setValue(data);
                 });
             } else {
@@ -378,7 +393,7 @@ function initFileTree(treeNode) {
                 param.extParams.modulePath = node.attributes.modulePath;
                 param.extParams.fileType = 1;
                 param.operation = "loadFile";
-                initData("step_preview", "none", param, function (data) {
+                execute("step_preview", param, function (data) {
                     fileEditor.setValue(data);
                 });
             }
@@ -470,7 +485,7 @@ function append(type) {
     param.extParams.fileType = type;
 
     param.operation = "addPath";
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -564,17 +579,16 @@ function step0Callback(data) {
 /**
  * 下一步的请求
  * @param curStep
- * @param next
  * @param param
  * @param succ_callback
  */
-function initData(stepId, route, param, succ_callback) {
+function execute(stepId, param, succ_callback) {
     let result = true;
     let stepIdSector = "#" + stepId;
     param.step = $(stepIdSector).attr("code");
     $.ajax({
         type: 'POST',
-        url: '/initData',
+        url: '/execute',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -589,9 +603,6 @@ function initData(stepId, route, param, succ_callback) {
                 return;
             }
             result = succ_callback(data.stepResult);
-            if (result) {
-                chooseBar(stepId, route);
-            }
         },
         error: function (e) {
             console.log(e);
@@ -602,10 +613,13 @@ function initData(stepId, route, param, succ_callback) {
 
 
 /**
- *
- * 导航条切换
+ * 步出、步进
+ * @param stepId
+ * @param route
+ * @param stepExitCallback  步出step回调
+ * @param stepIntoCallback  步进step回调
  */
-function chooseBar(stepId, route) {
+function chooseBar(stepId, route, stepExitCallback, stepIntoCallback) {
     $("#bars .bar").removeClass("cur");
     let stepIdSector = "#" + stepId;
     let barId = "#bar_" + $(stepIdSector).attr("code");
@@ -615,10 +629,10 @@ function chooseBar(stepId, route) {
     if (!route || route == "cur") {
         $(stepIdSector).show();//内容切换
         switchBar = $(barId);
+    } else if (route == "none") {
+        // do nothing
     } else {
-        if (route == "none") {
-            // do nothing
-        } else if (route == "next") {
+        if (route == "handle") {
             $(stepIdSector).hide();
             $(stepIdSector).next().show();//内容切换
             switchBar = $("#bars .bar").eq(barIndex + 1);
@@ -634,22 +648,29 @@ function chooseBar(stepId, route) {
             }
         }
 
+        if (stepExitCallback) {
+            stepExitCallback(stepId);
+        }
+
         //旧的步骤通知离开
-        let param = {}
+        let param = {};
         param.operation = "leave";
-        initData(stepId, "none", param, function (data) {
+        execute(stepId, param, function (data) {
         });
 
     }
-
     //新的步骤通知进度
     if (switchBar) {
         let param = {};
         param.operation = "into";
         let code = switchBar.attr("code");
         stepId = "step_" + code;
-        initData(stepId, "none", param, function (data) {
+        execute(stepId, param, function (data) {
         });
+
+        if (stepIntoCallback) {
+            stepIntoCallback(stepId);
+        }
     }
 
 }
@@ -661,7 +682,7 @@ function refreshuserTmpTreeList() {
 
     let param = {};
     param.operation = "refreshUserTmpTreeList";
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data) {
             $("#userTmpTreeList option").remove();
             for (let i = 0; i < data.length; i++) {
@@ -670,8 +691,8 @@ function refreshuserTmpTreeList() {
                 } else {
                     $("#userTmpTreeList").append('<option class="input-large" value="' + data[i] + '">' + data[i] + '</option>');
                 }
-                loadTmpTree();
             }
+            loadTmpTree();
         } else {
             $.messager.alert('info', '没有找到用户模板');
         }
@@ -689,7 +710,7 @@ function loadTmpTree() {
     param.operation = "loadTmpTree";
     param.extParams.tmpTreeName = tmpTreeName;
 
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data) {
             initTmps(data);
         } else {
@@ -746,12 +767,11 @@ function saveUserTmpTree() {
                 }
 
                 param.operation = "saveUserTmpTree";
-                initData("step_tmp", "none", param, function (data) {
+                execute("step_tmp", param, function (data) {
                     $('#dd').dialog('close');
                     if (data.msg == "提交成功") {
                         refreshuserTmpTreeList();
                         $("#userTmpTreeList").val(userTmpTreeName);//切换到新增的分支
-                        loadTmpTree();
                     } else {
                         $.messager.alert('info', data.msg);
                     }
@@ -783,7 +803,7 @@ function del(node) {
     param.extParams.modulePath = node.attributes.modulePath;
 
     param.operation = "deleteTmp";
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data.msg == "删除成功") {
             loadTmpTree();
         } else {
@@ -842,7 +862,7 @@ function doCopy(node) {
     param.extParams.targetTmpModulePath = targetNode.attributes.modulePath;
 
     param.operation = "copyPath";
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -873,7 +893,7 @@ function doMove(node) {
     param.extParams.targetTmpModulePath = targetNode.attributes.modulePath;
 
     param.operation = "movePath";
-    initData("step_tmp", "none", param, function (data) {
+    execute("step_tmp", param, function (data) {
         if (data == 1) {
             loadTmpTree();
             let nodes = $("#tmps").tree("getChildren", node.target);
@@ -909,7 +929,7 @@ function commitCode() {
         param.extParams.tmpModulePath = node.attributes.modulePath;
 
         param.operation = "commit";
-        initData("step_tmp", "none", param, function (data) {
+        execute("step_tmp", param, function (data) {
             if (data == 0) {
                 $.messager.alert('info', "提交失败");
             }
@@ -932,7 +952,7 @@ function fillInputParam(id, param) {
     let next = true;
     $(id + " input").each(function (item) {
         if (!$(this).val() && $(this).attr("notNull")) {
-            $(id + ".errMsg").text("必填项不能为空");
+            $(id + " .errMsg").text("必填项不能为空");
             next = false;
             return;
         }

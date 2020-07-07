@@ -42,7 +42,7 @@ public class ConfigController {
             config.setStep(StepEnum.STEP_DB.getCode());
             config.setOperation("into");
         }
-        Map<String, Object> result = initData(config);
+        Map<String, Object> result = execute(config);
         model.addAttribute("data", result.get("stepResult"));
         model.addAttribute("error", StringUtils.isEmpty(result.get("error"))? null : ((List)result.get("error")).stream().collect(Collectors.joining("")));
         model.addAttribute("view", ContextContainer.getViewerInfo());
@@ -55,9 +55,9 @@ public class ConfigController {
      * @param config
      * @return
      */
-    @PostMapping("/initData")
+    @PostMapping("/execute")
     @ResponseBody
-    public Map<String, Object> initData(@RequestBody Config config) {
+    public Map<String, Object> execute(@RequestBody Config config) {
         ContextContainer.getContext().setConfig(config);
         if (!StringUtils.isEmpty(config.getStep())) {
             for (StepHandler stepHandler : ContextContainer.getStepInitializer(config.getStep())) {

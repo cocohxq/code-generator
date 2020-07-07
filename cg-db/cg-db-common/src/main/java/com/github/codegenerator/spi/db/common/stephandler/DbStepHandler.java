@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class DbStepHandler extends AbstractStepHandler {
 
@@ -35,7 +36,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        return tryLock(context);
+        return  true;//withLock(context, false);
     }
 
     @Override
@@ -59,7 +60,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
                 DataUtil.deleteData(config.getConfigName());
                 context.setStepInitResult(1);
                 break;
-            case OPERATION_NEXT:
+            case OPERATION_HANDLE:
                 handlerNext(context);
                 break;
             case OPERATION_PREPARE_WRITE:
@@ -75,7 +76,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
 
     @Override
     public void finalize(SessionGenerateContext context) {
-        unWriteLock(context);
+//        withLock(context, true);
     }
 
     /**
@@ -188,6 +189,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
             db.setTableList(tableList);
 
             context.getGenerateInfo().setDatabase(db);
+            context.getGenerateInfo().setSelectedDbConfigName(cfg.getConfigName());
             context.setStepInitResult(db);
         } catch (Exception e) {
             context.error("数据库初始化异常：", e.toString());
@@ -208,40 +210,57 @@ public abstract class DbStepHandler extends AbstractStepHandler {
      * @param context
      * @return
      */
-    private boolean tryLock(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        if (StringUtils.isEmpty(config.getConfigName())) {
-            return true;
-        }
-        String key = String.format(DB_OP_KEY, config.getConfigName());
-
-        if (OPERATION_LEAVE.equals(config.getOperation())) {
-            LockUtils.unAllLock(key, context.getSessionId());
-            return true;
-        }
-        if (OPERATION_INTO.equals(config.getOperation()) || OPERATION_NEXT.equals(config.getOperation())) {
-            if (!LockUtils.tryReadLock(key, context.getSessionId())) {
-                context.error("该同名配置正在被其他人写操作中");
-                return false;
-            }
-        } else {
-            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-                context.error("该同名配置正在被其他人写操作中");
-                return false;
-            }
-        }
-        return true;
-
-    }
-
-    private void unWriteLock(SessionGenerateContext context) {
-        if (StringUtils.isEmpty(context.getConfig().getConfigName()) || OPERATION_PREPARE_WRITE.equals(context.getConfig().getOperation())) {
-            return;
-        }
-        //模板操作
-        String key = String.format(DB_OP_KEY, context.getConfig().getConfigName());
-        LockUtils.unWriteLock(key, context.getSessionId());
-    }
+//    private boolean withLock(SessionGenerateContext context, boolean unLock) {
+//        Config config = context.getConfig();
+//        String configName = Optional.ofNullable(config.getConfigName()).orElse(context.getGenerateInfo().getSelectedDbConfigName());
+//        if (StringUtils.isEmpty(configName)) {
+//            return true;
+//        }
+//        String key = String.format(DB_OP_KEY, configName);
+//
+//        //退出解锁
+//        if (OPERATION_LEAVE.equals(config.getOperation())) {
+//            if (unLock) {
+//                LockUtils.unAllLock(key, context.getSessionId());
+//            }
+//            return true;
+//        }
+//
+//        //写准备开始上锁
+//        if (OPERATION_PREPARE_WRITE.equals(config.getOperation())) {
+//            if (!unLock) {
+//                if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+//                    context.error("该同名配置正在被其他人写操作中");
+//                    return false;
+//                }
+//            }
+//            return true;
+//        }
+//
+//        if (OPERATION_INTO.equals(config.getOperation())
+//                || OPERATION_HANDLE.equals(config.getOperation())) {
+//            if (unLock) {
+//                LockUtils.unReadLock(key, context.getSessionId());
+//            } else {
+//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
+//                    context.error("该同名配置正在被其他人写操作中");
+//                    return false;
+//                }
+//            }
+//            return true;
+//        }
+//
+//        //写提交完就可以解锁
+//        if (unLock) {
+//            LockUtils.unWriteLock(key, context.getSessionId());
+//        } else {
+//            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+//                context.error("该同名配置正在被其他人写操作中");
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     private void into(SessionGenerateContext context) {
         List<String> configList = DataUtil.getDataNameList();

@@ -14,7 +14,6 @@ import com.github.codegenerator.common.in.model.TreeNode;
 import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 import com.github.codegenerator.common.util.ContextContainer;
 import com.github.codegenerator.common.util.FileUtils;
-import com.github.codegenerator.common.util.LockUtils;
 import com.github.codegenerator.common.util.TreeUtils;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -37,8 +36,8 @@ import java.util.Map;
  */
 public class TmpStepHandler extends AbstractStepHandler {
 
+    protected static final String OPERATION_PREPARE_WRITE = "prepareWrite";
     private static final String TMP_OP_KEY = "tmp_op_%s";
-
     private static final String OPERATION_LOAD_FILE = "loadFile";
     private static final String OPERATION_ADD_PATH = "addPath";
     private static final String OPERATION_MOVE_PATH = "movePath";
@@ -52,7 +51,7 @@ public class TmpStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        return tryLock(context);
+        return true;//withLock(context, false);
     }
 
     @Override
@@ -90,9 +89,11 @@ public class TmpStepHandler extends AbstractStepHandler {
             case OPERATION_DELETE_TMP:
                 deleteTmp(context);
                 break;
-            case OPERATION_NEXT:
+            case OPERATION_HANDLE:
                 buildCodeFile(context);
                 break;
+            case OPERATION_PREPARE_WRITE:
+                prepareWrite(context);
         }
 
 
@@ -110,7 +111,7 @@ public class TmpStepHandler extends AbstractStepHandler {
 
     @Override
     public void finalize(SessionGenerateContext context) {
-        unWriteLock(context);
+//        withLock(context, true);
     }
 
     private String parseModuleDir(String tmpModulePath, CodeConfigInfo codeConfigInfo, String templateFileName) {
@@ -436,39 +437,88 @@ public class TmpStepHandler extends AbstractStepHandler {
      * @param context
      * @return
      */
-    private boolean tryLock(SessionGenerateContext context) {
-        Config config = context.getConfig();
-        //模板操作
-        String tmpTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
-        String key = String.format(TMP_OP_KEY, tmpTreeName);
-
-        if (OPERATION_LEAVE.equals(config.getOperation())) {
-            LockUtils.unAllLock(key, context.getSessionId());
-            return true;
-        }
-        if (OPERATION_INTO.equals(config.getOperation())
-                || OPERATION_NEXT.equals(config.getOperation())
-                || OPERATION_REFRESH.equals(config.getOperation())
-                || OPERATION_LOAD_TREE.equals(config.getOperation())
-                || OPERATION_LOAD_FILE.equals(config.getOperation())) {
-            if (!LockUtils.tryReadLock(key, context.getSessionId())) {
-                context.error("该同名模板树正在被其他人写操作中");
-                return false;
-            }
-        } else {
-            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-                context.error("该同名模板树正在被其他人写操作中");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void unWriteLock(SessionGenerateContext context) {
-        //模板操作
-        String tmpTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
-        String key = String.format(TMP_OP_KEY, tmpTreeName);
-        LockUtils.unWriteLock(key, context.getSessionId());
+//    private boolean withLock(SessionGenerateContext context, boolean unLock) {
+//        Config config = context.getConfig();
+//        //模板操作
+//        String tmpTreeName = (String) Optional.ofNullable(config.getExtParams()).map(c -> c.get("tmpTreeName")).orElse(context.getGenerateInfo().getSelectedTmpTreeName());
+//        if (OPERATION_REFRESH.equals(config.getOperation())
+//                || StringUtils.isEmpty(tmpTreeName)
+//                || ContextContainer.DEFAULT_TMP_TREE.equals(tmpTreeName)) {
+//            return true;
+//        }
+//        String key = String.format(TMP_OP_KEY, tmpTreeName);
+//
+//
+//        //退出解锁
+//        if (unLock && OPERATION_LEAVE.equals(config.getOperation())) {
+//            LockUtils.unAllLock(key, context.getSessionId());
+//            return true;
+//        }
+//
+//        //写准备开始上锁
+//        if (OPERATION_PREPARE_WRITE.equals(config.getOperation())) {
+//            if (!unLock) {
+//                if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+//                    context.error("该同名模板树正在被其他人写操作中,请退回上一步重新进");
+//                    return false;
+//                }
+//            }
+//            return true;
+//        }
+//
+//        //写完
+//        if (OPERATION_FINISH_WRITE.equals(config.getOperation())) {
+//            if (unLock) {
+//                //模板操作
+//                LockUtils.unWriteLock(key, context.getSessionId());
+//            }
+//            return true;
+//        }
+//
+//
+//        //切换模板树时，解除旧锁，上新锁
+//        if (OPERATION_LOAD_TREE.equals(config.getOperation())) {
+//            if (unLock) {
+//                LockUtils.unReadLock(key, context.getSessionId());
+//            } else {
+//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
+//                    context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
+//                    return false;
+//                }
+//
+//                String oldTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
+//                String oldKey = String.format(TMP_OP_KEY, oldTreeName);
+//                LockUtils.unAllLock(oldKey, context.getSessionId());
+//            }
+//            return true;
+//        }
+//
+//
+//        if (OPERATION_INTO.equals(config.getOperation())
+//                || OPERATION_HANDLE.equals(config.getOperation())
+//                || OPERATION_LOAD_FILE.equals(config.getOperation())) {
+//            if (unLock) {
+//                LockUtils.unReadLock(key, context.getSessionId());
+//            } else {
+//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
+//                    context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
+//                    return false;
+//                }
+//            }
+//            return true;
+//        }
+//
+//        if (!unLock) {
+//            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
+//                context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
+//                return false;
+//            }
+//        } else {
+//            LockUtils.unWriteLock(key, context.getSessionId());
+//        }
+//        return true;
+//    }
+    private void prepareWrite(SessionGenerateContext context) {
     }
 
 }

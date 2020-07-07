@@ -20,7 +20,7 @@ public class LockUtils {
     private final static Map<String, LockInfo> dbLockMap = new ConcurrentHashMap<>();
     private static Logger logger = LoggerFactory.getLogger(LockUtils.class);
 
-    {
+    static {
         //每5秒检查下是否过期
         new Timer().schedule(new TimerTask() {
             @Override
@@ -41,6 +41,10 @@ public class LockUtils {
         try {
             if (!dbLockMap.containsKey(key)) {
                 dbLockMap.putIfAbsent(key, new LockInfo(key, EXPIRE_TIME));
+            } else {
+                if (dbLockMap.get(key).readLockUserSet.contains(user)) {
+                    dbLockMap.get(key).setStartTime(System.currentTimeMillis());
+                }
             }
             return dbLockMap.get(key).tryWriteLock(user);
         } catch (Exception e) {
@@ -53,6 +57,10 @@ public class LockUtils {
         try {
             if (!dbLockMap.containsKey(key)) {
                 dbLockMap.putIfAbsent(key, new LockInfo(key, EXPIRE_TIME));
+            } else {
+                if (dbLockMap.get(key).readLockUserSet.contains(user)) {
+                    dbLockMap.get(key).setStartTime(System.currentTimeMillis());
+                }
             }
             return dbLockMap.get(key).tryReadLock(user);
         } catch (Exception e) {
@@ -210,6 +218,14 @@ public class LockUtils {
 
         public void setKey(String key) {
             this.key = key;
+        }
+
+        public long getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
         }
     }
 

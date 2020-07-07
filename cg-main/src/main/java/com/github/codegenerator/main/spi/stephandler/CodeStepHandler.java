@@ -24,7 +24,7 @@ public class CodeStepHandler extends AbstractStepHandler {
     @Override
     public void doHandle(SessionGenerateContext context) {
         Config config = context.getConfig();
-        if (OPERATION_NEXT.equals(config.getOperation())) {
+        if (OPERATION_HANDLE.equals(config.getOperation())) {
             handlerNext(context);
         }
     }
