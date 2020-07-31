@@ -206,8 +206,6 @@ public class TmpStepHandler extends AbstractStepHandler {
         CodeConfigInfo codeConfigInfo = generateInfo.getCodeConfigInfo();
         TableConfigInfo tableConfigInfo = generateInfo.getTableConfigInfo();
 
-        //清理
-        generateInfo.setCommonValueStack(new CommonValueStack());
         generateInfo.setTableCodeTemplateInfoList(new ArrayList<>());
         FileUtils.deleteDir(FileUtils.concatPath(context.getGenerateInfo().getCodepath(), ContextContainer.MODULE_PATH_ROOT), true);//清除生成的代码文件
 

@@ -7,6 +7,8 @@ public class FieldMeta {
 
     private String  fieldType;
 
+    private Class fieldClazz;
+
     private Column column;
 
     public String getFieldCamelNameMin() {
@@ -39,5 +41,13 @@ public class FieldMeta {
 
     public void setFieldCamelNameMax(String fieldCamelNameMax) {
         this.fieldCamelNameMax = fieldCamelNameMax;
+    }
+
+    public Class getFieldClazz() {
+        return fieldClazz;
+    }
+
+    public void setFieldClazz(Class fieldClazz) {
+        this.fieldClazz = fieldClazz;
     }
 }

@@ -23,19 +23,27 @@
     <#if deleteStr?exists>
         and <#list commonValueStack.getSpecifiedFields(tableMeta.fields,deleteStr) as field>${field.column.columnName}=0</#list>
     </#if>
-<#list tableMeta.fields as field>
-    <if test="${field.fieldCamelNameMin} != null">
-        and ${field.column.columnName}=${r'#'}{${field.fieldCamelNameMin}}
-    </if>
-</#list>
-<#list commonValueStack.getSpecifiedFields(tableMeta.fields,inStr) as field>
-    <if test="${field.fieldCamelNameMin}List != null and ${field.fieldCamelNameMin}List.size() > 0">
-        and ${field.column.columnName} in
-        <foreach collection="${field.fieldCamelNameMin}List" item="item" open="(" close=")" separator=",">
-            ${r'#'}{item}
-        </foreach>
-    </if>
-</#list>
+    <#list tableMeta.fields as field>
+        <if test="${field.fieldCamelNameMin} != null">
+            and ${field.column.columnName}=${r'#'}{${field.fieldCamelNameMin}}
+        </if>
+    </#list>
+    <#list commonValueStack.getSpecifiedFields(tableMeta.fields,inStr) as field>
+        <if test="${field.fieldCamelNameMin}List != null and ${field.fieldCamelNameMin}List.size() > 0">
+            and ${field.column.columnName} in
+            <foreach collection="${field.fieldCamelNameMin}List" item="item" open="(" close=")" separator=",">
+                ${r'#'}{item}
+            </foreach>
+        </if>
+    </#list>
+    <#list commonValueStack.getSpecifiedFields(tableMeta.fields,betweenStr) as field>
+        <if test="${field.fieldCamelNameMin}From != null">
+            and ${field.column.columnName} &gt;= ${r'#'}{${field.fieldCamelNameMin}}From
+        </if>
+        <if test="${field.fieldCamelNameMin}To != null">
+            and ${field.column.columnName} &lt;= ${r'#'}{${field.fieldCamelNameMin}}To
+        </if>
+    </#list>
     </sql>
 
 

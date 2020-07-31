@@ -600,11 +600,17 @@ function execute(stepId, param, succ_callback) {
             if (data.error && data.error.length > 0) {
                 let err = data.error.join("<br>");
                 $.messager.alert('error', err);
+                result = false;
                 return;
             }
-            result = succ_callback(data.stepResult);
+            let callbackResult = succ_callback(data.stepResult);
+            //存在有效返回值的时候就使用返回值，没有就默认true
+            if (!typeof (callbackResult) == "undefined") {
+                result = callbackResult;
+            }
         },
         error: function (e) {
+            result = false;
             console.log(e);
         }
     });

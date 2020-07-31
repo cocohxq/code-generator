@@ -12,7 +12,6 @@ import com.github.codegenerator.common.in.model.db.Table;
 import com.github.codegenerator.common.in.model.db.TableMeta;
 import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 import com.github.codegenerator.common.util.DataUtil;
-import com.github.codegenerator.common.util.LockUtils;
 import com.github.codegenerator.spi.db.common.util.BuildUtils;
 import com.github.codegenerator.spi.db.common.util.DbUtils;
 import org.springframework.util.StringUtils;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class DbStepHandler extends AbstractStepHandler {
 
@@ -102,7 +100,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
      * @param columnType
      * @return
      */
-    public abstract String convertType(String columnType) throws Exception;
+    public abstract Class convertType(String columnType) throws Exception;
 
     @Override
     public StepEnum step() {
@@ -174,7 +172,9 @@ public abstract class DbStepHandler extends AbstractStepHandler {
                         fieldMeta.setFieldCamelNameMin(BuildUtils.conver2CameltNameMin(l.getColumnName()));
                         fieldMeta.setFieldCamelNameMax(BuildUtils.converMinCameltNameMax(fieldMeta.getFieldCamelNameMin()));
                         try {
-                            fieldMeta.setFieldType(convertType(l.getColumnType()));
+                            Class clazz = convertType(l.getColumnType());
+                            fieldMeta.setFieldType(clazz.getName());
+                            fieldMeta.setFieldClazz(clazz);
                         } catch (Exception e) {
                             throw new RuntimeException(String.format("表%s中字段%s转换类型出错", table.getTableName(), l.getColumnName()), e);
                         }

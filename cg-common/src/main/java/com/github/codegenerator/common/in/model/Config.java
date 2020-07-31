@@ -25,7 +25,7 @@ public class Config {
     private transient String deleteStr;
     private transient String extendStr;
     private transient String inStr;
-
+    private transient String betweenStr;
     //代码配置
     private transient String groupId;
     private transient String outBusiPack;
@@ -200,6 +200,14 @@ public class Config {
 
     public void setInStr(String inStr) {
         this.inStr = inStr;
+    }
+
+    public String getBetweenStr() {
+        return betweenStr;
+    }
+
+    public void setBetweenStr(String betweenStr) {
+        this.betweenStr = betweenStr;
     }
 
     public Map<String, Object> getExtParams() {

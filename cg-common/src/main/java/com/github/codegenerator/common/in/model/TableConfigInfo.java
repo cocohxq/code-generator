@@ -34,9 +34,14 @@ public class TableConfigInfo {
     private String extendStr;
 
     /**
-     * pojo继承字段
+     * pojo in字段
      */
     private String inStr;
+
+    /**
+     * pojo between字段
+     */
+    private String betweenStr;
 
     public TableMeta getTableMeta() {
         return tableMeta;
@@ -92,5 +97,13 @@ public class TableConfigInfo {
 
     public void setInStr(String inStr) {
         this.inStr = inStr;
+    }
+
+    public String getBetweenStr() {
+        return betweenStr;
+    }
+
+    public void setBetweenStr(String betweenStr) {
+        this.betweenStr = betweenStr;
     }
 }

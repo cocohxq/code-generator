@@ -284,6 +284,8 @@
                     <br>
                     <button class="btn btn-success field" at="inStr">选为in字段</button>
                     <br>
+                    <button class="btn btn-success field" at="betweenStr">选为&lt;=,&gt;=字段</button>
+                    <br>
                 </div>
             </div>
 
@@ -326,6 +328,14 @@
                 <label class="control-label" for="input01">支持in查询字段</label>
                 <div class="controls">
                     <input id="inStr" type="text" placeholder="xxx1,xxx2" class="input-large" value="">(在query和sql生成的时候支持in条件)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">支持>=和<=查询字段</label>
+                <div class="controls">
+                    <input id="betweenStr" type="text" placeholder="xxx1,xxx2" class="input-large" value="">(在query和sql生成的时候生成>=和<=条件范围查询)
                     <p class="help-block"></p>
                 </div>
             </div>

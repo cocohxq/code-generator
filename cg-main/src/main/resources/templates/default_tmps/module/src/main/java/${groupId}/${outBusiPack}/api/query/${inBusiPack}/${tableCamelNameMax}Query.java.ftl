@@ -28,7 +28,17 @@ public class ${javaClassName} extends BaseQuery {
 	private List<${field.fieldType}> ${field.fieldCamelNameMin}List;
 </#list>
 
+<#list commonValueStack.getSpecifiedFields(tableMeta.fields,betweenStr) as field>
+	/**
+	* ${field.column.comment!''}范围查找起始值
+	*/
+	private ${field.fieldType} ${field.fieldCamelNameMin}From;
 
+	/**
+	* ${field.column.comment!''}范围查找结束值
+	*/
+	private ${field.fieldType} ${field.fieldCamelNameMin}To;
+</#list>
 
 <#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,extendStr) as field>
 
@@ -49,6 +59,25 @@ public class ${javaClassName} extends BaseQuery {
 
 	public void set${field.fieldCamelNameMax}List(List<${field.fieldType}> ${field.fieldCamelNameMin}List) {
 		this.${field.fieldCamelNameMin}List = ${field.fieldCamelNameMin}List;
+	}
+</#list>
+
+<#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,betweenStr) as field>
+
+	public ${field.fieldType} get${field.fieldCamelNameMax}From() {
+		return ${field.fieldCamelNameMin}From;
+	}
+
+	public void set${field.fieldCamelNameMax}From(${field.fieldType} ${field.fieldCamelNameMin}From) {
+		this.${field.fieldCamelNameMin}From = ${field.fieldCamelNameMin}From;
+	}
+
+	public ${field.fieldType} get${field.fieldCamelNameMax}To() {
+		return ${field.fieldCamelNameMin}To;
+	}
+
+	public void set${field.fieldCamelNameMax}To(${field.fieldType} ${field.fieldCamelNameMin}To) {
+		this.${field.fieldCamelNameMin}To = ${field.fieldCamelNameMin}To;
 	}
 </#list>
 
