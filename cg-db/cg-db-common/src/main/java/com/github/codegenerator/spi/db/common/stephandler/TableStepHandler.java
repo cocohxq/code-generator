@@ -55,6 +55,8 @@ public abstract class TableStepHandler extends AbstractStepHandler {
         tableConfigInfo.setDbName(generateInfo.getDatabase().getDbName());
         tableConfigInfo.setCreateTimeStr(config.getCreateTimeStr());
         tableConfigInfo.setUpdateTimeStr(config.getUpdateTimeStr());
+        tableConfigInfo.setCreatorIdStr(config.getCreatorIdStr());
+        tableConfigInfo.setModifierIdStr(config.getModifierIdStr());
         tableConfigInfo.setDeleteStr(config.getDeleteStr());
         tableConfigInfo.setExtendStr(config.getExtendStr());
         tableConfigInfo.setInStr(config.getInStr());

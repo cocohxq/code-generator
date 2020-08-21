@@ -8,9 +8,6 @@ $(document).ready(function () {
     initCodeArea();//模板编辑区域
     showError();
 
-    // chooseBar("step_db", "cur");
-
-
     //更换配置重新加载
     $("#step_db #addConfig").click(function () {
         let href = location.href;
@@ -112,8 +109,8 @@ $(document).ready(function () {
         param.operation = "handle";
 
 
-        chooseBar("step_db", "handle", function (stepId) {
-            execute(stepId, param, step0Callback);
+        changeStep("step_db", "handle", function (stepId) {
+            return execute(stepId, param, step0Callback);
         });
     });
 
@@ -140,14 +137,14 @@ $(document).ready(function () {
         param.tableName = tableNames[0];
         param.operation = "handle";
 
-        chooseBar("step_table", "handle", function (stepId) {
-            execute(stepId, param, function (data) {
+        changeStep("step_table", "handle", function (stepId) {
+            return execute(stepId, param, function (data) {
             });
         });
     });
 
     $("#step_table .cancel").click(function () {
-        chooseBar("step_table", "back");
+        changeStep("step_table", "back");
     });
 
     $("#step_table .field").click(function () {
@@ -201,9 +198,8 @@ $(document).ready(function () {
         //初始化库表信息
         param.operation = "handle";
 
-        chooseBar("step_code", "handle", function (stepId) {
-            execute(stepId, param, function () {
-                return true
+        changeStep("step_code", "handle", function (stepId) {
+            return execute(stepId, param, function () {
             });
         }, function (stepId) {
             refreshuserTmpTreeList();
@@ -213,7 +209,7 @@ $(document).ready(function () {
     });
 
     $("#step_code .cancel").click(function () {
-        chooseBar("step_code", "back");
+        changeStep("step_code", "back");
     });
 
 
@@ -224,8 +220,8 @@ $(document).ready(function () {
         if (param.tmps) {
             param.operation = "handle";
 
-            chooseBar("step_tmp", "handle", function (stepId) {
-                execute(stepId, param, function (data) {
+            changeStep("step_tmp", "handle", function (stepId) {
+                return execute(stepId, param, function (data) {
                     return initFileTree(data);
                 });
             });
@@ -237,7 +233,7 @@ $(document).ready(function () {
     });
 
     $("#step_tmp .cancel").click(function () {
-        chooseBar("step_tmp", "back");
+        changeStep("step_tmp", "back");
     });
 
 
@@ -245,15 +241,15 @@ $(document).ready(function () {
     $("#step_preview .handle").click(function () {
         let param = {};
         param.operation = "handle";
-        chooseBar("step_preview", "handle", function (stepId) {
-            execute(stepId, param, function (data) {
+        changeStep("step_preview", "handle", function (stepId) {
+            return execute(stepId, param, function (data) {
                 return downloadZip(data);
             });
         });
     });
 
     $("#step_preview .cancel").click(function () {
-        chooseBar("step_preview", "back");
+        changeStep("step_preview", "back");
     });
 
 });
@@ -625,7 +621,7 @@ function execute(stepId, param, succ_callback) {
  * @param stepExitCallback  步出step回调
  * @param stepIntoCallback  步进step回调
  */
-function chooseBar(stepId, route, stepExitCallback, stepIntoCallback) {
+function changeStep(stepId, route, stepExitCallback, stepIntoCallback) {
     $("#bars .bar").removeClass("cur");
     let stepIdSector = "#" + stepId;
     let barId = "#bar_" + $(stepIdSector).attr("code");
@@ -638,6 +634,14 @@ function chooseBar(stepId, route, stepExitCallback, stepIntoCallback) {
     } else if (route == "none") {
         // do nothing
     } else {
+        //离开当前step做的事情
+        if (stepExitCallback) {
+            let result = stepExitCallback(stepId);
+            if (!result) {
+                return false;
+            }
+        }
+
         if (route == "handle") {
             $(stepIdSector).hide();
             $(stepIdSector).next().show();//内容切换
@@ -653,17 +657,6 @@ function chooseBar(stepId, route, stepExitCallback, stepIntoCallback) {
                 switchBar.addClass("cur");
             }
         }
-
-        if (stepExitCallback) {
-            stepExitCallback(stepId);
-        }
-
-        //旧的步骤通知离开
-        let param = {};
-        param.operation = "leave";
-        execute(stepId, param, function (data) {
-        });
-
     }
     //新的步骤通知进度
     if (switchBar) {

@@ -1,6 +1,7 @@
 package ${javaPackage};
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,6 +28,19 @@ public class PagedResult<T> implements Serializable {
         this.totalNum = totalNum;
         this.data = data;
         this.totalPage = this.calculateTotalPages(this.totalNum, this.pageSize);
+    }
+
+    public Pagination toPagination() {
+        Pagination pagination = new Pagination();
+        pagination.setCurPage(this.curPage);
+        pagination.setPageSize(this.pageSize);
+        pagination.setTotalPage(this.totalPage);
+        pagination.setTotalNum(this.totalNum);
+        return pagination;
+    }
+
+    public static PagedResult empty() {
+        return new PagedResult(0, 0, 0, Collections.emptyList());
     }
 
     public int getCurPage() {

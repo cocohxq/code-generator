@@ -21,6 +21,10 @@ public class MysqlStepHandler extends DbStepHandler {
     private final static String COLUMN_NAME = "COLUMN_NAME";
     private final static String COLUMN_TYPE = "COLUMN_TYPE";
     private final static String COLUMN_COMMENT = "COLUMN_COMMENT";
+    private final static String IS_NULLABLE = "IS_NULLABLE";
+    private final static String COLUMN_DEFAULT = "COLUMN_DEFAULT";
+    private final static String NULLABLE_YES = "YES";
+
 
     @Override
     public int getDbType() {
@@ -29,7 +33,7 @@ public class MysqlStepHandler extends DbStepHandler {
 
     @Override
     public String getJdbcUrl(String ip, String port, String dbName) {
-        return String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE&useSSL=false&connectTimeout=5000", ip, port, dbName);
+        return String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE&useSSL=false&connectTimeout=180000&allowMultiQueries=true", ip, port, dbName);
     }
 
     @Override
@@ -87,6 +91,8 @@ public class MysqlStepHandler extends DbStepHandler {
             column.setColumnName(rs.getString(COLUMN_NAME));
             column.setColumnType(rs.getString(COLUMN_TYPE));
             column.setComment(rs.getString(COLUMN_COMMENT));
+            column.setColumnDefault(rs.getString(COLUMN_DEFAULT));
+            column.setNullable(NULLABLE_YES.equals(rs.getString(IS_NULLABLE)));
             list.add(column);
         }
         return list;

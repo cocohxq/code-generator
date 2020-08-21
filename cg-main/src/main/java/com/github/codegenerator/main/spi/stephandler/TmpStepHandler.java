@@ -3,7 +3,6 @@ package com.github.codegenerator.main.spi.stephandler;
 import com.alibaba.fastjson.JSONObject;
 import com.github.codegenerator.common.em.StepEnum;
 import com.github.codegenerator.common.in.model.CodeConfigInfo;
-import com.github.codegenerator.common.in.model.CommonValueStack;
 import com.github.codegenerator.common.in.model.Config;
 import com.github.codegenerator.common.in.model.GenerateInfo;
 import com.github.codegenerator.common.in.model.SessionGenerateContext;
@@ -36,7 +35,6 @@ import java.util.Map;
  */
 public class TmpStepHandler extends AbstractStepHandler {
 
-    protected static final String OPERATION_PREPARE_WRITE = "prepareWrite";
     private static final String TMP_OP_KEY = "tmp_op_%s";
     private static final String OPERATION_LOAD_FILE = "loadFile";
     private static final String OPERATION_ADD_PATH = "addPath";
@@ -116,7 +114,7 @@ public class TmpStepHandler extends AbstractStepHandler {
 
     private String parseModuleDir(String tmpModulePath, CodeConfigInfo codeConfigInfo, String templateFileName) {
         //路径  module/src/main/java/groupId/${outBusiPack}/xxxx/${inBusiPack}
-        String moduleDir = tmpModulePath.replace("${groupId}", codeConfigInfo.getGroupId()).replace(templateFileName, "");
+        String moduleDir = tmpModulePath.replace("${groupId}", codeConfigInfo.getGroupId()).replace(templateFileName, "").replace(".", "/");
         if (null != codeConfigInfo.getInBusiPack()) {
             moduleDir = moduleDir.replace("${inBusiPack}", codeConfigInfo.getInBusiPack());
         } else {
@@ -178,7 +176,6 @@ public class TmpStepHandler extends AbstractStepHandler {
                     }
                     writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile), "UTF-8"));
                     Map<String, Object> valMap = template.getTmpValMap();
-                    valMap.put("commonValueStack", info.getCommonValueStack());
                     tmp.process(valMap, writer);
                     writer.flush();
                 } catch (Exception e) {
@@ -218,8 +215,7 @@ public class TmpStepHandler extends AbstractStepHandler {
             if (null != tmpModulePath) {
                 //模板填充内容
                 TableCodeTemplateInfo tableCodeTemplateInfo = new TableCodeTemplateInfo();
-                tableCodeTemplateInfo.setCodeConfigInfo(codeConfigInfo);
-                tableCodeTemplateInfo.setTableConfigInfo(tableConfigInfo);
+                tableCodeTemplateInfo.setGenerateInfo(generateInfo);
                 boolean isJavaFile = tmpModulePath.toLowerCase().endsWith(".java.ftl") ? true : false;
                 tableCodeTemplateInfo.setTemplateContent(FileUtils.loadFile(generateInfo.getSelectedTmpTreeName(), tmpModulePath, 0));//读取模板
                 tableCodeTemplateInfo.setTemplateFileName(FileUtils.getFileNameByPath(tmpModulePath));
@@ -429,93 +425,6 @@ public class TmpStepHandler extends AbstractStepHandler {
         return FileUtils.concatPath(ContextContainer.USER_TMPTREE_DIR, tmpTreeName, modulePath);
     }
 
-    /**
-     * 离开解所有锁、进入和下一步时是读锁、其他都是写锁
-     *
-     * @param context
-     * @return
-     */
-//    private boolean withLock(SessionGenerateContext context, boolean unLock) {
-//        Config config = context.getConfig();
-//        //模板操作
-//        String tmpTreeName = (String) Optional.ofNullable(config.getExtParams()).map(c -> c.get("tmpTreeName")).orElse(context.getGenerateInfo().getSelectedTmpTreeName());
-//        if (OPERATION_REFRESH.equals(config.getOperation())
-//                || StringUtils.isEmpty(tmpTreeName)
-//                || ContextContainer.DEFAULT_TMP_TREE.equals(tmpTreeName)) {
-//            return true;
-//        }
-//        String key = String.format(TMP_OP_KEY, tmpTreeName);
-//
-//
-//        //退出解锁
-//        if (unLock && OPERATION_LEAVE.equals(config.getOperation())) {
-//            LockUtils.unAllLock(key, context.getSessionId());
-//            return true;
-//        }
-//
-//        //写准备开始上锁
-//        if (OPERATION_PREPARE_WRITE.equals(config.getOperation())) {
-//            if (!unLock) {
-//                if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-//                    context.error("该同名模板树正在被其他人写操作中,请退回上一步重新进");
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-//
-//        //写完
-//        if (OPERATION_FINISH_WRITE.equals(config.getOperation())) {
-//            if (unLock) {
-//                //模板操作
-//                LockUtils.unWriteLock(key, context.getSessionId());
-//            }
-//            return true;
-//        }
-//
-//
-//        //切换模板树时，解除旧锁，上新锁
-//        if (OPERATION_LOAD_TREE.equals(config.getOperation())) {
-//            if (unLock) {
-//                LockUtils.unReadLock(key, context.getSessionId());
-//            } else {
-//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
-//                    context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
-//                    return false;
-//                }
-//
-//                String oldTreeName = context.getGenerateInfo().getSelectedTmpTreeName();
-//                String oldKey = String.format(TMP_OP_KEY, oldTreeName);
-//                LockUtils.unAllLock(oldKey, context.getSessionId());
-//            }
-//            return true;
-//        }
-//
-//
-//        if (OPERATION_INTO.equals(config.getOperation())
-//                || OPERATION_HANDLE.equals(config.getOperation())
-//                || OPERATION_LOAD_FILE.equals(config.getOperation())) {
-//            if (unLock) {
-//                LockUtils.unReadLock(key, context.getSessionId());
-//            } else {
-//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
-//                    context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-//
-//        if (!unLock) {
-//            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-//                context.error("该同名模板树正在被其他人写操作中，请退回上一步重新进");
-//                return false;
-//            }
-//        } else {
-//            LockUtils.unWriteLock(key, context.getSessionId());
-//        }
-//        return true;
-//    }
     private void prepareWrite(SessionGenerateContext context) {
     }
 

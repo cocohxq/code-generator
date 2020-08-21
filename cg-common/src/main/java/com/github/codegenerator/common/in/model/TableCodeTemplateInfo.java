@@ -4,8 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 表和模板关联的对象
@@ -14,9 +19,7 @@ public class TableCodeTemplateInfo {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private CodeConfigInfo codeConfigInfo;
-
-    private TableConfigInfo tableConfigInfo;
+    private GenerateInfo generateInfo;
 
     /**
      * ${tableCamelNameMax}DTO.java.ftl
@@ -56,10 +59,14 @@ public class TableCodeTemplateInfo {
     }
 
     //Object转Map
-    public static Map<String, Object> getObjectToMap(Object obj) throws IllegalAccessException {
+    public static Map<String, Object> getObjectToMap(Object obj, String... ignoreFields) throws IllegalAccessException {
+        Set<String> ignoreSet = null != ignoreFields ? Arrays.stream(ignoreFields).collect(Collectors.toSet()):new HashSet<>();
         Map<String, Object> map = new HashMap<>();
         Class<?> clazz = obj.getClass();
         for (Field field : clazz.getDeclaredFields()) {
+            if(ignoreSet.contains(field.getName())){
+                continue;
+            }
             field.setAccessible(true);
             String fieldCamelNameMin = field.getName();
             Object value = field.get(obj);
@@ -73,8 +80,10 @@ public class TableCodeTemplateInfo {
 
     public Map<String, Object> getTmpValMap() {
         try {
-            Map<String, Object> valMap = getObjectToMap(this.getCodeConfigInfo());
-            valMap.putAll(getObjectToMap(this.getTableConfigInfo()));
+            Map<String, Object> valMap = getObjectToMap(this.generateInfo.getCodeConfigInfo());
+            valMap.putAll(getObjectToMap(this.generateInfo.getDatabase(),"tableList"));
+            valMap.putAll(getObjectToMap(this.generateInfo.getTableConfigInfo()));
+            valMap.put("commonValueStack", this.generateInfo.getCommonValueStack());
             valMap.put("javaPackage", this.getJavaPackage());
             valMap.put("javaClassName", this.getJavaClassName());
             return valMap;
@@ -100,12 +109,13 @@ public class TableCodeTemplateInfo {
         this.templateFileName = templateFileName;
     }
 
-    public CodeConfigInfo getCodeConfigInfo() {
-        return codeConfigInfo;
+
+    public GenerateInfo getGenerateInfo() {
+        return generateInfo;
     }
 
-    public void setCodeConfigInfo(CodeConfigInfo codeConfigInfo) {
-        this.codeConfigInfo = codeConfigInfo;
+    public void setGenerateInfo(GenerateInfo generateInfo) {
+        this.generateInfo = generateInfo;
     }
 
     public String getJavaPackage() {
@@ -140,11 +150,4 @@ public class TableCodeTemplateInfo {
         this.targetFilePath = targetFilePath;
     }
 
-    public TableConfigInfo getTableConfigInfo() {
-        return tableConfigInfo;
-    }
-
-    public void setTableConfigInfo(TableConfigInfo tableConfigInfo) {
-        this.tableConfigInfo = tableConfigInfo;
-    }
 }

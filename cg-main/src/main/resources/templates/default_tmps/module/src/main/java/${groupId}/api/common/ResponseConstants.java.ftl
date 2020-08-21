@@ -1,4 +1,4 @@
-package com.pos.kb.api.common;
+package ${javaPackage};
 
 /**
 * 常量

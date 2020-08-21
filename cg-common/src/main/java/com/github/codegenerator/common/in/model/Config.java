@@ -21,7 +21,9 @@ public class Config {
     //表选择
     private transient String tableName;
     private transient String createTimeStr;
+    private transient String creatorIdStr;
     private transient String updateTimeStr;
+    private transient String modifierIdStr;
     private transient String deleteStr;
     private transient String extendStr;
     private transient String inStr;
@@ -31,7 +33,7 @@ public class Config {
     private transient String outBusiPack;
     private transient String inBusiPack;
     private transient Integer codeLocationType;
-
+    private transient String appId;
 
     //模板
     private transient List<String> tmps;
@@ -216,5 +218,29 @@ public class Config {
 
     public void setExtParams(Map<String, Object> extParams) {
         this.extParams = extParams;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getCreatorIdStr() {
+        return creatorIdStr;
+    }
+
+    public void setCreatorIdStr(String creatorIdStr) {
+        this.creatorIdStr = creatorIdStr;
+    }
+
+    public String getModifierIdStr() {
+        return modifierIdStr;
+    }
+
+    public void setModifierIdStr(String modifierIdStr) {
+        this.modifierIdStr = modifierIdStr;
     }
 }

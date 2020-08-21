@@ -13,7 +13,7 @@ public class DbUtils {
     public static Connection getConnection(Database db) throws Exception {
         Driver driver = (Driver) Class.forName(db.getDriverName()).newInstance();
         Properties info = new Properties();
-        info.put("user", db.getUser());
+        info.put("user", db.getUserName());
         info.put("password", db.getPassword());
         Connection connection = driver.connect(db.getUrl(), info);
         return connection;

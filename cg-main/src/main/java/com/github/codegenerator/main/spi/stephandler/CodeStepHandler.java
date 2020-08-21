@@ -8,7 +8,9 @@ import com.github.codegenerator.common.in.model.SessionGenerateContext;
 import com.github.codegenerator.common.in.model.TableConfigInfo;
 import com.github.codegenerator.common.spi.stephandler.AbstractStepHandler;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,8 +47,10 @@ public class CodeStepHandler extends AbstractStepHandler {
         //类groupId
         codeConfigInfo.setGroupId(config.getGroupId());
 
+        codeConfigInfo.setAppId(config.getAppId());
+
         //大驼峰  表名对应的大驼峰名称  eg:Car
-        codeConfigInfo.setTableCamelNameMax(tableConfigInfo.getTableMeta().getTableCamelNameMin().substring(0, 1).toUpperCase() + tableConfigInfo.getTableMeta().getTableCamelNameMin().substring(1));
+        codeConfigInfo.setTableCamelNameMax(tableConfigInfo.getTableMeta().getTableCamelNameMax());
         //小驼峰  变量 eg:car
         codeConfigInfo.setTableCamelNameMin(tableConfigInfo.getTableMeta().getTableCamelNameMin());
 
@@ -62,11 +66,11 @@ public class CodeStepHandler extends AbstractStepHandler {
                 codeConfigInfo.setJavaImports(importList);
             }
 
-            if (t.getFieldType().indexOf("Date") > -1 && !importList.contains("java.util.Date")) {
-                importList.add("java.util.Date");
+            if (t.getFieldClazz().equals(Date.class) && !importList.contains(Date.class.getName())) {
+                importList.add(Date.class.getName());
             }
-            if (t.getFieldType().indexOf("BigDecimal") > -1 && !importList.contains("java.math.BigDecimal")) {
-                importList.add("java.math.BigDecimal");
+            if (t.getFieldClazz().equals(BigDecimal.class) && !importList.contains(BigDecimal.class.getName())) {
+                importList.add(BigDecimal.class.getName());
             }
         });
 

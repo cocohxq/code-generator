@@ -100,7 +100,7 @@
 
             <div style="border-bottom: 1px solid #e5e5e5;">
                 解析字段示例说明：<br>
-                1、表：user_info
+                1、表：user
                 <table style="width:40%;text-align: left">
                     <tr>
                         <td>Field</td>
@@ -113,14 +113,39 @@
                         <td></td>
                     </tr>
                     <tr>
-                        <td>user_name</td>
+                        <td>name</td>
                         <td>varchar(50)</td>
                         <td>用户名</td>
                     </tr>
                     <tr>
-                        <td>birthday</td>
+                        <td>age</td>
+                        <td>int</td>
+                        <td>年龄</td>
+                    </tr>
+                    <tr>
+                        <td>creator_id</td>
+                        <td>bigint</td>
+                        <td>创建人</td>
+                    </tr>
+                    <tr>
+                        <td>created_time</td>
                         <td>datetime</td>
-                        <td>生日</td>
+                        <td>创建时间</td>
+                    </tr>
+                    <tr>
+                        <td>last_modifier_id</td>
+                        <td>bigint</td>
+                        <td>最后修改人</td>
+                    </tr>
+                    <tr>
+                        <td>last_modified_time</td>
+                        <td>datetime</td>
+                        <td>最后修改时间</td>
+                    </tr>
+                    <tr>
+                        <td>deleted</td>
+                        <td>int</td>
+                        <td>是否删除</td>
                     </tr>
                 </table>
 
@@ -138,79 +163,173 @@
 
 
 <textarea id="tipObj" style="display: none">
-2.1、公共值对象（所有模板都可以通过commonValueStack.getValue访问，包括一些类路径)
+2.模板变量值说明
+a. commonValueStack属于公共值对象（所有模板都可以通过commonValueStack.getValue访问，包括一些类路径)
+b. 模板特有值对象（其中java开头属性只有java模板才有）
 {
-  "UserInfoManagerImpl.classPath": "com.hxq.manager.impl.UserInfoManagerImpl",
-  "UserInfoVO.classPath": "com.hxq.vo.UserInfoVO",
-  "UserInfoServiceImpl.classPath": "com.hxq.service.impl.UserInfoServiceImpl",
-  "UserInfoDao.classPath": "com.hxq.dao.UserInfoDao",
-  "UserInfoQuery.classPath": "com.hxq.query.UserInfoQuery",
-  "UserInfoDaoImpl.classPath": "com.hxq.dao.impl.UserInfoDaoImpl",
-  "PagedResult.classPath": "com.hxq.common.PagedResult",
-  "UserInfo.classPath": "com.hxq.model.UserInfo",
-  "UserInfoDTO.classPath": "com.hxq.dto.UserInfoDTO",
-  "UserInfoEntity.classPath": "com.hxq.entity.UserInfoEntity",
-  "UserInfoManager.classPath": "com.hxq.manager.UserInfoManager",
-  "BaseDao.classPath": "com.hxq.common.BaseDao",
-  "BaseDTO.classPath": "com.hxq.common.BaseDTO",
-  "UserInfoDO.classPath": "com.hxq.do.UserInfoDO",
-  "UserInfoService.classPath": "com.hxq.service.UserInfoService",
-  "BaseDO.classPath": "com.hxq.common.BaseDO",
-  "Page.classPath": "com.hxq.common.Page",
-  "BaseQuery.classPath": "com.hxq.common.BaseQuery",
-  "BaseEntity.classPath": "com.hxq.common.BaseEntity"
-}
-2.2 模板特有值对象（其中java开头属性只有java模板才有）
-{
-  "targetFilePath": "/Users/user/6B2E8BD3DE746842C8EE323A7C66BBD4/module/src/main/java/com/hxq/dto/UserInfoDTO.java",
-  "javaImports": ["java.util.Date"],
-  "dbName":"demo",
-  "javaPackage": "com.hxq.dto",
-  "javaClassName": "UserInfoDTO",
-  "tableMeta": {
-    "fields": [{
-      "column": {
-        "columnName": "id",
-        "columnType": "BIGINT",
-        "comment": ""
-      },
-      "fieldCamelNameMin": "id",
-      "fieldCamelNameMax": "Id",
-      "fieldType": "Long"
-    }, {
-      "column": {
-        "columnName": "user_name",
-        "columnType": "VARCHAR",
-        "comment": "姓名"
-      },
-      "fieldCamelNameMin": "userName",
-      "fieldCamelNameMax": "UserName",
-      "fieldType": "String"
-    }, {
-      "column": {
-        "columnName": "birthday",
-        "columnType": "DATETIME",
-        "comment": "生日"
-      },
-      "fieldCamelNameMin": "birthday",
-      "fieldCamelNameMax": "Birthday",
-      "fieldType": "Date"
-    }],
-    "table": {
-      "comment": "",
-      "tableName": "user_info"
+    "creatorIdStr":"creator_id",
+    "extendStr":"id",
+    "javaImports":[
+        "java.util.Date"
+    ],
+    "tableMeta":{
+        "fields":[
+            {
+                "column":{
+                    "columnName":"id",
+                    "columnType":"bigint(20)",
+                    "comment":"主键id",
+                    "nullable":false
+                },
+                "fieldCamelNameMax":"Id",
+                "fieldCamelNameMin":"id",
+                "fieldClazz":"java.lang.Long",
+                "fieldType":"Long"
+            },
+            {
+                "column":{
+                    "columnName":"name",
+                    "columnType":"varchar(200)",
+                    "comment":"名称",
+                    "nullable":false
+                },
+                "fieldCamelNameMax":"Name",
+                "fieldCamelNameMin":"name",
+                "fieldClazz":"java.lang.String",
+                "fieldType":"String"
+            },
+            {
+                "column":{
+                    "columnName":"age",
+                    "columnType":"int(3)",
+                    "comment":"年龄",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"Age",
+                "fieldCamelNameMin":"age",
+                "fieldClazz":"java.lang.Integer",
+                "fieldType":"Integer"
+            },
+            {
+                "column":{
+                    "columnName":"creator_id",
+                    "columnType":"bigint(20)",
+                    "comment":"创建人",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"CreatorId",
+                "fieldCamelNameMin":"creatorId",
+                "fieldClazz":"java.lang.Long",
+                "fieldType":"Long"
+            },
+            {
+                "column":{
+                    "columnDefault":"CURRENT_TIMESTAMP",
+                    "columnName":"created_time",
+                    "columnType":"datetime",
+                    "comment":"创建时间",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"CreatedTime",
+                "fieldCamelNameMin":"createdTime",
+                "fieldClazz":"java.util.Date",
+                "fieldType":"Date"
+            },
+            {
+                "column":{
+                    "columnName":"last_modifier_id",
+                    "columnType":"bigint(20)",
+                    "comment":"最后修改者ID",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"LastModifierId",
+                "fieldCamelNameMin":"lastModifierId",
+                "fieldClazz":"java.lang.Long",
+                "fieldType":"Long"
+            },
+            {
+                "column":{
+                    "columnName":"last_modified_time",
+                    "columnType":"datetime",
+                    "comment":"最后修改时间",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"LastModifiedTime",
+                "fieldCamelNameMin":"lastModifiedTime",
+                "fieldClazz":"java.util.Date",
+                "fieldType":"Date"
+            },
+            {
+                "column":{
+                    "columnName":"deleted",
+                    "columnType":"tinyint(2)",
+                    "comment":"是否已删除，1:是，0:否",
+                    "nullable":true
+                },
+                "fieldCamelNameMax":"Deleted",
+                "fieldCamelNameMin":"deleted",
+                "fieldClazz":"java.lang.Integer",
+                "fieldType":"Integer"
+            }
+        ],
+        "table":{
+            "comment":"人员表",
+            "tableName":"user"
+        },
+        "tableCamelNameMax":"User",
+        "tableCamelNameMin":"user"
     },
-    "tableCamelNameMin": "userInfo",
-    "tableCamelNameMax": "UserInfo"
-  },
-  "groupId": "com.hxq",
-  "tableCamelNameMin": "userInfo",
-  "tableCamelNameMax": "UserInfo",
-  "createTimeStr":"created_time",
-  "updateTimeStr":"update_time",
-  "deleteStr":"deleted",
-  "extendStr":"deleted",
-  "inStr":"deleted"
+    "groupId":"com.demo",
+    "dbName":"xxxx",
+    "modifierIdStr":"last_modifier_id",
+    "betweenStr":"age",
+    "password":"xxxx",
+    "appId":"demo-app",
+    "deleteStr":"deleted",
+    "tableCamelNameMin":"user",
+    "createTimeStr":"created_time",
+    "inBusiPack":"user",
+    "updateTimeStr":"last_modified_time",
+    "commonValueStack":{
+        "commonRelatedMap":{
+            "AbstractManager.classPath":"com.demo.common.AbstractManager",
+            "UserVO.classPath":"com.demo.vo.user.UserVO",
+            "UserDTO.classPath":"com.demo.api.dto.user.UserDTO",
+            "UserManager.classPath":"com.demo.manager.user.UserManager",
+            "UserQuery.classPath":"com.demo.api.query.user.UserQuery",
+            "UserManagerImpl.classPath":"com.demo.manager.user.impl.UserManagerImpl",
+            "BaseDTO.classPath":"com.demo.api.common.BaseDTO",
+            "BaseVO.classPath":"com.demo.common.BaseVO",
+            "UserService.classPath":"com.demo.api.service.user.UserService",
+            "BaseMapper.classPath":"com.demo.common.BaseMapper",
+            "DruidMonitorController.classPath":"com.demo.common.DruidMonitorController",
+            "PagedResultsResponse.classPath":"com.demo.api.common.PagedResultsResponse",
+            "ResponseConstants.classPath":"com.demo.api.common.ResponseConstants",
+            "AppApplication.classPath":"com.demo.AppApplication",
+            "Response.classPath":"com.demo.api.common.Response",
+            "User.classPath":"com.demo.model.user.User",
+            "PagedResult.classPath":"com.demo.api.common.PagedResult",
+            "UserServiceImpl.classPath":"com.demo.service.user.impl.UserServiceImpl",
+            "AbstractController.classPath":"com.demo.common.AbstractController",
+            "Manager.classPath":"com.demo.common.Manager",
+            "UserMapper.classPath":"com.demo.mapper.user.UserMapper",
+            "Page.classPath":"com.demo.api.common.Page",
+            "BaseDO.classPath":"com.demo.common.BaseDO",
+            "BaseQuery.classPath":"com.demo.api.common.BaseQuery",
+            "Pagination.classPath":"com.demo.api.common.Pagination",
+            "UserDO.classPath":"com.demo.domain.user.UserDO",
+            "UserController.classPath":"com.demo.controller.user.UserController"
+        }
+    },
+    "ip":"xxxx",
+    "userName":"xxxx",
+    "codeLocationType":1,
+    "url":"jdbc:mysql://localhost:3306/xxxx?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE&useSSL=false&connectTimeout=180000&allowMultiQueries=true",
+    "tableCamelNameMax":"User",
+    "port":"3306",
+    "inStr":"id",
+    "driverName":"com.mysql.jdbc.Driver",
+    "outBusiPack":""
 }
 </textarea>
 

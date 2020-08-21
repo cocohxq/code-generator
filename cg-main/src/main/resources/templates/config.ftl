@@ -274,9 +274,13 @@
                 </div>
 
                 <div class="controls" style="margin-left:850px;">
-                    <button class="btn btn-success field" at="createTimeStr">选为新增时间</button>
+                    <button class="btn btn-success field" at="createTimeStr">选为创建时间</button>
+                    <br>
+                    <button class="btn btn-success field" at="creatorIdStr">选为创建人</button>
                     <br>
                     <button class="btn btn-success field" at="updateTimeStr">选为更新时间</button>
+                    <br>
+                    <button class="btn btn-success field" at="modifierIdStr">选为更新人</button>
                     <br>
                     <button class="btn btn-success field" at="deleteStr">选为删除标识</button>
                     <br>
@@ -290,9 +294,18 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="input01">时间戳-新增</label>
+                <label class="control-label" for="input01">时间戳-创建</label>
                 <div class="controls">
                     <input id="createTimeStr" type="text" placeholder="create_time,created_time" class="input-large"
+                           value="">(用于创建sql生成识别，表字段不同用","分隔)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">创建人</label>
+                <div class="controls">
+                    <input id="creatorIdStr" type="text" placeholder="creator_id" class="input-large"
                            value="">(用于创建sql生成识别，表字段不同用","分隔)
                     <p class="help-block"></p>
                 </div>
@@ -303,6 +316,15 @@
                 <div class="controls">
                     <input id="updateTimeStr" type="text" placeholder="update_time,last_modified_time"
                            class="input-large" value="">(用于更新sql生成识别,表字段不同用","分隔)
+                    <p class="help-block"></p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">更新人</label>
+                <div class="controls">
+                    <input id="modifierIdStr" type="text" placeholder="modifier_id" class="input-large"
+                           value="">(用于更sql生成识别，表字段不同用","分隔)
                     <p class="help-block"></p>
                 </div>
             </div>
@@ -380,12 +402,20 @@
                     <input name="businessPackage" type="text" placeholder="业务包名" class="input-large" value="">
                     <p class="help-block"></p>
                     <label class="radio inline">
-                        <input name="businessLocationType" type="radio" value="1" checked> 相对外置
+                        <input name="businessLocationType" type="radio" value="1"> 相对外置
                     </label>
                     <label class="radio inline">
-                        <input name="businessLocationType" type="radio" value="2"> 相对内置
+                        <input name="businessLocationType" type="radio" value="2" checked> 相对内置
                         &nbsp;&nbsp;&nbsp;&nbsp;(包名相对dao、service包的放置位置)
                     </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="input01">appId</label>
+                <div class="controls">
+                    <input id="appId" type="text" placeholder="demo-1" class="input-large" value="">(用做pom、log4j、logback等文件应用名的设定)
+                    <p class="help-block"></p>
                 </div>
             </div>
 

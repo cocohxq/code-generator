@@ -25,6 +25,10 @@ public class CodeConfigInfo {
     private List<String> javaImports;
 
     /**
+     * 应用名
+     */
+    private String appId;
+    /**
      * 代码输出类型
      */
     private transient Integer codeLocationType;
@@ -37,6 +41,7 @@ public class CodeConfigInfo {
      * 业务包内置
      */
     private transient String inBusiPack;
+
 
     public String getGroupId() {
         return groupId;
@@ -92,5 +97,13 @@ public class CodeConfigInfo {
 
     public void setInBusiPack(String inBusiPack) {
         this.inBusiPack = inBusiPack;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }

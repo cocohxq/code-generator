@@ -6,6 +6,8 @@ public class Column {
     private String columnName;
     private String columnType;
     private String comment;
+    private boolean nullable;
+    private String columnDefault;
 
     public String getColumnName() {
         return columnName;
@@ -29,5 +31,21 @@ public class Column {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public boolean isNullable() {
+        return nullable;
+    }
+
+    public void setNullable(boolean nullable) {
+        this.nullable = nullable;
+    }
+
+    public String getColumnDefault() {
+        return columnDefault;
+    }
+
+    public void setColumnDefault(String columnDefault) {
+        this.columnDefault = columnDefault;
     }
 }

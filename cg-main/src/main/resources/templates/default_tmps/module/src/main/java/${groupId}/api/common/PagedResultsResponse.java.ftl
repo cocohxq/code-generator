@@ -1,7 +1,5 @@
 package ${javaPackage};
 
-import ${commonValueStack.getValue("PagedResult.classPath")!""};
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -40,7 +38,7 @@ public class PagedResultsResponse<T> extends Response<List<T>> implements Serial
         PagedResultsResponse<T> pagedResultsResponse = new PagedResultsResponse<>();
         pagedResultsResponse.setCode(ResponseConstants.CODE_SUCCESS);
         pagedResultsResponse.setMessage(ResponseConstants.MSG_SUCCESS);
-        if (pagedResult != null && CollectionUtils.isNotEmpty(pagedResult.getData())) {
+        if (pagedResult != null && null != pagedResult.getData() && !pagedResult.getData().isEmpty()) {
             Pagination pagination = new Pagination();
             pagination.setCurPage(pagedResult.getCurPage());
             pagination.setPageSize(pagedResult.getPageSize());
@@ -80,7 +78,6 @@ public class PagedResultsResponse<T> extends Response<List<T>> implements Serial
 
     public static PagedResultsResponse writeError(String messageCode, String messageText) {
         PagedResultsResponse pagedResultsResponse = new PagedResultsResponse<>();
-        pagedResultsResponse.setSuccess(false);
         pagedResultsResponse.setCode(StringUtils.isEmpty(messageCode) ? ResponseConstants.CODE_DEFAULT_FAILURE : messageCode);
         pagedResultsResponse.setMessage(StringUtils.isEmpty(messageText) ? ResponseConstants.MSG_DEFAULT_FAILURE : messageText);
         return pagedResultsResponse;

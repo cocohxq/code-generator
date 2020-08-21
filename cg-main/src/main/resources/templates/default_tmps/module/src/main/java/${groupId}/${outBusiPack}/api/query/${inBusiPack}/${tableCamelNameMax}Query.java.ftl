@@ -1,10 +1,9 @@
 package ${javaPackage};
 
+import ${commonValueStack.getValue("BaseQuery.classPath")!""};
 <#list javaImports as ipt>
 import ${ipt};
 </#list>
-import ${commonValueStack.getValue("BaseQuery.classPath")!""};
-
 <#if (commonValueStack.getSpecifiedFields(tableMeta.fields,inStr)?size >0) >
 import java.util.List;
 </#if>
@@ -62,7 +61,7 @@ public class ${javaClassName} extends BaseQuery {
 	}
 </#list>
 
-<#list commonValueStack.getFieldsWithoutExclude(tableMeta.fields,betweenStr) as field>
+<#list commonValueStack.getSpecifiedFields(tableMeta.fields,betweenStr) as field>
 
 	public ${field.fieldType} get${field.fieldCamelNameMax}From() {
 		return ${field.fieldCamelNameMin}From;

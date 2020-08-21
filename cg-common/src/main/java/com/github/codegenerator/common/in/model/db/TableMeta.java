@@ -4,8 +4,9 @@ import java.util.List;
 
 public class TableMeta {
 
+    //首字母小写驼峰命名
     private String tableCamelNameMin;
-
+    //首字母大写驼峰命名
     private String tableCamelNameMax;
 
     private List<FieldMeta> fields;

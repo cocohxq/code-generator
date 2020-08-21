@@ -19,10 +19,14 @@ public class TableConfigInfo {
      * 创建时间字段
      */
     private String createTimeStr;
+
+    private String creatorIdStr;
     /**
      * 更新时间字段
      */
     private String updateTimeStr;
+
+    private String modifierIdStr;
     /**
      * 删除字段
      */
@@ -105,5 +109,21 @@ public class TableConfigInfo {
 
     public void setBetweenStr(String betweenStr) {
         this.betweenStr = betweenStr;
+    }
+
+    public String getCreatorIdStr() {
+        return creatorIdStr;
+    }
+
+    public void setCreatorIdStr(String creatorIdStr) {
+        this.creatorIdStr = creatorIdStr;
+    }
+
+    public String getModifierIdStr() {
+        return modifierIdStr;
+    }
+
+    public void setModifierIdStr(String modifierIdStr) {
+        this.modifierIdStr = modifierIdStr;
     }
 }

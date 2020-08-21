@@ -34,7 +34,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
 
     @Override
     public boolean before(SessionGenerateContext context) {
-        return  true;//withLock(context, false);
+        return true;//withLock(context, false);
     }
 
     @Override
@@ -116,7 +116,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
             //加载class
             cfg = DataUtil.getData(cfg.getConfigName(), Config.class);
             context.setConfig(cfg);
-            Database db = new Database(DbEnum.getDbByType(getDbType()).getDriver(), cfg.getUsername(), cfg.getPwd(), getJdbcUrl(cfg.getIp(), cfg.getPort(), cfg.getDbName()), cfg.getDbName());
+            Database db = new Database(cfg.getIp(), cfg.getPort(),DbEnum.getDbByType(getDbType()).getDriver(), cfg.getUsername(), cfg.getPwd(), getJdbcUrl(cfg.getIp(), cfg.getPort(), cfg.getDbName()), cfg.getDbName());
             try {
                 cn = DbUtils.getConnection(db);
             } catch (Exception e) {
@@ -173,7 +173,7 @@ public abstract class DbStepHandler extends AbstractStepHandler {
                         fieldMeta.setFieldCamelNameMax(BuildUtils.converMinCameltNameMax(fieldMeta.getFieldCamelNameMin()));
                         try {
                             Class clazz = convertType(l.getColumnType());
-                            fieldMeta.setFieldType(clazz.getName());
+                            fieldMeta.setFieldType(clazz.getSimpleName());
                             fieldMeta.setFieldClazz(clazz);
                         } catch (Exception e) {
                             throw new RuntimeException(String.format("表%s中字段%s转换类型出错", table.getTableName(), l.getColumnName()), e);
@@ -202,65 +202,6 @@ public abstract class DbStepHandler extends AbstractStepHandler {
             }
         }
     }
-
-
-    /**
-     * 离开解所有锁、进入和下一步时是读锁、其他都是写锁
-     *
-     * @param context
-     * @return
-     */
-//    private boolean withLock(SessionGenerateContext context, boolean unLock) {
-//        Config config = context.getConfig();
-//        String configName = Optional.ofNullable(config.getConfigName()).orElse(context.getGenerateInfo().getSelectedDbConfigName());
-//        if (StringUtils.isEmpty(configName)) {
-//            return true;
-//        }
-//        String key = String.format(DB_OP_KEY, configName);
-//
-//        //退出解锁
-//        if (OPERATION_LEAVE.equals(config.getOperation())) {
-//            if (unLock) {
-//                LockUtils.unAllLock(key, context.getSessionId());
-//            }
-//            return true;
-//        }
-//
-//        //写准备开始上锁
-//        if (OPERATION_PREPARE_WRITE.equals(config.getOperation())) {
-//            if (!unLock) {
-//                if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-//                    context.error("该同名配置正在被其他人写操作中");
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-//
-//        if (OPERATION_INTO.equals(config.getOperation())
-//                || OPERATION_HANDLE.equals(config.getOperation())) {
-//            if (unLock) {
-//                LockUtils.unReadLock(key, context.getSessionId());
-//            } else {
-//                if (!LockUtils.tryReadLock(key, context.getSessionId())) {
-//                    context.error("该同名配置正在被其他人写操作中");
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-//
-//        //写提交完就可以解锁
-//        if (unLock) {
-//            LockUtils.unWriteLock(key, context.getSessionId());
-//        } else {
-//            if (!LockUtils.tryWriteLock(key, context.getSessionId())) {
-//                context.error("该同名配置正在被其他人写操作中");
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
 
     private void into(SessionGenerateContext context) {
         List<String> configList = DataUtil.getDataNameList();
@@ -297,4 +238,5 @@ public abstract class DbStepHandler extends AbstractStepHandler {
         map.put("operation", context.getConfig().getOperation());
         context.setStepInitResult(map);
     }
+
 }
